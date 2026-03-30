@@ -1,36 +1,136 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Pulse / AI早知道
 
-## Getting Started
+面向 AI 工程师的中文研究型媒体产品。
 
-First, run the development server:
+`AI早知道` 不追求覆盖所有 AI 新闻，而是通过编辑判断筛选真正重要的变化，并通过**周刊**与**深度专题**帮助读者理解这些变化的长期意义。
+
+## 当前能力
+
+- 研究型首页：本周主打、周刊、深度专题三层结构
+- 文章详情页：更适合中文长文阅读的 editorial 排版
+- 邮件订阅页
+- 双重确认订阅流程
+- 草稿 / 已发布内容工作流
+- Vault Markdown → Supabase 内容导入脚本
+- 付费内容占位式 paywall
+
+产品与架构设计详见 `PRODUCT.md`，阶段化事项详见 `TODO.md`。
+
+## 技术栈
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- Supabase
+- Resend
+- Vitest
+
+## 本地启动
+
+### 1. 安装依赖
+
+```bash
+npm install
+```
+
+### 2. 配置环境变量
+
+复制 `.env.example` 为 `.env.local`，并填入真实值：
+
+```bash
+cp .env.example .env.local
+```
+
+必填变量：
+
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_SITE_NAME`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `RESEND_API_KEY`
+- `RESEND_FROM_NAME`
+- `RESEND_FROM_EMAIL`
+- `EMAIL_CONFIRMATION_SECRET`
+- `EMAIL_CONFIRMATION_TTL_SECONDS`
+
+说明：
+
+- `EMAIL_CONFIRMATION_SECRET` 用于生成和校验一次性确认链接，不能和其他密钥复用。
+- `EMAIL_CONFIRMATION_TTL_SECONDS` 默认建议 `86400`，即 24 小时。
+
+### 3. 初始化数据库
+
+在 Supabase SQL Editor 中执行 `supabase/schema.sql`。
+
+当前 schema 会创建以下表：
+
+- `ai_pulse_posts`
+- `ai_pulse_subscribers`
+- `ai_pulse_email_sends`
+
+### 4. 导入内容（可选）
+
+当前内容源采用 Vault Markdown + frontmatter。导入单篇文章：
+
+```bash
+npm run import:post -- "/absolute/or/relative/path/to/article.md"
+```
+
+例如：
+
+```bash
+npm run import:post -- "/Users/rafael/R129/Vault/AI早知道/Harness系列-篇1-什么是Harness.md"
+```
+
+### 5. 启动开发服务器
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+打开 <http://localhost:3000>。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 常用脚本
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev
+npm run lint
+npm run test
+npm run test:coverage
+npm run build
+npm run import:post -- "/path/to/article.md"
+```
 
-## Learn More
+## 当前关键路由
 
-To learn more about Next.js, take a look at the following resources:
+- `/`：首页
+- `/post/[slug]`：文章详情
+- `/subscribe`：订阅页
+- `/subscribe/confirmed`：确认结果页
+- `/api/subscribe`：订阅接口
+- `/api/confirm`：确认接口
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 当前确认流程
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. 用户在 `/subscribe` 提交邮箱。
+2. 服务端写入或更新 `ai_pulse_subscribers`。
+3. 系统生成带过期时间的一次性确认链接并发送邮件。
+4. 用户点击 `/api/confirm`。
+5. 服务端校验签名、过期时间、当前有效 nonce。
+6. 校验通过后写入 `confirmed_at`，并清空 nonce，避免重复使用。
 
-## Deploy on Vercel
+## 验证
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+本地交付前建议至少运行：
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npm run test
+npm run build
+```
+
+## License
+
+MIT
