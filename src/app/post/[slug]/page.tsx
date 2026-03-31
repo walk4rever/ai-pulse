@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { Post } from '@/types'
 import { getTypeLabel } from '@/lib/content'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { BackButton } from '@/components/BackButton'
 
