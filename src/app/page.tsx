@@ -60,20 +60,10 @@ function PostItem({ post }: { post: HomePost }) {
 }
 
 function buildSections(posts: HomePost[]): { featured: HomePost[]; recent: HomePost[] } {
-  const featuredPosts = posts.filter((p) => p.featured)
-  const nonFeatured = posts.filter((p) => !p.featured)
-
-  // Fill featured slots up to 3 from most recent if not enough manually featured
-  const featured = featuredPosts.slice(0, 3)
-  const fillerNeeded = 3 - featured.length
-  const fillers = fillerNeeded > 0 ? nonFeatured.slice(0, fillerNeeded) : []
-  const fillerIds = new Set(fillers.map((p) => p.id))
-
-  const allFeatured = [...featured, ...fillers]
-  const featuredIds = new Set(allFeatured.map((p) => p.id))
-  const recent = posts.filter((p) => !featuredIds.has(p.id) && !fillerIds.has(p.id)).slice(0, 5)
-
-  return { featured: allFeatured, recent }
+  const featured = posts.filter((p) => p.featured).slice(0, 3)
+  const featuredIds = new Set(featured.map((p) => p.id))
+  const recent = posts.filter((p) => !featuredIds.has(p.id)).slice(0, 5)
+  return { featured, recent }
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
