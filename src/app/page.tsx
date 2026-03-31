@@ -61,8 +61,7 @@ function PostItem({ post }: { post: HomePost }) {
 
 function buildSections(posts: HomePost[]): { featured: HomePost[]; recent: HomePost[] } {
   const featured = posts.filter((p) => p.featured).slice(0, 3)
-  const featuredIds = new Set(featured.map((p) => p.id))
-  const recent = posts.filter((p) => !featuredIds.has(p.id)).slice(0, 5)
+  const recent = posts.slice(0, 5)
   return { featured, recent }
 }
 
