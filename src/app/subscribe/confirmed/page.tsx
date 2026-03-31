@@ -9,30 +9,30 @@ interface ConfirmationPageProps {
 const contentByStatus: Record<
   ConfirmationStatus,
   {
+    label: string
     title: string
     description: string
-    tone: string
   }
 > = {
   success: {
+    label: 'Confirmed',
     title: '订阅确认成功',
     description: '你的邮箱已完成确认，后续将收到 AI早知道 的更新邮件。',
-    tone: 'border-emerald-200 bg-emerald-50 text-emerald-950',
   },
   invalid: {
+    label: 'Invalid Link',
     title: '确认链接无效',
     description: '该链接不正确或已被篡改。请重新提交订阅以获取新的确认邮件。',
-    tone: 'border-rose-200 bg-rose-50 text-rose-950',
   },
   expired: {
+    label: 'Link Expired',
     title: '确认链接已过期',
     description: '为了保证安全，确认链接有有效期。请重新提交订阅，我们会发送新的确认邮件。',
-    tone: 'border-amber-200 bg-amber-50 text-amber-950',
   },
   error: {
+    label: 'Error',
     title: '确认失败',
     description: '系统暂时无法完成确认，请稍后再试。如果问题持续，请重新订阅。',
-    tone: 'border-rose-200 bg-rose-50 text-rose-950',
   },
 }
 
@@ -46,25 +46,27 @@ export default async function ConfirmedPage({ searchParams }: ConfirmationPagePr
   const content = contentByStatus[resolvedStatus]
 
   return (
-    <div className="mx-auto max-w-xl py-12">
-      <div className={`rounded-3xl border px-6 py-8 ${content.tone}`}>
-        <h1 className="text-3xl font-bold">{content.title}</h1>
-        <p className="mt-3 text-sm leading-6">{content.description}</p>
-
-        <div className="mt-6 flex gap-3">
-          <Link
-            href="/subscribe"
-            className="rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
-          >
-            返回订阅
-          </Link>
-          <Link
-            href="/"
-            className="rounded-full border border-current px-5 py-2.5 text-sm font-medium"
-          >
-            返回首页
-          </Link>
-        </div>
+    <div className="max-w-2xl">
+      <div className="border-l-2 border-[var(--foreground)] pl-6 py-2">
+        <p className="kicker mb-3">{content.label}</p>
+        <h1 className="text-3xl font-semibold leading-tight tracking-tight">
+          {content.title}
+        </h1>
+      </div>
+      <p className="mt-8 text-[var(--muted)] leading-relaxed">{content.description}</p>
+      <div className="mt-10 flex flex-wrap gap-4 pt-8 border-t border-[var(--subtle)] border-opacity-20">
+        <Link
+          href="/subscribe"
+          className="bg-[var(--foreground)] text-[var(--background)] px-6 py-3 text-sm hover:opacity-80 transition-opacity"
+        >
+          返回订阅
+        </Link>
+        <Link
+          href="/"
+          className="border border-[var(--foreground)] px-6 py-3 text-sm hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
+        >
+          返回首页
+        </Link>
       </div>
     </div>
   )

@@ -1,24 +1,25 @@
 @import "tailwindcss";
 
+/*
+  AI早知道 - 极简/极致美学
+  核心原则：
+  - 最大化负空间
+  - 极致排版层次
+  - 克制色彩（黑白为主，少量暖调）
+  - 拒绝所有装饰性元素
+*/
+
 :root {
-  --background: #f6f1e8;
-  --surface: #fbf8f2;
-  --surface-strong: #f1e7d8;
-  --foreground: #1d1a17;
-  --muted: #5e544a;
-  --subtle: #86786a;
-  --border: #d9cbbb;
-  --border-light: #e9dfd3;
-  --accent: #7a2e24;
-  --accent-soft: #b9715f;
-  --ink-blue: #22374b;
+  --background: oklch(0.987 0.003 90); /* 极浅暖白 */
+  --foreground: oklch(0.15 0 0); /* 深炭黑 */
+  --muted: oklch(0.45 0 0);
+  --subtle: oklch(0.65 0 0);
+  --accent: oklch(0.55 0.12 260); /* 克制的靛蓝 */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 * {
@@ -32,144 +33,110 @@ html {
 
 body {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top right, rgba(122, 46, 36, 0.08), transparent 26%),
-    radial-gradient(circle at top left, rgba(34, 55, 75, 0.08), transparent 22%),
-    linear-gradient(180deg, #f8f3eb 0%, var(--background) 24%, #f5efe6 100%);
+  background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
-  text-rendering: optimizeLegibility;
+  font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Noto Serif SC", "PingFang SC", "Hiragino Sans GB", "Source Han Serif SC", serif;
+  font-weight: 600;
 }
 
 a {
   color: inherit;
+  text-decoration: none;
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 18%, white);
+  background: oklch(0.9 0.05 260);
+  color: var(--foreground);
 }
 
-.editorial-shell {
-  position: relative;
-}
-
-.editorial-shell::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image: linear-gradient(rgba(29, 26, 23, 0.03) 1px, transparent 1px);
-  background-size: 100% 34px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.1), transparent 32%);
-}
-
-.editorial-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.22)), var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 0 rgba(29, 26, 23, 0.04), 0 16px 40px rgba(95, 74, 58, 0.06);
-}
-
-.editorial-card-strong {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.12)), var(--surface-strong);
-  border: 1px solid color-mix(in srgb, var(--border) 88%, var(--accent) 12%);
-  box-shadow: 0 20px 48px rgba(122, 46, 36, 0.08);
-}
-
-.editorial-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--border) 84%, var(--accent) 16%);
-  color: var(--muted);
-  background: rgba(255, 251, 245, 0.86);
-  border-radius: 999px;
-  padding: 0.34rem 0.78rem;
-  font-size: 0.78rem;
-  line-height: 1;
-}
-
-.editorial-kicker {
-  font-size: 0.8rem;
+/* 极简排版工具类 */
+.kicker {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 0.6875rem; /* 11px */
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
   color: var(--subtle);
 }
 
-.editorial-rule {
-  height: 1px;
-  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--border) 85%, transparent));
+.date {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  font-size: 0.75rem; /* 12px */
+  color: var(--subtle);
+  font-variant-numeric: tabular-nums;
 }
 
-.editorial-prose {
-  font-size: 1.125rem;
-  line-height: 1.95;
+.prose {
+  font-size: 1.0625rem;
+  line-height: 1.9;
   color: var(--foreground);
 }
 
-.editorial-prose p {
-  margin: 0 0 1.35rem;
+.prose p {
+  margin: 0 0 1.4rem;
 }
 
-.editorial-prose h2,
-.editorial-prose h3,
-.editorial-prose h4 {
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: "Noto Serif SC", serif;
   color: var(--foreground);
-  letter-spacing: -0.03em;
   line-height: 1.3;
-  margin-top: 2.6rem;
-  margin-bottom: 0.95rem;
-  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 0.8rem;
 }
 
-.editorial-prose h2 {
-  font-size: 1.8rem;
+.prose h2 {
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
 }
 
-.editorial-prose h3 {
-  font-size: 1.38rem;
+.prose h3 {
+  font-size: 1.25rem;
 }
 
-.editorial-prose ul,
-.editorial-prose ol {
-  margin: 0 0 1.5rem 1.35rem;
+.prose ul,
+.prose ol {
+  margin: 0 0 1.4rem 1.5rem;
 }
 
-.editorial-prose li {
-  margin-bottom: 0.55rem;
+.prose li {
+  margin-bottom: 0.5rem;
 }
 
-.editorial-prose blockquote {
-  margin: 1.9rem 0;
-  padding: 1.1rem 1.25rem;
-  border-left: 2px solid var(--accent);
-  background: rgba(255, 252, 247, 0.72);
+.prose blockquote {
+  margin: 2rem 0;
+  padding: 0 0 0 1.5rem;
+  border-left: 1px solid var(--subtle);
   color: var(--muted);
 }
 
-.editorial-prose code {
-  font-family: var(--font-geist-mono), "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
-  font-size: 0.92em;
-  background: #f3ede4;
-  border-radius: 0.35rem;
-  padding: 0.1rem 0.35rem;
+.prose code {
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Mono", "Droid Sans Mono", "Source Code Pro", monospace;
+  font-size: 0.875em;
+  background: oklch(0.96 0.01 90);
+  padding: 0.15rem 0.4rem;
 }
 
-.editorial-prose pre {
+.prose pre {
   margin: 1.75rem 0;
-  padding: 1rem 1.1rem;
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  background: #f4ede4;
+  padding: 1.25rem 1.5rem;
+  background: oklch(0.96 0.01 90);
   overflow-x: auto;
 }
 
-.editorial-prose pre code {
+.prose pre code {
   background: transparent;
   padding: 0;
 }
 
-.editorial-prose hr {
-  margin: 2rem 0;
-  border: 0;
-  border-top: 1px solid var(--border-light);
+.prose a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

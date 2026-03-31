@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Post } from '@/types'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 interface Props {
@@ -7,13 +8,9 @@ interface Props {
 }
 
 function formatPublishedAt(value: string | null) {
-  return value
-    ? new Date(value).toLocaleDateString('zh-CN', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : ''
+  if (!value) return ''
+  const d = new Date(value)
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
 
 function getContentTypeLabel(post: Pick<Post, 'content_type' | 'series_slug'>) {
@@ -24,7 +21,6 @@ function getContentTypeLabel(post: Pick<Post, 'content_type' | 'series_slug'>) {
 
 function formatSeriesLabel(seriesSlug: string | null) {
   if (!seriesSlug) return null
-
   return seriesSlug
     .split('-')
     .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
@@ -34,7 +30,6 @@ function formatSeriesLabel(seriesSlug: string | null) {
 function formatAuthorLabel(authorSlug: string | null) {
   if (!authorSlug) return '编辑部'
   if (authorSlug === 'rafa') return 'RAFA'
-
   return authorSlug
     .split('-')
     .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
@@ -59,26 +54,30 @@ export default async function PostPage({ params }: Props) {
   const authorLabel = formatAuthorLabel(post.author_slug)
 
   return (
-    <article className="mx-auto max-w-[46rem]">
-      <header className="mb-10 border-b border-[var(--border)] pb-9">
-        <div className="mb-5 flex flex-wrap items-center gap-2 text-[0.8rem] text-[var(--subtle)]">
-          <span className="editorial-label">{contentTypeLabel}</span>
-          {seriesLabel && <span className="editorial-label">系列 · {seriesLabel}</span>}
-          <span>{authorLabel}</span>
-          <span>·</span>
-          <span>{formatPublishedAt(post.published_at)}</span>
-          {post.is_premium && <span className="editorial-label">付费内容</span>}
+    <article className="max-w-2xl">
+      <div className="mb-12">
+        <Link href="/" className="kicker hover:text-[var(--foreground)] transition-colors">
+          ← AI早知道
+        </Link>
+      </div>
+
+      <header className="mb-12 pb-8 border-b border-[var(--subtle)] border-opacity-20">
+        <div className="flex flex-wrap items-center gap-4 mb-6">
+          <span className="kicker">{contentTypeLabel}</span>
+          {seriesLabel && <span className="kicker">系列 · {seriesLabel}</span>}
+          {post.is_premium && <span className="kicker text-[var(--accent)]">付费内容</span>}
         </div>
-        <h1 className="max-w-4xl text-[2.45rem] font-semibold leading-[1.18] tracking-[-0.05em] text-[var(--foreground)] lg:text-[3rem]">
+        <h1 className="text-3xl lg:text-4xl font-semibold leading-tight tracking-tight">
           {post.title}
         </h1>
-        <p className="mt-5 max-w-3xl text-[1.18rem] leading-9 text-[var(--muted)]">{post.excerpt}</p>
+        <p className="mt-6 text-lg text-[var(--muted)] leading-relaxed">{post.excerpt}</p>
+        <p className="mt-6 date">{authorLabel} · {formatPublishedAt(post.published_at)}</p>
       </header>
 
       {post.is_premium ? (
         <PremiumPaywall excerpt={post.excerpt} />
       ) : (
-        <div className="editorial-prose" dangerouslySetInnerHTML={{ __html: post.content }} />
+        <div className="prose" dangerouslySetInnerHTML={{ __html: post.content }} />
       )}
     </article>
   )
@@ -87,21 +86,25 @@ export default async function PostPage({ params }: Props) {
 function PremiumPaywall({ excerpt }: { excerpt: string }) {
   return (
     <div>
-      <div className="editorial-prose" dangerouslySetInnerHTML={{ __html: excerpt }} />
-      <div className="relative mt-8">
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-transparent to-[var(--background)] pointer-events-none" />
-        <div className="editorial-card mt-5 rounded-[1.75rem] px-8 py-9 text-center">
-          <p className="text-[0.82rem] uppercase tracking-[0.12em] text-[var(--subtle)]">Members edition</p>
-          <h3 className="mt-3 text-[1.55rem] font-semibold tracking-[-0.03em] text-[var(--foreground)]">订阅以阅读完整内容</h3>
-          <p className="mx-auto mt-3 max-w-xl text-[1rem] leading-8 text-[var(--muted)]">
+      <div className="prose" dangerouslySetInnerHTML={{ __html: excerpt }} />
+      <div className="relative mt-12">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-transparent to-[var(--background)]" />
+        <div className="mt-8 border border-[var(--subtle)] border-opacity-30 px-8 py-10 text-center">
+          <p className="kicker mb-4">Members Edition</p>
+          <h3 className="text-2xl font-semibold leading-tight tracking-tight">
+            订阅以阅读完整内容
+          </h3>
+          <p className="mt-4 text-[var(--muted)] leading-relaxed max-w-md mx-auto">
             加入 AI早知道 的读者名单，每周获取更完整的深度分析与长期判断。
           </p>
-          <a
-            href="/subscribe"
-            className="mt-6 inline-block rounded-full bg-[var(--accent)] px-6 py-2.5 text-sm font-medium text-white transition hover:opacity-92"
-          >
-            免费订阅
-          </a>
+          <div className="mt-8">
+            <Link
+              href="/subscribe"
+              className="inline-block bg-[var(--foreground)] text-[var(--background)] px-6 py-3 text-sm hover:opacity-80 transition-opacity"
+            >
+              免费订阅
+            </Link>
+          </div>
         </div>
       </div>
     </div>

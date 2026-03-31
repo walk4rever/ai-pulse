@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 
 export default function SubscribePage() {
@@ -31,28 +32,43 @@ export default function SubscribePage() {
 
   if (status === 'success') {
     return (
-      <div className="editorial-card mx-auto max-w-[42rem] rounded-[2rem] px-8 py-14 text-center">
-        <div className="text-4xl">✉️</div>
-        <h1 className="mt-4 text-[2rem] font-semibold tracking-[-0.04em] text-[var(--foreground)]">请查收确认邮件</h1>
-        <p className="mx-auto mt-4 max-w-xl text-[1rem] leading-8 text-[var(--muted)]">{message}</p>
+      <div className="max-w-2xl">
+        <div className="text-center py-12">
+          <p className="kicker mb-6">已发送确认邮件</p>
+          <h1 className="text-3xl font-semibold leading-tight tracking-tight">
+            请查收确认邮件
+          </h1>
+          <p className="mt-6 text-[var(--muted)] leading-relaxed max-w-md mx-auto">{message}</p>
+          <div className="mt-10">
+            <Link href="/" className="kicker hover:text-[var(--foreground)] transition-colors">
+              ← 返回首页
+            </Link>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-[42rem] py-6">
-      <div className="editorial-card rounded-[2rem] px-8 py-10 lg:px-10 lg:py-12">
-        <p className="text-[0.82rem] uppercase tracking-[0.12em] text-[var(--subtle)]">Subscribe</p>
-        <h1 className="mt-4 text-[2.2rem] font-semibold leading-[1.18] tracking-[-0.05em] text-[var(--foreground)]">
+    <div className="max-w-2xl">
+      <div className="mb-12">
+        <Link href="/" className="kicker hover:text-[var(--foreground)] transition-colors">
+          ← AI早知道
+        </Link>
+      </div>
+
+      <div>
+        <p className="kicker mb-4">Subscribe</p>
+        <h1 className="text-4xl font-semibold leading-tight tracking-tight">
           订阅 AI早知道
         </h1>
-        <p className="mt-4 max-w-2xl text-[1.05rem] leading-8 text-[var(--muted)]">
+        <p className="mt-6 text-lg text-[var(--muted)] leading-relaxed max-w-xl">
           每周一次，收到一封面向 AI 工程师的研究型简报：筛掉噪音，只留下真正重要的变化与判断。完全免费。
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+        <form onSubmit={handleSubmit} className="mt-10 space-y-6">
           <div>
-            <label htmlFor="name" className="mb-2 block text-sm font-medium text-[var(--muted)]">
+            <label htmlFor="name" className="kicker mb-3 block">
               姓名（可选）
             </label>
             <input
@@ -61,12 +77,12 @@ export default function SubscribePage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="你的名字"
-              className="w-full rounded-2xl border border-[var(--border)] bg-white px-4 py-3 text-[0.98rem] outline-none transition focus:border-[var(--accent)]"
+              className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-3 text-[0.95rem] outline-none transition focus:border-[var(--foreground)] placeholder:text-[var(--subtle)]"
             />
           </div>
           <div>
-            <label htmlFor="email" className="mb-2 block text-sm font-medium text-[var(--muted)]">
-              邮箱地址 <span className="text-red-500">*</span>
+            <label htmlFor="email" className="kicker mb-3 block">
+              邮箱地址
             </label>
             <input
               id="email"
@@ -75,24 +91,24 @@ export default function SubscribePage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-2xl border border-[var(--border)] bg-white px-4 py-3 text-[0.98rem] outline-none transition focus:border-[var(--accent)]"
+              className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-3 text-[0.95rem] outline-none transition focus:border-[var(--foreground)] placeholder:text-[var(--subtle)]"
             />
           </div>
 
-          {status === 'error' && <p className="text-sm text-[#8A2D2D]">{message}</p>}
+          {status === 'error' && (
+            <p className="text-sm text-[var(--accent)]">{message}</p>
+          )}
 
           <button
             type="submit"
             disabled={status === 'loading'}
-            className="w-full rounded-full bg-[var(--accent)] py-3 text-sm font-medium text-white transition hover:opacity-92 disabled:opacity-50"
+            className="w-full bg-[var(--foreground)] text-[var(--background)] py-3.5 text-sm font-medium hover:opacity-80 transition-opacity disabled:opacity-50"
           >
             {status === 'loading' ? '处理中...' : '免费订阅'}
           </button>
         </form>
 
-        <p className="mt-5 text-center text-xs text-[var(--subtle)]">
-          订阅即表示同意接收邮件。随时可以取消订阅。
-        </p>
+        <p className="kicker mt-8 text-center">订阅即表示同意接收邮件。随时可以取消订阅。</p>
       </div>
     </div>
   )
