@@ -26,9 +26,30 @@ function getTypeLabel(post: Pick<Post, 'content_type' | 'series_slug'>) {
   return 'Brief'
 }
 
+function FeaturedCard({ post }: { post: HomePost }) {
+  return (
+    <article className="border border-[oklch(0.85_0_0)] p-6 flex flex-col gap-4 hover:border-[var(--foreground)] transition-colors">
+      <div className="flex items-center justify-between">
+        <span className="kicker">{getTypeLabel(post)}</span>
+        <span className="date">{formatDate(post.published_at)}</span>
+      </div>
+      <Link href={`/post/${post.slug}`} className="group flex-1">
+        <h3 className="text-base font-semibold leading-snug group-hover:text-[var(--accent)] transition-colors">
+          {post.title}
+        </h3>
+        {post.excerpt && (
+          <p className="mt-3 text-sm text-[var(--muted)] leading-relaxed line-clamp-3">
+            {post.excerpt}
+          </p>
+        )}
+      </Link>
+    </article>
+  )
+}
+
 function PostItem({ post }: { post: HomePost }) {
   return (
-    <article className="py-6 flex items-baseline gap-6">
+    <article className="py-5 flex items-baseline gap-6">
       <span className="date shrink-0 w-24">{formatDate(post.published_at)}</span>
       <div className="flex-1 min-w-0">
         <Link href={`/post/${post.slug}`} className="group">
@@ -40,6 +61,23 @@ function PostItem({ post }: { post: HomePost }) {
       <span className="kicker shrink-0">{getTypeLabel(post)}</span>
     </article>
   )
+}
+
+function buildSections(posts: HomePost[]): { featured: HomePost[]; recent: HomePost[] } {
+  const featuredPosts = posts.filter((p) => p.featured)
+  const nonFeatured = posts.filter((p) => !p.featured)
+
+  // Fill featured slots up to 3 from most recent if not enough manually featured
+  const featured = featuredPosts.slice(0, 3)
+  const fillerNeeded = 3 - featured.length
+  const fillers = fillerNeeded > 0 ? nonFeatured.slice(0, fillerNeeded) : []
+  const fillerIds = new Set(fillers.map((p) => p.id))
+
+  const allFeatured = [...featured, ...fillers]
+  const featuredIds = new Set(allFeatured.map((p) => p.id))
+  const recent = posts.filter((p) => !featuredIds.has(p.id) && !fillerIds.has(p.id)).slice(0, 5)
+
+  return { featured: allFeatured, recent }
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
@@ -63,6 +101,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     .order('published_at', { ascending: false })
 
   const allPosts = (posts ?? []) as HomePost[]
+  const { featured, recent } = buildSections(allPosts)
 
   return (
     <div>
@@ -71,14 +110,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       )}
 
       {/* Hero */}
-      <section className="mb-20">
+      <section className="mb-16">
         <p className="text-lg font-semibold leading-relaxed">
           帮你读懂 AI，而不只是跟上 AI。
         </p>
       </section>
 
       {/* Three dimensions */}
-      <section className="mb-20 grid grid-cols-1 md:grid-cols-3 gap-10 border-t border-[oklch(0.85_0_0)] pt-14">
+      <section className="mb-16 grid grid-cols-1 md:grid-cols-3 gap-10 border-t border-[oklch(0.85_0_0)] pt-14">
         {[
           {
             label: '创造力',
@@ -100,14 +139,30 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         ))}
       </section>
 
-      {/* Post list */}
-      <section>
+      {/* Featured */}
+      {featured.length > 0 && (
+        <section className="mb-16 border-t border-[oklch(0.85_0_0)] pt-14">
+          <p className="kicker mb-8">精选</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {featured.map((post) => (
+              <FeaturedCard key={post.id} post={post} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Recent */}
+      <section className="border-t border-[oklch(0.85_0_0)] pt-14">
+        <p className="kicker mb-2">最近</p>
         <div className="divide-y divide-[oklch(0.85_0_0)]">
-          {allPosts.length > 0 ? (
-            allPosts.map((post) => <PostItem key={post.id} post={post} />)
-          ) : (
-            <p className="py-8 text-[var(--muted)] text-sm">内容即将发布</p>
-          )}
+          {recent.map((post) => (
+            <PostItem key={post.id} post={post} />
+          ))}
+        </div>
+        <div className="mt-8">
+          <Link href="/archive" className="kicker hover:text-[var(--foreground)] transition-colors">
+            全部文章 →
+          </Link>
         </div>
       </section>
     </div>

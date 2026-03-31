@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Logo } from '@/components/Logo'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -16,12 +17,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="mx-auto max-w-3xl px-6 py-12">
             <div className="flex items-center justify-between">
               <Link href="/" className="block">
-                <span className="text-2xl font-semibold tracking-tight">AI早知道</span>
+                <Logo />
               </Link>
-              <nav className="flex items-center gap-8">
-                <Link href="/" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)]">
-                  首页
-                </Link>
+              <nav className="flex items-center gap-6">
+                <Link href="/latest" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">最新</Link>
+                <Link href="/weekly" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">周刊</Link>
+                <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">系列</Link>
                 <Link
                   href="/subscribe"
                   className="text-sm border border-[var(--foreground)] px-4 py-2 hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
@@ -36,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="mx-auto max-w-3xl px-6 pb-20">{children}</main>
 
         <footer className="border-t border-[var(--subtle)] border-opacity-20">
-          <div className="mx-auto max-w-3xl px-6 py-10 flex flex-col items-center gap-2 text-center">
+          <div className="mx-auto max-w-3xl px-6 py-10 flex items-center justify-center gap-4">
             <span className="text-sm text-[var(--muted)]">AI早知道 © 2026</span>
             <span className="text-xs text-[var(--subtle)]">Powered by Air7.fun</span>
           </div>
