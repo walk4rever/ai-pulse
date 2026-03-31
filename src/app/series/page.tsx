@@ -17,6 +17,14 @@ function formatDate(value: string | null | undefined) {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
 
+const SERIES_LABELS: Record<string, string> = {
+  harness: 'Harness',
+}
+
+function seriesLabel(slug: string): string {
+  return SERIES_LABELS[slug] ?? slug
+}
+
 function groupBySeries(posts: ListPost[]): Map<string, ListPost[]> {
   const map = new Map<string, ListPost[]>()
   for (const post of posts) {
@@ -60,7 +68,7 @@ export default async function SeriesPage() {
           const items = grouped.get(seriesSlug) ?? []
           return (
             <section key={seriesSlug} className="border-t border-[oklch(0.85_0_0)] pt-10">
-              <p className="text-base font-semibold mb-6">{seriesSlug}</p>
+              <p className="text-base font-semibold mb-6">{seriesLabel(seriesSlug)}</p>
               <div className="divide-y divide-[oklch(0.85_0_0)]">
                 {items.map((post, i) => (
                   <article key={post.id} className="py-4 flex items-baseline gap-6">

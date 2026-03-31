@@ -82,6 +82,8 @@ async function prepareWithFrontmatter(filePath) {
   const resolvedAuthor = existingFm.author_slug ||
     (existingFm.author ? existingFm.author.toLowerCase() : authorSlug)
 
+  const seriesSlug = existingFm.series_slug || null
+
   const frontmatter = [
     '---',
     `title: "${title.replace(/"/g, '\\"')}"`,
@@ -90,6 +92,7 @@ async function prepareWithFrontmatter(filePath) {
     `author_slug: ${resolvedAuthor}`,
     `status: ${status}`,
     date ? `date: "${date}"` : '',
+    seriesSlug ? `series_slug: ${seriesSlug}` : '',
     `excerpt: "${excerpt.replace(/"/g, '\\"')}"`,
     '---',
   ].filter(Boolean).join('\n')
