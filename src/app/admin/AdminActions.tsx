@@ -47,16 +47,14 @@ export function AdminActions(props: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ featured: !featured }),
     })
-    router.refresh()
-    setLoading(false)
+    router.push('/admin')
   }
 
   async function deletePost() {
     if (!confirm(`确认删除「${slug}」？此操作不可撤销。`)) return
     setLoading(true)
     await fetch(`/api/admin/posts/${slug}`, { method: 'DELETE' })
-    router.refresh()
-    setLoading(false)
+    router.push('/admin')
   }
 
   return (
