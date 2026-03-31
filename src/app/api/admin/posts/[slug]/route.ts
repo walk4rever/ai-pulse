@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { createServiceClient } from '@/lib/supabase/server'
 
@@ -22,6 +23,12 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
   const { error } = await supabase.from('ai_pulse_posts').delete().eq('slug', slug)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  revalidatePath('/')
+  revalidatePath('/latest')
+  revalidatePath('/archive')
+  revalidatePath(`/post/${slug}`)
+
   return NextResponse.json({ ok: true })
 }
 
@@ -48,5 +55,11 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   const { error } = await supabase.from('ai_pulse_posts').update(update).eq('slug', slug)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  revalidatePath('/')
+  revalidatePath('/latest')
+  revalidatePath('/archive')
+  revalidatePath(`/post/${slug}`)
+
   return NextResponse.json({ ok: true })
 }

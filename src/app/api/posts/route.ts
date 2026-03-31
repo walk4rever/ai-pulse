@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createServiceClient } from '@/lib/supabase/server'
 import { markdownToHtml } from '@/lib/markdown'
 import { resolveAuthor } from '@/lib/api-auth'
@@ -113,6 +114,11 @@ export async function POST(req: NextRequest) {
     console.error('[api/posts] upsert failed', { slug, message: error.message })
     return NextResponse.json({ error: 'Database error' }, { status: 500 })
   }
+
+  revalidatePath('/')
+  revalidatePath('/latest')
+  revalidatePath('/archive')
+  revalidatePath(`/post/${slug}`)
 
   return NextResponse.json({ ok: true, slug, author: author.authorSlug }, { status: 200 })
 }
