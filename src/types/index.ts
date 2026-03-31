@@ -1,6 +1,7 @@
 export type PostStatus = 'draft' | 'published'
 export type PostContentType = 'daily' | 'weekly' | 'series' | 'interview'
 export type SubscriberTier = 'free' | 'paid'
+export type SubscriberStatus = 'pending' | 'active' | 'unsubscribed'
 
 export interface Post {
   id: string
@@ -24,8 +25,10 @@ export interface Subscriber {
   email: string
   name: string | null
   tier: SubscriberTier
+  status: SubscriberStatus
   stripe_customer_id?: string | null
   confirmed_at: string | null
+  unsubscribed_at?: string | null
   subscribed_at: string
   confirmation_nonce_hash?: string | null
   confirmation_expires_at?: string | null

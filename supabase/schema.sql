@@ -22,8 +22,10 @@ CREATE TABLE IF NOT EXISTS ai_pulse_subscribers (
   email TEXT UNIQUE NOT NULL,
   name TEXT,
   tier TEXT NOT NULL DEFAULT 'free' CHECK (tier IN ('free', 'paid')),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'unsubscribed')),
   stripe_customer_id TEXT,
   confirmed_at TIMESTAMPTZ,
+  unsubscribed_at TIMESTAMPTZ,
   confirmation_nonce_hash TEXT,
   confirmation_expires_at TIMESTAMPTZ,
   subscribed_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -67,6 +69,7 @@ CREATE INDEX IF NOT EXISTS idx_ai_pulse_posts_featured_published_at ON ai_pulse_
 CREATE INDEX IF NOT EXISTS idx_ai_pulse_posts_series_slug_published_at ON ai_pulse_posts (series_slug, published_at DESC) WHERE series_slug IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_ai_pulse_subscribers_email ON ai_pulse_subscribers (email);
 CREATE INDEX IF NOT EXISTS idx_ai_pulse_subscribers_confirmed ON ai_pulse_subscribers (confirmed_at) WHERE confirmed_at IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ai_pulse_subscribers_status ON ai_pulse_subscribers (status);
 
 -- Grants for Supabase API roles
 GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;

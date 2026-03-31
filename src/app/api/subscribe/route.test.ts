@@ -60,7 +60,13 @@ describe('POST /api/subscribe', () => {
   })
 
   it('returns conflict for already confirmed subscribers', async () => {
-    single.mockResolvedValue({ data: { id: '1', confirmed_at: '2026-03-28T00:00:00.000Z' } })
+    single.mockResolvedValue({
+      data: {
+        id: '1',
+        status: 'active',
+        confirmed_at: '2026-03-28T00:00:00.000Z',
+      },
+    })
 
     const { POST } = await import('./route')
     const req = new NextRequest('http://localhost/api/subscribe', {
@@ -77,7 +83,7 @@ describe('POST /api/subscribe', () => {
   })
 
   it('resends confirmation for unconfirmed subscribers', async () => {
-    single.mockResolvedValue({ data: { id: '1', confirmed_at: null } })
+    single.mockResolvedValue({ data: { id: '1', status: 'pending', confirmed_at: null } })
     sendEmail.mockResolvedValue({ data: { id: 'email_1' }, error: null })
 
     const { POST } = await import('./route')
@@ -96,8 +102,35 @@ describe('POST /api/subscribe', () => {
     expect(upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         email: 'reader@example.com',
+        status: 'pending',
         confirmation_nonce_hash: expect.any(String),
         confirmation_expires_at: expect.any(String),
+      }),
+      { onConflict: 'email' }
+    )
+  })
+
+  it('allows resubscribe for unsubscribed readers', async () => {
+    single.mockResolvedValue({ data: { id: '1', status: 'unsubscribed', confirmed_at: null } })
+    sendEmail.mockResolvedValue({ data: { id: 'email_1' }, error: null })
+
+    const { POST } = await import('./route')
+    const req = new NextRequest('http://localhost/api/subscribe', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'reader@example.com' }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    const res = await POST(req)
+    const body = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(body.message).toBe('确认邮件已发送，请查收并点击确认链接。')
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'pending',
+        unsubscribed_at: null,
+        confirmed_at: null,
       }),
       { onConflict: 'email' }
     )

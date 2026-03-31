@@ -29,11 +29,11 @@ export async function GET(req: NextRequest) {
   const supabase = await createServiceClient()
   const { data: subscriber } = await supabase
     .from('ai_pulse_subscribers')
-    .select('id, confirmed_at, confirmation_nonce_hash, confirmation_expires_at')
+    .select('id, status, confirmed_at, confirmation_nonce_hash, confirmation_expires_at')
     .eq('email', email)
     .single()
 
-  if (!subscriber?.confirmation_nonce_hash || subscriber.confirmed_at) {
+  if (!subscriber?.confirmation_nonce_hash || subscriber.status === 'active' || subscriber.confirmed_at) {
     return NextResponse.redirect(buildStatusUrl(req, 'invalid'))
   }
 
@@ -73,7 +73,9 @@ export async function GET(req: NextRequest) {
   const { error } = await supabase
     .from('ai_pulse_subscribers')
     .update({
+      status: 'active',
       confirmed_at: new Date().toISOString(),
+      unsubscribed_at: null,
       confirmation_nonce_hash: null,
       confirmation_expires_at: null,
     })
@@ -86,6 +88,32 @@ export async function GET(req: NextRequest) {
       message: error.message,
     })
     return NextResponse.redirect(buildStatusUrl(req, 'error'))
+  }
+
+  const { data: updatedSubscriber } = await supabase
+    .from('ai_pulse_subscribers')
+    .select('status, confirmed_at, unsubscribed_at')
+    .eq('email', email)
+    .single()
+
+  if (
+    updatedSubscriber &&
+    updatedSubscriber.confirmed_at &&
+    !updatedSubscriber.unsubscribed_at &&
+    updatedSubscriber.status !== 'active'
+  ) {
+    const { error: repairError } = await supabase
+      .from('ai_pulse_subscribers')
+      .update({ status: 'active' })
+      .eq('email', email)
+
+    if (repairError) {
+      console.error('[confirm] status repair failed', {
+        email,
+        message: repairError.message,
+      })
+      return NextResponse.redirect(buildStatusUrl(req, 'error'))
+    }
   }
 
   return NextResponse.redirect(buildStatusUrl(req, 'success'))

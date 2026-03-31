@@ -1,6 +1,13 @@
 import Link from 'next/link'
 
-type ConfirmationStatus = 'success' | 'invalid' | 'expired' | 'error'
+type ConfirmationStatus =
+  | 'success'
+  | 'invalid'
+  | 'expired'
+  | 'error'
+  | 'unsubscribed'
+  | 'unsubscribe-invalid'
+  | 'unsubscribe-error'
 
 interface ConfirmationPageProps {
   searchParams: Promise<{ status?: string }>
@@ -34,16 +41,43 @@ const contentByStatus: Record<
     title: '确认失败',
     description: '系统暂时无法完成确认，请稍后再试。如果问题持续，请重新订阅。',
   },
+  unsubscribed: {
+    label: 'Unsubscribed',
+    title: '你已取消订阅',
+    description: '后续将不再收到 AI早知道 的更新邮件。你随时可以重新订阅。',
+  },
+  'unsubscribe-invalid': {
+    label: 'Invalid Link',
+    title: '退订链接无效',
+    description: '该退订链接不正确、已失效，或当前邮箱并非有效订阅状态。',
+  },
+  'unsubscribe-error': {
+    label: 'Error',
+    title: '退订失败',
+    description: '系统暂时无法完成退订，请稍后重试。',
+  },
 }
 
 function isConfirmationStatus(value?: string): value is ConfirmationStatus {
-  return value === 'success' || value === 'invalid' || value === 'expired' || value === 'error'
+  return (
+    value === 'success' ||
+    value === 'invalid' ||
+    value === 'expired' ||
+    value === 'error' ||
+    value === 'unsubscribed' ||
+    value === 'unsubscribe-invalid' ||
+    value === 'unsubscribe-error'
+  )
 }
 
 export default async function ConfirmedPage({ searchParams }: ConfirmationPageProps) {
   const { status } = await searchParams
   const resolvedStatus: ConfirmationStatus = isConfirmationStatus(status) ? status : 'invalid'
   const content = contentByStatus[resolvedStatus]
+  const isUnsubscribeFlow =
+    resolvedStatus === 'unsubscribed' ||
+    resolvedStatus === 'unsubscribe-invalid' ||
+    resolvedStatus === 'unsubscribe-error'
 
   return (
     <div className="max-w-2xl">
@@ -59,7 +93,7 @@ export default async function ConfirmedPage({ searchParams }: ConfirmationPagePr
           href="/subscribe"
           className="bg-[var(--foreground)] text-[var(--background)] px-6 py-3 text-sm hover:opacity-80 transition-opacity"
         >
-          返回订阅
+          {isUnsubscribeFlow ? '重新订阅' : '返回订阅'}
         </Link>
         <Link
           href="/"

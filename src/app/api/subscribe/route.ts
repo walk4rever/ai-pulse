@@ -1,8 +1,8 @@
 import { createServiceClient } from '@/lib/supabase/server'
 import {
-  generateConfirmationToken,
   hashConfirmationNonce,
 } from '@/lib/subscription/confirmation-token'
+import { buildConfirmationUrl } from '@/lib/subscription/links'
 import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
   }
 
   const confirmationSecret = process.env.EMAIL_CONFIRMATION_SECRET
+  const siteUrl = req.nextUrl.origin
 
   if (!confirmationSecret) {
     console.error('[subscribe] missing EMAIL_CONFIRMATION_SECRET')
@@ -32,14 +33,7 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = await createServiceClient()
-  const now = new Date()
   const confirmationNonce = crypto.randomBytes(16).toString('base64url')
-  const token = generateConfirmationToken({
-    email,
-    nonce: confirmationNonce,
-    secret: confirmationSecret,
-    now,
-  })
   const verificationResult = verifyStoredConfirmation({
     nonce: confirmationNonce,
     secret: confirmationSecret,
@@ -47,11 +41,11 @@ export async function POST(req: NextRequest) {
 
   const { data: existing } = await supabase
     .from('ai_pulse_subscribers')
-    .select('id, confirmed_at')
+    .select('id, status, confirmed_at')
     .eq('email', email)
     .single()
 
-  if (existing?.confirmed_at) {
+  if (existing?.status === 'active' || existing?.confirmed_at) {
     return NextResponse.json({ error: '该邮箱已订阅。' }, { status: 409 })
   }
 
@@ -62,6 +56,9 @@ export async function POST(req: NextRequest) {
         email,
         name: name || null,
         tier: 'free',
+        status: 'pending',
+        confirmed_at: null,
+        unsubscribed_at: null,
         confirmation_nonce_hash: verificationResult.hash,
         confirmation_expires_at: verificationResult.expiresAt,
       },
@@ -76,7 +73,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '订阅失败，请稍后重试。' }, { status: 500 })
   }
 
-  const confirmUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/api/confirm?email=${encodeURIComponent(email)}&token=${token}`
+  const confirmUrl = buildConfirmationUrl({
+    email,
+    nonce: confirmationNonce,
+    secret: confirmationSecret,
+    siteUrl,
+  })
 
   const resendResult = await resend.emails.send({
     from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
@@ -109,7 +111,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const message = existing
+  const message = existing?.status === 'pending'
     ? '确认邮件已重新发送，请查收并点击确认链接。'
     : '确认邮件已发送，请查收并点击确认链接。'
 

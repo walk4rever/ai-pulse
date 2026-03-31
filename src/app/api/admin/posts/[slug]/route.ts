@@ -1,20 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { cookies } from 'next/headers'
 import { createServiceClient } from '@/lib/supabase/server'
-
-async function requireAdmin(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const session = cookieStore.get('admin_session')?.value
-  return session === process.env.ADMIN_PASSWORD
-}
+import { requireAdminSession } from '@/lib/admin-auth'
 
 interface RouteParams {
   params: Promise<{ slug: string }>
 }
 
 export async function DELETE(_req: NextRequest, { params }: RouteParams) {
-  if (!await requireAdmin()) {
+  if (!await requireAdminSession()) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -33,7 +27,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
 }
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
-  if (!await requireAdmin()) {
+  if (!await requireAdminSession()) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

@@ -27,12 +27,14 @@ describe('GET /api/confirm', () => {
     single.mockResolvedValue({
       data: {
         id: 'subscriber-1',
+        status: 'pending',
         confirmed_at: null,
         confirmation_nonce_hash: hashConfirmationNonce({
           nonce: 'nonce-1',
           secret: 'confirmation-secret',
         }),
         confirmation_expires_at: '2026-03-28T01:00:00.000Z',
+        unsubscribe_nonce_hash: 'unsubscribe-hash',
       },
     })
     selectEq.mockReturnValue({ single })
@@ -102,6 +104,7 @@ describe('GET /api/confirm', () => {
     )
 
     expect(update).toHaveBeenCalledWith(expect.objectContaining({ confirmed_at: expect.any(String) }))
+    expect(update).toHaveBeenCalledWith(expect.objectContaining({ status: 'active' }))
     expect(res.headers.get('location')).toBe('http://localhost/subscribe/confirmed?status=success')
 
     vi.useRealTimers()
@@ -136,12 +139,14 @@ describe('GET /api/confirm', () => {
     single.mockResolvedValue({
       data: {
         id: 'subscriber-1',
+        status: 'pending',
         confirmed_at: null,
         confirmation_nonce_hash: hashConfirmationNonce({
           nonce: 'newer-nonce',
           secret: 'confirmation-secret',
         }),
         confirmation_expires_at: '2026-03-28T01:00:00.000Z',
+        unsubscribe_nonce_hash: 'unsubscribe-hash',
       },
     })
 
