@@ -5,6 +5,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { createClient } from '@supabase/supabase-js'
 import yaml from 'js-yaml'
+import { markdownToHtml } from './markdown.mjs'
 
 const VALID_CONTENT_TYPES = new Set(['weekly', 'deep_dive', 'brief'])
 const VALID_SOURCE_TYPES = new Set(['editorial', 'guest', 'syndicated'])
@@ -28,7 +29,7 @@ async function main() {
   const payload = {
     slug: normalized.slug,
     title: normalized.title,
-    content: markdownToHtml(normalized.body),
+    content: await markdownToHtml(normalized.body),
     excerpt: normalized.excerpt,
     is_premium: normalized.isPremium,
     status: normalized.status,
@@ -248,133 +249,6 @@ function slugify(value) {
     .replace(/^-+|-+$/g, '')
 }
 
-function markdownToHtml(markdown) {
-  const lines = markdown.replace(/\r\n/g, '\n').split('\n')
-  const html = []
-  let paragraph = []
-  let listType = null
-  let listItems = []
-  let inCodeBlock = false
-  let codeBuffer = []
-
-  const flushParagraph = () => {
-    if (!paragraph.length) return
-    html.push(`<p>${renderInline(paragraph.join(' '))}</p>`)
-    paragraph = []
-  }
-
-  const flushList = () => {
-    if (!listType || !listItems.length) return
-    const tag = listType === 'ol' ? 'ol' : 'ul'
-    html.push(`<${tag}>${listItems.map((item) => `<li>${renderInline(item)}</li>`).join('')}</${tag}>`)
-    listType = null
-    listItems = []
-  }
-
-  const flushCode = () => {
-    if (!inCodeBlock) return
-    html.push(`<pre><code>${escapeHtml(codeBuffer.join('\n'))}</code></pre>`)
-    inCodeBlock = false
-    codeBuffer = []
-  }
-
-  for (const rawLine of lines) {
-    const line = rawLine.trimEnd()
-    const trimmed = line.trim()
-
-    if (trimmed.startsWith('```')) {
-      flushParagraph()
-      flushList()
-      if (inCodeBlock) {
-        flushCode()
-      } else {
-        inCodeBlock = true
-      }
-      continue
-    }
-
-    if (inCodeBlock) {
-      codeBuffer.push(line)
-      continue
-    }
-
-    if (!trimmed) {
-      flushParagraph()
-      flushList()
-      continue
-    }
-
-    if (/^---+$/.test(trimmed)) {
-      flushParagraph()
-      flushList()
-      html.push('<hr />')
-      continue
-    }
-
-    const heading = trimmed.match(/^(#{1,6})\s+(.*)$/)
-    if (heading) {
-      flushParagraph()
-      flushList()
-      const level = heading[1].length
-      html.push(`<h${level}>${renderInline(heading[2])}</h${level}>`)
-      continue
-    }
-
-    const orderedItem = trimmed.match(/^\d+\.\s+(.*)$/)
-    if (orderedItem) {
-      flushParagraph()
-      if (listType && listType !== 'ol') flushList()
-      listType = 'ol'
-      listItems.push(orderedItem[1])
-      continue
-    }
-
-    const unorderedItem = trimmed.match(/^[-*]\s+(.*)$/)
-    if (unorderedItem) {
-      flushParagraph()
-      if (listType && listType !== 'ul') flushList()
-      listType = 'ul'
-      listItems.push(unorderedItem[1])
-      continue
-    }
-
-    if (trimmed.startsWith('>')) {
-      flushParagraph()
-      flushList()
-      html.push(`<blockquote><p>${renderInline(trimmed.replace(/^>\s?/, ''))}</p></blockquote>`)
-      continue
-    }
-
-    flushList()
-    paragraph.push(trimmed)
-  }
-
-  flushParagraph()
-  flushList()
-  flushCode()
-
-  return html.join('\n')
-}
-
-function renderInline(value) {
-  let html = escapeHtml(value)
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
-  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-  html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>')
-  html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>')
-  html = html.replace(/_([^_]+)_/g, '<em>$1</em>')
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-  return html
-}
-
-function escapeHtml(value) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
 
 function isValidHttpUrl(value) {
   if (!value) return false
