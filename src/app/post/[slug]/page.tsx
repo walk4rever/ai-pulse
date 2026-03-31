@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { Post } from '@/types'
 import { getTypeLabel } from '@/lib/content'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { BackButton } from '@/components/BackButton'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -52,9 +52,7 @@ export default async function PostPage({ params }: Props) {
   return (
     <article className="max-w-2xl">
       <div className="mb-12">
-        <Link href="/" className="kicker hover:text-[var(--foreground)] transition-colors">
-          ← AI早知道
-        </Link>
+        <BackButton />
       </div>
 
       <header className="mb-12 pb-8 border-b border-[var(--subtle)] border-opacity-20">
