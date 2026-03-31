@@ -21,7 +21,7 @@ export default async function AdminPage() {
   const { data: posts } = await supabase
     .from('ai_pulse_posts')
     .select('id, slug, title, content_type, author_slug, status, featured, published_at')
-    .order('published_at', { ascending: false })
+    .order('published_at', { ascending: false }).order('created_at', { ascending: false })
 
   const allPosts = posts ?? []
   const featuredCount = allPosts.filter((p) => p.featured).length

@@ -27,7 +27,7 @@ export default async function WeeklyPage() {
     .select('id, slug, title, excerpt, published_at, content_type, series_slug')
     .eq('status', 'published')
     .eq('content_type', 'weekly')
-    .order('published_at', { ascending: false })
+    .order('published_at', { ascending: false }).order('created_at', { ascending: false })
 
   const allPosts = (posts ?? []) as ListPost[]
 

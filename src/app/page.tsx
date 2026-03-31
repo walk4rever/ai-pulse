@@ -84,7 +84,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     .from('ai_pulse_posts')
     .select('id, slug, title, excerpt, is_premium, published_at, content_type, featured, series_slug')
     .eq('status', 'published')
-    .order('published_at', { ascending: false })
+    .order('published_at', { ascending: false }).order('created_at', { ascending: false })
 
   const allPosts = (posts ?? []) as HomePost[]
   const { featured, recent } = buildSections(allPosts)

@@ -31,7 +31,7 @@ export default async function ArchivePage() {
     .from('ai_pulse_posts')
     .select('id, slug, title, published_at, content_type, series_slug')
     .eq('status', 'published')
-    .order('published_at', { ascending: false })
+    .order('published_at', { ascending: false }).order('created_at', { ascending: false })
 
   const allPosts = (posts ?? []) as ArchivePost[]
 
