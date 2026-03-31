@@ -13,8 +13,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="zh-CN">
       <body className="antialiased">
+        <div className="mx-auto max-w-3xl bg-[var(--background)]">
         <header>
-          <div className="mx-auto max-w-3xl px-6 py-12">
+          <div className="px-6 py-12">
             <div className="flex items-center justify-between">
               <Link href="/" className="block">
                 <Logo />
@@ -34,14 +35,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </header>
 
-        <main className="mx-auto max-w-3xl px-6 pb-20">{children}</main>
+        <main className="px-6 pb-20">{children}</main>
 
         <footer className="border-t border-[var(--subtle)] border-opacity-20">
-          <div className="mx-auto max-w-3xl px-6 py-10 flex items-center justify-center gap-4">
+          <div className="px-6 py-10 flex items-center justify-center gap-4">
             <span className="text-sm text-[var(--muted)]">AI早知道 © 2026</span>
             <span className="text-xs text-[var(--subtle)]">Powered by Air7.fun</span>
           </div>
         </footer>
+        </div>
       </body>
     </html>
   )

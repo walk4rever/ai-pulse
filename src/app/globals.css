@@ -10,7 +10,8 @@
 */
 
 :root {
-  --background: oklch(0.987 0.003 90); /* 极浅暖白 */
+  --background: oklch(0.987 0.003 90); /* 极浅暖白，内容列 */
+  --surface: oklch(0.91 0.008 80);     /* 页面大背景，暖灰 */
   --foreground: oklch(0.15 0 0); /* 深炭黑 */
   --muted: oklch(0.45 0 0);
   --subtle: oklch(0.65 0 0);
@@ -27,13 +28,13 @@
 }
 
 html {
-  background: var(--background);
+  background: var(--surface);
   color: var(--foreground);
 }
 
 body {
   min-height: 100vh;
-  background: var(--background);
+  background: var(--surface);
   color: var(--foreground);
   font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Microsoft YaHei", system-ui, sans-serif;
   text-rendering: geometricPrecision;
