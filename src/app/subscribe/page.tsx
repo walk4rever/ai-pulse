@@ -5,7 +5,6 @@ import { useState } from 'react'
 
 export default function SubscribePage() {
   const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
 
@@ -16,7 +15,7 @@ export default function SubscribePage() {
     const res = await fetch('/api/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, name }),
+      body: JSON.stringify({ email }),
     })
 
     const data = await res.json()
@@ -68,29 +67,13 @@ export default function SubscribePage() {
 
         <form onSubmit={handleSubmit} className="mt-10 space-y-6">
           <div>
-            <label htmlFor="name" className="kicker mb-3 block">
-              姓名（可选）
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="你的名字"
-              className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-3 text-[0.95rem] outline-none transition focus:border-[var(--foreground)] placeholder:text-[var(--subtle)]"
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className="kicker mb-3 block">
-              邮箱地址
-            </label>
             <input
               id="email"
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder="your@email.com"
               className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-3 text-[0.95rem] outline-none transition focus:border-[var(--foreground)] placeholder:text-[var(--subtle)]"
             />
           </div>
