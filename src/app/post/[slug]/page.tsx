@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
-import { Post } from '@/types'
 import { getTypeLabel } from '@/lib/content'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { BackButton } from '@/components/BackButton'
+import { MermaidContent } from '@/components/MermaidContent'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -72,7 +72,7 @@ export default async function PostPage({ params }: Props) {
       {post.is_premium ? (
         <PremiumPaywall excerpt={post.excerpt} />
       ) : (
-        <div className="prose" dangerouslySetInnerHTML={{ __html: post.content }} />
+        <MermaidContent className="prose" html={post.content} />
       )}
     </article>
   )
@@ -81,7 +81,7 @@ export default async function PostPage({ params }: Props) {
 function PremiumPaywall({ excerpt }: { excerpt: string }) {
   return (
     <div>
-      <div className="prose" dangerouslySetInnerHTML={{ __html: excerpt }} />
+      <MermaidContent className="prose" html={excerpt} />
       <div className="relative mt-12">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-transparent to-[var(--background)]" />
         <div className="mt-8 border border-[var(--subtle)] border-opacity-30 px-8 py-10 text-center">

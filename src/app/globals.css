@@ -163,6 +163,20 @@ a {
   border-radius: 0;
   color: inherit;
 }
+.prose .mermaid {
+  margin: 1.75rem 0;
+  padding: 1.25rem 1rem;
+  background: oklch(0.985 0.004 80);
+  border: 1px solid oklch(0.89 0.005 80);
+  border-radius: 2px;
+  overflow-x: auto;
+}
+.prose .mermaid svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
 /* line highlights */
 .prose [data-highlighted-line] {
   background: oklch(0.93 0.01 260 / 0.4);
