@@ -7,8 +7,7 @@ import { createClient } from '@supabase/supabase-js'
 import yaml from 'js-yaml'
 import { markdownToHtml } from './markdown.mjs'
 
-const VALID_CONTENT_TYPES = new Set(['weekly', 'deep_dive', 'brief'])
-const VALID_SOURCE_TYPES = new Set(['editorial', 'guest', 'syndicated'])
+const VALID_CONTENT_TYPES = new Set(['daily', 'weekly', 'series', 'interview'])
 const VALID_STATUS = new Set(['draft', 'published'])
 
 async function main() {
@@ -37,7 +36,6 @@ async function main() {
     featured: normalized.featured,
     series_slug: normalized.seriesSlug,
     author_slug: normalized.authorSlug,
-    source_type: normalized.sourceType,
     published_at: normalized.publishedAt,
   }
 
@@ -51,7 +49,6 @@ async function main() {
       featured: payload.featured,
       series_slug: payload.series_slug,
       author_slug: payload.author_slug,
-      source_type: payload.source_type,
       published_at: payload.published_at,
       excerpt: payload.excerpt,
     }, null, 2))
@@ -84,7 +81,8 @@ async function main() {
   console.log(`- status: ${normalized.status}`)
   console.log(`- featured: ${normalized.featured}`)
   console.log(`- series: ${normalized.seriesSlug ?? '—'}`)
-  console.log(`- author: ${normalized.authorSlug ?? '—'}`)
+  console.log(`- author: ${normalized.authorSlug}`)
+
 }
 
 function parseFrontmatter(raw) {
@@ -152,14 +150,9 @@ function normalizePost({ filePath, data, body }) {
     throw new Error('Frontmatter field "title" is required.')
   }
 
-  const contentType = asNonEmptyString(data.content_type)
+  const contentType = asNonEmptyString(data.type)
   if (!VALID_CONTENT_TYPES.has(contentType)) {
-    throw new Error('Frontmatter field "content_type" must be weekly, deep_dive, or brief.')
-  }
-
-  const sourceType = asNonEmptyString(data.source_type) || 'editorial'
-  if (!VALID_SOURCE_TYPES.has(sourceType)) {
-    throw new Error('Frontmatter field "source_type" must be editorial, guest, or syndicated.')
+    throw new Error('Frontmatter field "type" must be daily, weekly, series, or interview.')
   }
 
   const status = asNonEmptyString(data.status) || 'draft'
@@ -184,9 +177,8 @@ function normalizePost({ filePath, data, body }) {
     status,
     contentType,
     featured: Boolean(data.featured),
-    seriesSlug: nullableString(data.series_slug),
-    authorSlug: nullableString(data.author_slug) || 'rafa',
-    sourceType,
+    seriesSlug: nullableString(data.series) ? asNonEmptyString(data.series).toLowerCase() : null,
+    authorSlug: nullableString(data.author) ? asNonEmptyString(data.author).toLowerCase() : 'rafa',
     publishedAt,
     filePath,
   }

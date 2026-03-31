@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getSupabaseEnv } from '@/lib/supabase/env'
 import { Post } from '@/types'
+import { getTypeLabel } from '@/lib/content'
 import Link from 'next/link'
 
 export const revalidate = 60
@@ -20,17 +21,12 @@ function formatDate(value: string | null | undefined) {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
 
-function getTypeLabel(post: Pick<Post, 'content_type' | 'series_slug'>) {
-  if (post.content_type === 'weekly') return '周刊'
-  if (post.content_type === 'deep_dive') return '深度'
-  return 'Brief'
-}
 
 function FeaturedCard({ post }: { post: HomePost }) {
   return (
     <article className="border border-[oklch(0.85_0_0)] p-6 flex flex-col gap-4 hover:border-[var(--foreground)] transition-colors">
       <div className="flex items-center justify-between">
-        <span className="kicker">{getTypeLabel(post)}</span>
+        <span className="kicker">{getTypeLabel(post.content_type)}</span>
         <span className="date">{formatDate(post.published_at)}</span>
       </div>
       <Link href={`/post/${post.slug}`} className="group flex-1">
@@ -58,7 +54,7 @@ function PostItem({ post }: { post: HomePost }) {
           </h3>
         </Link>
       </div>
-      <span className="kicker shrink-0">{getTypeLabel(post)}</span>
+      <span className="kicker shrink-0">{getTypeLabel(post.content_type)}</span>
     </article>
   )
 }

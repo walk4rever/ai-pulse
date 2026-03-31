@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getSupabaseEnv } from '@/lib/supabase/env'
 import { Post } from '@/types'
+import { getTypeLabel } from '@/lib/content'
 import Link from 'next/link'
 
 export const revalidate = 60
@@ -17,11 +18,6 @@ function formatDate(value: string | null | undefined) {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
 
-function getTypeLabel(post: Pick<Post, 'content_type' | 'series_slug'>) {
-  if (post.content_type === 'weekly') return '周刊'
-  if (post.content_type === 'deep_dive') return '深度'
-  return 'Brief'
-}
 
 export default async function ArchivePage() {
   const { hasPublicEnv } = getSupabaseEnv()
@@ -61,7 +57,7 @@ export default async function ArchivePage() {
                 </h3>
               </Link>
             </div>
-            <span className="kicker shrink-0">{getTypeLabel(post)}</span>
+            <span className="kicker shrink-0">{getTypeLabel(post.content_type)}</span>
           </article>
         ))}
       </div>

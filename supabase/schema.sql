@@ -7,11 +7,10 @@ CREATE TABLE IF NOT EXISTS ai_pulse_posts (
   excerpt TEXT NOT NULL DEFAULT '',
   is_premium BOOLEAN NOT NULL DEFAULT false,
   status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
-  content_type TEXT NOT NULL DEFAULT 'brief' CHECK (content_type IN ('weekly', 'deep_dive', 'brief')),
+  content_type TEXT NOT NULL DEFAULT 'daily' CHECK (content_type IN ('daily', 'weekly', 'series', 'interview')),
   featured BOOLEAN NOT NULL DEFAULT false,
   series_slug TEXT,
   author_slug TEXT,
-  source_type TEXT NOT NULL DEFAULT 'editorial' CHECK (source_type IN ('editorial', 'guest', 'syndicated')),
   published_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()

@@ -6,7 +6,7 @@ import Link from 'next/link'
 export const revalidate = 60
 
 export const metadata = {
-  title: '系列 | AI早知道',
+  title: '专题 | AI早知道',
 }
 
 type ListPost = Pick<Post, 'id' | 'slug' | 'title' | 'published_at' | 'content_type' | 'series_slug'>
@@ -44,7 +44,7 @@ export default async function SeriesPage() {
     .from('ai_pulse_posts')
     .select('id, slug, title, published_at, content_type, series_slug')
     .eq('status', 'published')
-    .eq('content_type', 'deep_dive')
+    .eq('content_type', 'series')
     .order('published_at', { ascending: true })
 
   const allPosts = (posts ?? []) as ListPost[]

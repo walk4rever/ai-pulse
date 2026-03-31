@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * Batch import for Vault markdown files without frontmatter.
+ * Batch import for Vault markdown files.
  *
- * Rules:
- *   wechat-daily-*  → content_type: brief,  author_slug: dwight
- *   weekly-*        → content_type: weekly,  author_slug: monica
- *   deep-dive-*     → content_type: deep_dive, author_slug: rafa
+ * Fallback classification (used only when frontmatter lacks a "type" field):
+ *   wechat-daily-*  → type: daily,   author: dwight
+ *   weekly-* / 周刊  → type: weekly,  author: monica
+ *   everything else → type: series,  author: rafa
  *
  * Usage:
  *   node scripts/import-batch.mjs "/path/to/file1.md" "/path/to/file2.md"
@@ -78,21 +78,19 @@ async function prepareWithFrontmatter(filePath) {
   const date = existingFm.date || extractDate(basename)
   const excerpt = existingFm.excerpt || existingFm.description || deriveExcerpt(body)
   const status = existingFm.status || 'published'
-  const resolvedContentType = existingFm.content_type || contentType
-  const resolvedAuthor = existingFm.author_slug ||
-    (existingFm.author ? existingFm.author.toLowerCase() : authorSlug)
-
-  const seriesSlug = existingFm.series_slug || null
+  const resolvedType = existingFm.type || contentType
+  const resolvedAuthor = existingFm.author || authorSlug
+  const series = existingFm.series || null
 
   const frontmatter = [
     '---',
     `title: "${title.replace(/"/g, '\\"')}"`,
     `slug: "${slug}"`,
-    `content_type: ${resolvedContentType}`,
-    `author_slug: ${resolvedAuthor}`,
+    `type: ${resolvedType}`,
+    `author: ${resolvedAuthor}`,
     `status: ${status}`,
     date ? `date: "${date}"` : '',
-    seriesSlug ? `series_slug: ${seriesSlug}` : '',
+    series ? `series: ${series}` : '',
     `excerpt: "${excerpt.replace(/"/g, '\\"')}"`,
     '---',
   ].filter(Boolean).join('\n')
@@ -105,9 +103,9 @@ async function prepareWithFrontmatter(filePath) {
 }
 
 function classifyFile(basename) {
-  if (basename.startsWith('wechat')) return { contentType: 'brief', authorSlug: 'dwight' }
+  if (basename.startsWith('wechat')) return { contentType: 'daily', authorSlug: 'dwight' }
   if (basename.startsWith('weekly') || basename.includes('周刊')) return { contentType: 'weekly', authorSlug: 'monica' }
-  return { contentType: 'deep_dive', authorSlug: 'rafa' }
+  return { contentType: 'series', authorSlug: 'rafa' }
 }
 
 function extractTitle(raw) {

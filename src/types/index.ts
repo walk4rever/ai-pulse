@@ -1,6 +1,5 @@
 export type PostStatus = 'draft' | 'published'
-export type PostContentType = 'weekly' | 'deep_dive' | 'brief'
-export type PostSourceType = 'editorial' | 'guest' | 'syndicated'
+export type PostContentType = 'daily' | 'weekly' | 'series' | 'interview'
 export type SubscriberTier = 'free' | 'paid'
 
 export interface Post {
@@ -15,7 +14,6 @@ export interface Post {
   featured: boolean
   series_slug: string | null
   author_slug: string | null
-  source_type: PostSourceType
   published_at: string | null
   created_at: string
   updated_at: string

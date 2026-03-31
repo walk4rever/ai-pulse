@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Post } from '@/types'
+import { getTypeLabel } from '@/lib/content'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -13,11 +14,6 @@ function formatPublishedAt(value: string | null) {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
 
-function getContentTypeLabel(post: Pick<Post, 'content_type' | 'series_slug'>) {
-  if (post.content_type === 'weekly') return '周刊'
-  if (post.content_type === 'deep_dive') return '深度'
-  return 'Brief'
-}
 
 function formatSeriesLabel(seriesSlug: string | null) {
   if (!seriesSlug) return null
@@ -49,7 +45,7 @@ export default async function PostPage({ params }: Props) {
 
   if (!post) notFound()
 
-  const contentTypeLabel = getContentTypeLabel(post)
+  const contentTypeLabel = getTypeLabel(post.content_type)
   const seriesLabel = formatSeriesLabel(post.series_slug)
   const authorLabel = formatAuthorLabel(post.author_slug)
 
