@@ -77,7 +77,13 @@ curl -X POST https://ai.air7.fun/api/posts \
 
 ## Slug 命名规范
 
-Slug 是文章的永久 URL，必须全小写英文字母、数字、连字符，**不含中文、空格、特殊字符**。
+Slug 是文章的永久标识符。发布成功后，文章访问路径为：
+
+```
+https://ai.air7.fun/post/{slug}
+```
+
+Slug 必须全小写英文字母、数字、连字符，**不含中文、空格、特殊字符**。
 
 ```
 Dwight / Ross 每日快讯：
