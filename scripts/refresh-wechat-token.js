@@ -17,90 +17,101 @@
  *   SUPABASE_SERVICE_ROLE_KEY=eyJ...
  */
 
-import { createClient } from '@supabase/supabase-js'
-import { readFileSync } from 'fs'
-import { resolve, dirname } from 'path'
-import { fileURLToPath } from 'url'
+'use strict'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const { createClient } = require('@supabase/supabase-js')
+const fs = require('fs')
+const path = require('path')
+const https = require('https')
 
-// Load .env manually (no dotenv dependency needed)
+// Load .env manually
 try {
-  const envPath = resolve(__dirname, '.env')
-  const lines = readFileSync(envPath, 'utf8').split('\n')
-  for (const line of lines) {
-    const trimmed = line.trim()
-    if (!trimmed || trimmed.startsWith('#')) continue
-    const idx = trimmed.indexOf('=')
+  const envPath = path.resolve(__dirname, '.env')
+  const lines = fs.readFileSync(envPath, 'utf8').split('\n')
+  for (var i = 0; i < lines.length; i++) {
+    var trimmed = lines[i].trim()
+    if (!trimmed || trimmed.charAt(0) === '#') continue
+    var idx = trimmed.indexOf('=')
     if (idx === -1) continue
-    const key = trimmed.slice(0, idx).trim()
-    const val = trimmed.slice(idx + 1).trim().replace(/^["']|["']$/g, '')
-    process.env[key] = process.env[key] ?? val
+    var key = trimmed.slice(0, idx).trim()
+    var val = trimmed.slice(idx + 1).trim().replace(/^["']|["']$/g, '')
+    if (!process.env[key]) process.env[key] = val
   }
-} catch {
+} catch (e) {
   // .env not found — rely on environment variables already set
 }
 
-const APP_ID = process.env.WECHAT_APP_ID
-const APP_SECRET = process.env.WECHAT_APP_SECRET
-const SUPABASE_URL = process.env.SUPABASE_URL
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+var APP_ID = process.env.WECHAT_APP_ID
+var APP_SECRET = process.env.WECHAT_APP_SECRET
+var SUPABASE_URL = process.env.SUPABASE_URL
+var SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!APP_ID || !APP_SECRET || !SUPABASE_URL || !SUPABASE_KEY) {
-  console.error(`[${now()}] ERROR: Missing required environment variables.`)
+  console.error('[' + now() + '] ERROR: Missing required environment variables.')
   console.error('Required: WECHAT_APP_ID, WECHAT_APP_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY')
   process.exit(1)
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+var supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 function now() {
   return new Date().toISOString()
 }
 
-async function fetchAccessToken() {
-  const url = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${APP_ID}&secret=${APP_SECRET}`
-  const res = await fetch(url)
-  const data = await res.json()
-  if (!data.access_token) {
-    throw new Error(`Failed to get access_token: ${JSON.stringify(data)}`)
-  }
-  return { token: data.access_token, expiresIn: data.expires_in }
+function httpGet(url) {
+  return new Promise(function(resolve, reject) {
+    https.get(url, function(res) {
+      var data = ''
+      res.on('data', function(chunk) { data += chunk })
+      res.on('end', function() {
+        try { resolve(JSON.parse(data)) }
+        catch (e) { reject(new Error('Invalid JSON: ' + data)) }
+      })
+    }).on('error', reject)
+  })
 }
 
-async function fetchJsapiTicket(accessToken) {
-  const url = `https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=${accessToken}&type=jsapi`
-  const res = await fetch(url)
-  const data = await res.json()
-  if (!data.ticket) {
-    throw new Error(`Failed to get jsapi_ticket: ${JSON.stringify(data)}`)
-  }
-  return { ticket: data.ticket, expiresIn: data.expires_in }
+function fetchAccessToken() {
+  var url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + APP_ID + '&secret=' + APP_SECRET
+  return httpGet(url).then(function(data) {
+    if (!data.access_token) throw new Error('Failed to get access_token: ' + JSON.stringify(data))
+    return { token: data.access_token, expiresIn: data.expires_in }
+  })
 }
 
-async function saveToSupabase(key, value, expiresInSeconds) {
-  const expiresAt = new Date(Date.now() + expiresInSeconds * 1000).toISOString()
-  const { error } = await supabase
+function fetchJsapiTicket(accessToken) {
+  var url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=' + accessToken + '&type=jsapi'
+  return httpGet(url).then(function(data) {
+    if (!data.ticket) throw new Error('Failed to get jsapi_ticket: ' + JSON.stringify(data))
+    return { ticket: data.ticket, expiresIn: data.expires_in }
+  })
+}
+
+function saveToSupabase(key, value, expiresInSeconds) {
+  var expiresAt = new Date(Date.now() + expiresInSeconds * 1000).toISOString()
+  return supabase
     .from('ai_pulse_wechat_tokens')
-    .upsert({ key, value, expires_at: expiresAt, updated_at: new Date().toISOString() })
-  if (error) throw new Error(`Supabase upsert failed for key "${key}": ${error.message}`)
+    .upsert({ key: key, value: value, expires_at: expiresAt, updated_at: new Date().toISOString() })
+    .then(function(result) {
+      if (result.error) throw new Error('Supabase upsert failed for key "' + key + '": ' + result.error.message)
+    })
 }
 
-async function main() {
-  console.log(`[${now()}] Starting WeChat token refresh...`)
+console.log('[' + now() + '] Starting WeChat token refresh...')
 
-  const { token, expiresIn: tokenExpiry } = await fetchAccessToken()
-  console.log(`[${now()}] access_token fetched (expires in ${tokenExpiry}s)`)
-
-  const { ticket, expiresIn: ticketExpiry } = await fetchJsapiTicket(token)
-  console.log(`[${now()}] jsapi_ticket fetched (expires in ${ticketExpiry}s)`)
-
-  await saveToSupabase('access_token', token, tokenExpiry)
-  await saveToSupabase('jsapi_ticket', ticket, ticketExpiry)
-  console.log(`[${now()}] Saved to Supabase. Done.`)
-}
-
-main().catch((err) => {
-  console.error(`[${now()}] ERROR:`, err.message)
-  process.exit(1)
-})
+fetchAccessToken()
+  .then(function(result) {
+    console.log('[' + now() + '] access_token fetched (expires in ' + result.expiresIn + 's)')
+    return fetchJsapiTicket(result.token).then(function(ticketResult) {
+      console.log('[' + now() + '] jsapi_ticket fetched (expires in ' + ticketResult.expiresIn + 's)')
+      return saveToSupabase('access_token', result.token, result.expiresIn)
+        .then(function() { return saveToSupabase('jsapi_ticket', ticketResult.ticket, ticketResult.expiresIn) })
+    })
+  })
+  .then(function() {
+    console.log('[' + now() + '] Saved to Supabase. Done.')
+  })
+  .catch(function(err) {
+    console.error('[' + now() + '] ERROR:', err.message)
+    process.exit(1)
+  })
