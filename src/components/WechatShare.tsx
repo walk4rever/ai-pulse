@@ -75,7 +75,7 @@ export function WechatShare({ title, description, imageUrl }: WechatShareProps) 
         onClick={copyLink}
         className="text-sm border border-[var(--foreground)] px-4 py-2 hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
       >
-        {copied ? '已复制链接' : '分享'}
+        {copied ? '已复制链接' : '分享链接'}
       </button>
     </div>
   )
