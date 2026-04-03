@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { BackButton } from '@/components/BackButton'
 import { MermaidContent } from '@/components/MermaidContent'
+import { WechatShare } from '@/components/WechatShare'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -74,6 +75,12 @@ export default async function PostPage({ params }: Props) {
       ) : (
         <MermaidContent className="prose" html={post.content} />
       )}
+
+      <WechatShare
+        title={post.title}
+        description={post.excerpt ?? ''}
+        imageUrl={post.cover_image ?? undefined}
+      />
     </article>
   )
 }
