@@ -81,7 +81,7 @@ async function fetchJsapiTicket(accessToken) {
 async function saveToSupabase(key, value, expiresInSeconds) {
   const expiresAt = new Date(Date.now() + expiresInSeconds * 1000).toISOString()
   const { error } = await supabase
-    .from('wechat_tokens')
+    .from('ai_wechat_tokens')
     .upsert({ key, value, expires_at: expiresAt, updated_at: new Date().toISOString() })
   if (error) throw new Error(`Supabase upsert failed for key "${key}": ${error.message}`)
 }
