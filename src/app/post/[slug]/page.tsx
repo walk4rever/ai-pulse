@@ -109,7 +109,7 @@ export default async function PostPage({ params }: Props) {
       <WechatShare
         title={post.title}
         description={post.excerpt ?? ''}
-        imageUrl={post.cover_image ?? undefined}
+        imageUrl={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://ai.air7.fun'}/post/${post.slug}/opengraph-image`}
       />
     </article>
   )
