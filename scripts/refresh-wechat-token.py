@@ -54,8 +54,12 @@ def http_get(url):
 def http_post(url, data, headers):
     body = json.dumps(data).encode()
     req = urllib.request.Request(url, data=body, headers=headers, method='POST')
-    with urllib.request.urlopen(req, timeout=10) as res:
-        return res.status
+    try:
+        with urllib.request.urlopen(req, timeout=10) as res:
+            return res.status
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode()
+        raise RuntimeError(f'HTTP {e.code}: {error_body}')
 
 
 def fetch_access_token(app_id, app_secret):
