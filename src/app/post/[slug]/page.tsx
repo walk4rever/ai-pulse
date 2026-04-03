@@ -2,12 +2,42 @@ import { createClient } from '@/lib/supabase/server'
 import { getTypeLabel } from '@/lib/content'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
 import { BackButton } from '@/components/BackButton'
 import { MermaidContent } from '@/components/MermaidContent'
 import { WechatShare } from '@/components/WechatShare'
 
 interface Props {
   params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const supabase = await createClient()
+  const { data: post } = await supabase
+    .from('ai_pulse_posts')
+    .select('title, excerpt')
+    .eq('slug', slug)
+    .eq('status', 'published')
+    .single()
+
+  if (!post) return {}
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ai.air7.fun'
+  const imageUrl = `${siteUrl}/post/${slug}/opengraph-image`
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      url: `${siteUrl}/post/${slug}`,
+      siteName: 'AI早知道',
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: post.title }],
+      type: 'article',
+    },
+  }
 }
 
 function formatPublishedAt(value: string | null) {
