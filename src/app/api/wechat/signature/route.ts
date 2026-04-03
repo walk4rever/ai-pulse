@@ -1,44 +1,27 @@
 import { createHash, randomBytes } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
-
-const APP_ID = process.env.WECHAT_APP_ID!
-const APP_SECRET = process.env.WECHAT_APP_SECRET!
-
-// In-memory cache for access_token and jsapi_ticket (TTL: 7000s < 7200s)
-const cache: { accessToken?: string; ticket?: string; expiresAt?: number } = {}
-
-async function getAccessToken(): Promise<string> {
-  if (cache.accessToken && cache.expiresAt && Date.now() < cache.expiresAt) {
-    return cache.accessToken
-  }
-  const res = await fetch(
-    `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${APP_ID}&secret=${APP_SECRET}`
-  )
-  const data = await res.json()
-  if (!data.access_token) throw new Error(`WeChat token error: ${JSON.stringify(data)}`)
-  cache.accessToken = data.access_token
-  cache.expiresAt = Date.now() + 7000 * 1000
-  cache.ticket = undefined
-  return cache.accessToken!
-}
-
-async function getJsapiTicket(): Promise<string> {
-  if (cache.ticket && cache.expiresAt && Date.now() < cache.expiresAt) {
-    return cache.ticket
-  }
-  const token = await getAccessToken()
-  const res = await fetch(
-    `https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=${token}&type=jsapi`
-  )
-  const data = await res.json()
-  if (!data.ticket) throw new Error(`WeChat ticket error: ${JSON.stringify(data)}`)
-  cache.ticket = data.ticket
-  return cache.ticket!
-}
+import { createServiceClient } from '@/lib/supabase/server'
 
 function sign(ticket: string, nonceStr: string, timestamp: number, url: string): string {
   const str = `jsapi_ticket=${ticket}&noncestr=${nonceStr}&timestamp=${timestamp}&url=${url}`
   return createHash('sha1').update(str).digest('hex')
+}
+
+async function getTicketFromSupabase(): Promise<string> {
+  const supabase = await createServiceClient()
+  const { data, error } = await supabase
+    .from('wechat_tokens')
+    .select('value, expires_at')
+    .eq('key', 'jsapi_ticket')
+    .single()
+
+  if (error || !data) throw new Error('jsapi_ticket not found in DB. Run the refresh script first.')
+
+  if (new Date(data.expires_at) < new Date()) {
+    throw new Error('jsapi_ticket has expired. Check the refresh script on Alibaba Cloud.')
+  }
+
+  return data.value
 }
 
 export async function GET(req: NextRequest) {
@@ -48,12 +31,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const ticket = await getJsapiTicket()
+    const ticket = await getTicketFromSupabase()
     const nonceStr = randomBytes(8).toString('hex')
     const timestamp = Math.floor(Date.now() / 1000)
     const signature = sign(ticket, nonceStr, timestamp, url)
+    const appId = process.env.WECHAT_APP_ID!
 
-    return NextResponse.json({ appId: APP_ID, timestamp, nonceStr, signature })
+    return NextResponse.json({ appId, timestamp, nonceStr, signature })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     return NextResponse.json({ error: message }, { status: 500 })

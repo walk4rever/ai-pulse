@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS wechat_tokens (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
