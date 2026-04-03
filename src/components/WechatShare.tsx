@@ -70,26 +70,13 @@ export function WechatShare({ title, description, imageUrl }: WechatShareProps) 
   }
 
   return (
-    <div className="mt-12 pt-8 border-t border-[var(--subtle)] border-opacity-20">
-      <p className="text-xs text-[var(--subtle)] mb-4 tracking-widest uppercase">分享这篇文章</p>
-      <div className="flex flex-wrap gap-3">
-        <button
-          onClick={copyLink}
-          className="text-sm border border-[var(--foreground)] px-4 py-2 hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
-        >
-          {copied ? '已复制' : '复制链接'}
-        </button>
-        {inWeChat && (
-          <span className="text-sm text-[var(--muted)] flex items-center">
-            点击右上角菜单即可分享到朋友圈或好友
-          </span>
-        )}
-        {!inWeChat && (
-          <span className="text-sm text-[var(--muted)] flex items-center">
-            粘贴到微信发给朋友
-          </span>
-        )}
-      </div>
+    <div className="mt-12 pt-8 border-t border-[var(--subtle)] border-opacity-20 flex justify-end">
+      <button
+        onClick={copyLink}
+        className="text-sm border border-[var(--foreground)] px-4 py-2 hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
+      >
+        {copied ? '已复制链接' : '分享'}
+      </button>
     </div>
   )
 }
