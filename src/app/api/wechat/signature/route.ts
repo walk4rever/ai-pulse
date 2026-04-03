@@ -10,7 +10,7 @@ function sign(ticket: string, nonceStr: string, timestamp: number, url: string):
 async function getTicketFromSupabase(): Promise<string> {
   const supabase = await createServiceClient()
   const { data, error } = await supabase
-    .from('ai_wechat_tokens')
+    .from('ai_pulse_wechat_tokens')
     .select('value, expires_at')
     .eq('key', 'jsapi_ticket')
     .single()

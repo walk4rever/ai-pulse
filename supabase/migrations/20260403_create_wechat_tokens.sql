@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS ai_wechat_tokens (
+CREATE TABLE IF NOT EXISTS ai_pulse_wechat_tokens (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL,
   expires_at TIMESTAMPTZ NOT NULL,
