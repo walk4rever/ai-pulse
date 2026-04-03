@@ -16,21 +16,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="mx-auto max-w-3xl bg-[var(--background)]">
         <header>
           <div className="px-6 py-12">
-            <div className="flex items-center justify-between">
+            <div className="grid grid-cols-3 items-center">
               <Link href="/" className="block">
                 <Logo />
               </Link>
-              <nav className="flex items-center gap-6">
+              <nav className="flex items-center justify-center gap-6">
                 <Link href="/latest" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">最新</Link>
                 <Link href="/weekly" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">周刊</Link>
                 <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">系列</Link>
+              </nav>
+              <div className="flex justify-end">
                 <Link
                   href="/subscribe"
                   className="text-sm border border-[var(--foreground)] px-4 py-2 hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
                 >
                   订阅
                 </Link>
-              </nav>
+              </div>
             </div>
           </div>
         </header>
