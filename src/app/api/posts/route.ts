@@ -14,7 +14,7 @@ interface PostPayload {
   content: string
   type: PostContentType
   date?: string
-  excerpt?: string
+  excerpt: string
   featured?: boolean
   status?: string
   series?: string
@@ -82,6 +82,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Field "date" is not a valid date' }, { status: 422 })
   }
 
+  if (!excerpt || typeof excerpt !== 'string' || !excerpt.trim()) {
+    return NextResponse.json({ error: 'Field "excerpt" is required' }, { status: 422 })
+  }
+
   // Render markdown
   let html: string
   try {
@@ -90,7 +94,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to render markdown content' }, { status: 422 })
   }
 
-  const derivedExcerpt = excerpt?.trim() || deriveExcerpt(content)
+  const derivedExcerpt = excerpt.trim()
 
   const supabase = await createServiceClient()
   const { error } = await supabase.from('ai_pulse_posts').upsert(

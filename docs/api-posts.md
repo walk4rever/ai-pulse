@@ -32,7 +32,7 @@ Authorization: Bearer <API_KEY>
 | `type` | string | ✅ | `daily` / `weekly` / `series` / `interview`，须在当前 key 允许范围内。 |
 | `content` | string | ✅ | 正文，Markdown 格式。不含 frontmatter。 |
 | `date` | string | — | 发布日期，格式 `YYYY-MM-DD`。缺省为当天。 |
-| `excerpt` | string | — | 摘要，纯文本，120–180 字。不填则自动从正文提取前 180 字。建议手动填写。 |
+| `excerpt` | string | ✅ | 摘要，纯文本，120–180 字。 |
 | `series` | string | — | 系列名称，仅 `type: series` 时填写，如 `Harness`。会自动转小写存储。 |
 | `featured` | boolean | — | 是否在首页精选展示。默认 `false`。 |
 | `status` | string | — | `published`（默认）或 `draft`。 |
