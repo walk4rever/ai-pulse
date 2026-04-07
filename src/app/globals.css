@@ -189,10 +189,13 @@ h1, h2, h3, h4, h5, h6 {
 
 /* tables (GFM) */
 .prose table {
+  display: block;
   width: 100%;
   border-collapse: collapse;
   margin: 1.75rem 0;
   font-size: 0.9375rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .prose th {
   font-family: "Noto Sans SC", system-ui, sans-serif;
