@@ -70,11 +70,11 @@ export default function RegisterPage() {
               type="text"
               required
               value={username}
-              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-              placeholder="用户名（仅小写字母、数字、连字符）"
+              onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
+              placeholder="用户名（字母、数字、连字符）"
               minLength={3}
               maxLength={30}
-              pattern="[a-z0-9-]{3,30}"
+              pattern="[a-zA-Z0-9-]{3,30}"
               className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-3 text-sm outline-none focus:border-[var(--foreground)] transition placeholder:text-[var(--subtle)]"
             />
             <p className="mt-1 text-xs text-[var(--muted)]">用于文章署名，注册后可修改</p>

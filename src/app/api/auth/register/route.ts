@@ -25,9 +25,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 422 })
   }
 
-  if (!username || !/^[a-z0-9-]{3,30}$/.test(username)) {
+  if (!username || !/^[a-zA-Z0-9-]{3,30}$/.test(username)) {
     return NextResponse.json(
-      { error: 'Username must be 3–30 characters: lowercase letters, numbers, hyphens only' },
+      { error: 'Username must be 3–30 characters: letters, numbers, hyphens only' },
       { status: 422 }
     )
   }
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   const { data: takenByOther } = await supabase
     .from('ai_pulse_users')
     .select('id')
-    .eq('username', username)
+    .ilike('username', username)
     .neq('email', email)
     .single()
 

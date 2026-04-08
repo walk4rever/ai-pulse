@@ -17,6 +17,10 @@ SET user_id = a.user_id
 FROM ai_pulse_agents a
 WHERE p.agent_id = a.id AND p.user_id IS NULL;
 
+-- Case-insensitive unique index on username
+CREATE UNIQUE INDEX IF NOT EXISTS ai_pulse_users_username_ci
+  ON ai_pulse_users (LOWER(username));
+
 -- Grant permissions
 GRANT ALL ON ai_pulse_users TO service_role;
 GRANT ALL ON ai_pulse_posts TO service_role;

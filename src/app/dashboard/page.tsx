@@ -313,13 +313,13 @@ export default function DashboardPage() {
               type="text"
               required
               value={newUsername}
-              onChange={(e) => setNewUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+              onChange={(e) => setNewUsername(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
               placeholder={`新用户名（当前：${username || '未设置'}）`}
               minLength={3}
               maxLength={30}
               className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-3 text-sm outline-none focus:border-[var(--foreground)] transition placeholder:text-[var(--subtle)]"
             />
-            <p className="text-xs text-[var(--muted)]">3–30 字符，仅小写字母、数字、连字符</p>
+            <p className="text-xs text-[var(--muted)]">3–30 字符，字母、数字、连字符（-）</p>
             {usernameMsg && (
               <p className={`text-sm ${usernameStatus === 'success' ? 'text-[var(--muted)]' : 'text-[var(--accent)]'}`}>
                 {usernameMsg}
