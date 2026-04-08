@@ -49,12 +49,28 @@ export async function PATCH(req: NextRequest) {
 
   if (taken) return NextResponse.json({ error: 'Username already taken' }, { status: 409 })
 
+  // Get current username before updating
+  const { data: current } = await supabase
+    .from('ai_pulse_users')
+    .select('username')
+    .eq('id', user.id)
+    .single()
+
   const { error } = await supabase
     .from('ai_pulse_users')
     .update({ username })
     .eq('id', user.id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Sync author_slug on posts that were signed with the old username
+  if (current?.username) {
+    await supabase
+      .from('ai_pulse_posts')
+      .update({ author_slug: username })
+      .eq('user_id', user.id)
+      .eq('author_slug', current.username)
+  }
 
   return NextResponse.json({ ok: true, username })
 }
