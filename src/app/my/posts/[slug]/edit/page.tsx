@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 
 interface Post {
@@ -32,12 +32,7 @@ export default function MyPostEditPage() {
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (!getToken()) { router.push('/login'); return }
-    fetchPost()
-  }, [slug])
-
-  async function fetchPost() {
+  const fetchPost = useEffectEvent(async () => {
     const res = await fetch(`/api/my/posts/${slug}`, {
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -56,7 +51,12 @@ export default function MyPostEditPage() {
       author_slug: p.author_slug ?? '',
     })
     setLoading(false)
-  }
+  })
+
+  useEffect(() => {
+    if (!getToken()) { router.push('/login'); return }
+    void fetchPost()
+  }, [router, slug])
 
   function update<K extends keyof typeof form>(key: K, value: typeof form[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))

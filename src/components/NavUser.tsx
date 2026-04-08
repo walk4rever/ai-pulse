@@ -1,14 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 
 export function NavUser() {
-  const [loggedIn, setLoggedIn] = useState(false)
-
-  useEffect(() => {
-    setLoggedIn(!!localStorage.getItem('user_token'))
-  }, [])
+  const [loggedIn] = useState(() => (
+    typeof window !== 'undefined' && !!localStorage.getItem('user_token')
+  ))
 
   if (loggedIn) {
     return (

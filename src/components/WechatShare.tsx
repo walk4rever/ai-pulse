@@ -31,11 +31,9 @@ function loadScript(src: string): Promise<void> {
 
 export function WechatShare({ title, description, imageUrl }: WechatShareProps) {
   const [copied, setCopied] = useState(false)
-  const [inWeChat, setInWeChat] = useState(false)
 
   useEffect(() => {
     const isWeChat = /MicroMessenger/i.test(navigator.userAgent)
-    setInWeChat(isWeChat)
     if (!isWeChat) return
 
     const url = window.location.href

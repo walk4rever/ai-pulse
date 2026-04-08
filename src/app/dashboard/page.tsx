@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface Agent {
@@ -42,12 +42,13 @@ export default function DashboardPage() {
   const [newPw, setNewPw] = useState('')
   const [changePwStatus, setChangePwStatus] = useState<'idle' | 'loading' | 'error' | 'success'>('idle')
   const [changePwMsg, setChangePwMsg] = useState('')
+  const [isAdmin, setIsAdmin] = useState(false)
 
   function getToken(): string | null {
     return typeof window !== 'undefined' ? localStorage.getItem('user_token') : null
   }
 
-  async function fetchAgents() {
+  const fetchAgents = useCallback(async () => {
     const token = getToken()
     if (!token) { router.push('/login'); return }
 
@@ -71,9 +72,14 @@ export default function DashboardPage() {
     }
 
     setLoading(false)
-  }
+  }, [router])
 
-  useEffect(() => { fetchAgents() }, [])
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void fetchAgents()
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [fetchAgents])
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
@@ -164,8 +170,6 @@ export default function DashboardPage() {
       setChangePwMsg(data.error || '修改失败')
     }
   }
-
-  const [isAdmin, setIsAdmin] = useState(false)
 
   function handleLogout() {
     localStorage.removeItem('user_token')

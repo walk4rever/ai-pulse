@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getTypeLabel } from '@/lib/content'
 
@@ -29,12 +29,7 @@ export default function MyPostsPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!getToken()) { router.push('/login'); return }
-    fetchPosts()
-  }, [])
-
-  async function fetchPosts() {
+  const fetchPosts = useCallback(async () => {
     const res = await fetch('/api/my/posts', {
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -42,7 +37,15 @@ export default function MyPostsPage() {
     const data = await res.json()
     setPosts(data.posts ?? [])
     setLoading(false)
-  }
+  }, [router])
+
+  useEffect(() => {
+    if (!getToken()) { router.push('/login'); return }
+    const timer = window.setTimeout(() => {
+      void fetchPosts()
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [fetchPosts, router])
 
   async function deletePost(slug: string) {
     if (!confirm(`确认删除「${slug}」？此操作不可撤销。`)) return

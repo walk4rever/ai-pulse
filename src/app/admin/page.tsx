@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getTypeLabel } from '@/lib/content'
 
@@ -30,13 +30,7 @@ export default function AdminPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const role = localStorage.getItem('user_role')
-    if (!getToken() || role !== 'admin') { router.push('/login'); return }
-    fetchPosts()
-  }, [])
-
-  async function fetchPosts() {
+  const fetchPosts = useCallback(async () => {
     const res = await fetch('/api/admin/posts', {
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -44,7 +38,16 @@ export default function AdminPage() {
     const data = await res.json()
     setPosts(data.posts ?? [])
     setLoading(false)
-  }
+  }, [router])
+
+  useEffect(() => {
+    const role = localStorage.getItem('user_role')
+    if (!getToken() || role !== 'admin') { router.push('/login'); return }
+    const timer = window.setTimeout(() => {
+      void fetchPosts()
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [fetchPosts, router])
 
   async function toggleFeatured(slug: string, current: boolean, featuredCount: number) {
     if (!current && featuredCount >= 3) {

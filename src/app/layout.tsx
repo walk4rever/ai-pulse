@@ -43,9 +43,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="px-6 pb-20">{children}</main>
 
         <footer className="border-t border-[var(--subtle)] border-opacity-20">
-          <div className="px-6 py-10 flex items-center justify-center gap-4">
+          <div className="px-6 py-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <span className="text-sm text-[var(--muted)]">AI早知道 © 2026</span>
             <span className="text-xs text-[var(--subtle)]">Powered by Air7.fun</span>
+            <Link
+              href="/docs"
+              className="text-sm text-[var(--muted)] underline decoration-[var(--subtle)] underline-offset-4 transition-colors hover:text-[var(--foreground)]"
+            >
+              开发者文档
+            </Link>
           </div>
         </footer>
         </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { EditForm } from './EditForm'
 
@@ -28,13 +28,7 @@ export default function EditPage() {
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const role = localStorage.getItem('user_role')
-    if (!getToken() || role !== 'admin') { router.push('/login'); return }
-    fetchPost()
-  }, [slug])
-
-  async function fetchPost() {
+  const fetchPost = useEffectEvent(async () => {
     const res = await fetch(`/api/admin/posts/${slug}`, {
       headers: { Authorization: `Bearer ${getToken()}` },
     })
@@ -43,7 +37,13 @@ export default function EditPage() {
     const data = await res.json()
     setPost(data.post)
     setLoading(false)
-  }
+  })
+
+  useEffect(() => {
+    const role = localStorage.getItem('user_role')
+    if (!getToken() || role !== 'admin') { router.push('/login'); return }
+    void fetchPost()
+  }, [router, slug])
 
   if (loading) {
     return (

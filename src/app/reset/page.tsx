@@ -1,26 +1,27 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 function ResetForm() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const email = searchParams.get('email') ?? ''
   const nonce = searchParams.get('nonce') ?? ''
+  const invalidLink = !email || !nonce
 
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'success'>('idle')
   const [message, setMessage] = useState('')
 
-  useEffect(() => {
-    if (!email || !nonce) setStatus('error')
-  }, [email, nonce])
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (invalidLink) {
+      setStatus('error')
+      setMessage('链接无效，请重新申请。')
+      return
+    }
     if (password !== confirm) {
       setStatus('error')
       setMessage('两次密码不一致')
@@ -60,7 +61,7 @@ function ResetForm() {
     )
   }
 
-  if (!email || !nonce) {
+  if (invalidLink) {
     return (
       <div className="text-center">
         <p className="kicker mb-6">链接无效</p>
