@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
+import { NavUser } from '@/components/NavUser'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -27,9 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">系列</Link>
               </nav>
               <div className="flex items-center justify-end gap-4">
-                <Link href="/login" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
-                  登录
-                </Link>
+                <NavUser />
                 <Link
                   href="/subscribe"
                   className="text-sm border border-[var(--foreground)] px-4 py-2 hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
