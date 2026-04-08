@@ -17,12 +17,24 @@ function formatDate(value: string) {
 
 export default function DashboardPage() {
   const router = useRouter()
+  const [email, setEmail] = useState('')
   const [agents, setAgents] = useState<Agent[]>([])
   const [loading, setLoading] = useState(true)
+
+  // New agent
   const [newName, setNewName] = useState('')
   const [creating, setCreating] = useState(false)
-  const [newKey, setNewKey] = useState<{ agentName: string; key: string } | null>(null)
-  const [error, setError] = useState('')
+  const [createError, setCreateError] = useState('')
+
+  // Displayed key (create or rotate)
+  const [shownKey, setShownKey] = useState<{ agentName: string; key: string } | null>(null)
+
+  // Change password
+  const [showChangePassword, setShowChangePassword] = useState(false)
+  const [currentPw, setCurrentPw] = useState('')
+  const [newPw, setNewPw] = useState('')
+  const [changePwStatus, setChangePwStatus] = useState<'idle' | 'loading' | 'error' | 'success'>('idle')
+  const [changePwMsg, setChangePwMsg] = useState('')
 
   function getToken(): string | null {
     return typeof window !== 'undefined' ? localStorage.getItem('user_token') : null
@@ -35,11 +47,11 @@ export default function DashboardPage() {
     const res = await fetch('/api/agents', {
       headers: { Authorization: `Bearer ${token}` },
     })
-
     if (res.status === 401) { router.push('/login'); return }
 
     const data = await res.json()
     setAgents(data.agents ?? [])
+    setEmail(localStorage.getItem('user_email') ?? '')
     setLoading(false)
   }
 
@@ -49,43 +61,72 @@ export default function DashboardPage() {
     e.preventDefault()
     if (!newName.trim()) return
     setCreating(true)
-    setError('')
-    setNewKey(null)
+    setCreateError('')
+    setShownKey(null)
 
     const res = await fetch('/api/agents', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${getToken()}`,
-      },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify({ name: newName.trim() }),
     })
-
     const data = await res.json()
 
     if (res.ok) {
-      setNewKey({ agentName: data.agent.name, key: data.api_key })
+      setShownKey({ agentName: data.agent.name, key: data.api_key })
       setNewName('')
       await fetchAgents()
     } else {
-      setError(data.error || '创建失败')
+      setCreateError(data.error || '创建失败')
     }
     setCreating(false)
   }
 
   async function handleRevoke(id: string, name: string) {
     if (!confirm(`确认撤销 Agent「${name}」的 Key？此操作不可恢复。`)) return
-
     const res = await fetch(`/api/agents/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${getToken()}` },
     })
-
     if (res.ok) await fetchAgents()
+  }
+
+  async function handleRotate(id: string, name: string) {
+    if (!confirm(`重新生成「${name}」的 Key？旧 Key 立即失效。`)) return
+    setShownKey(null)
+    const res = await fetch(`/api/agents/${id}/rotate`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+    const data = await res.json()
+    if (res.ok) setShownKey({ agentName: name, key: data.api_key })
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault()
+    setChangePwStatus('loading')
+    setChangePwMsg('')
+
+    const res = await fetch('/api/auth/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({ current_password: currentPw, new_password: newPw }),
+    })
+    const data = await res.json()
+
+    if (res.ok) {
+      setChangePwStatus('success')
+      setChangePwMsg('密码已更新。')
+      setCurrentPw('')
+      setNewPw('')
+    } else {
+      setChangePwStatus('error')
+      setChangePwMsg(data.error || '修改失败')
+    }
   }
 
   function handleLogout() {
     localStorage.removeItem('user_token')
+    localStorage.removeItem('user_email')
     router.push('/login')
   }
 
@@ -97,11 +138,16 @@ export default function DashboardPage() {
     )
   }
 
+  const activeAgents = agents.filter((a) => a.status === 'active')
+
   return (
     <div className="max-w-2xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-12">
-        <p className="kicker">控制台</p>
+        <div>
+          <p className="kicker">控制台</p>
+          <p className="text-sm text-[var(--muted)] mt-1">{email}</p>
+        </div>
         <button
           onClick={handleLogout}
           className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
@@ -110,18 +156,16 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      {/* New key banner */}
-      {newKey && (
+      {/* Key banner */}
+      {shownKey && (
         <div className="mb-10 border border-[var(--foreground)] p-5">
-          <p className="kicker mb-2">Agent「{newKey.agentName}」创建成功</p>
-          <p className="text-xs text-[var(--muted)] mb-3">
-            API Key 仅显示一次，请立即复制保存。
-          </p>
+          <p className="kicker mb-2">「{shownKey.agentName}」的 API Key</p>
+          <p className="text-xs text-[var(--muted)] mb-3">仅显示一次，请立即复制保存。</p>
           <code className="block text-sm break-all bg-[oklch(0.95_0_0)] px-3 py-2 select-all">
-            {newKey.key}
+            {shownKey.key}
           </code>
           <button
-            onClick={() => setNewKey(null)}
+            onClick={() => setShownKey(null)}
             className="mt-4 text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
           >
             已保存，关闭
@@ -132,26 +176,34 @@ export default function DashboardPage() {
       {/* Agent list */}
       <section className="mb-12">
         <p className="kicker mb-2">我的 Agent</p>
-        <p className="text-sm text-[var(--muted)] mb-6">{agents.length} / 3 个</p>
+        <p className="text-sm text-[var(--muted)] mb-6">{activeAgents.length} / 3 个</p>
 
         {agents.length === 0 ? (
           <p className="text-sm text-[var(--muted)] py-6">还没有 Agent，创建第一个吧。</p>
         ) : (
           <div className="divide-y divide-[oklch(0.85_0_0)]">
             {agents.map((agent) => (
-              <div key={agent.id} className="py-5 flex items-center gap-6">
+              <div key={agent.id} className="py-5 flex items-center gap-4">
                 <div className="flex-1">
                   <p className="text-sm font-medium">{agent.name}</p>
                   <p className="text-xs text-[var(--muted)] mt-1">{formatDate(agent.created_at)}</p>
                 </div>
                 <span className="kicker">{agent.status === 'active' ? '运行中' : '已撤销'}</span>
                 {agent.status === 'active' && (
-                  <button
-                    onClick={() => handleRevoke(agent.id, agent.name)}
-                    className="text-xs text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
-                  >
-                    撤销
-                  </button>
+                  <>
+                    <button
+                      onClick={() => handleRotate(agent.id, agent.name)}
+                      className="text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+                    >
+                      重新生成 Key
+                    </button>
+                    <button
+                      onClick={() => handleRevoke(agent.id, agent.name)}
+                      className="text-xs text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
+                    >
+                      撤销
+                    </button>
+                  </>
                 )}
               </div>
             ))}
@@ -160,8 +212,8 @@ export default function DashboardPage() {
       </section>
 
       {/* Create agent */}
-      {agents.filter((a) => a.status === 'active').length < 3 && (
-        <section className="border-t border-[oklch(0.85_0_0)] pt-10">
+      {activeAgents.length < 3 && (
+        <section className="border-t border-[oklch(0.85_0_0)] pt-10 mb-12">
           <p className="kicker mb-6">创建 Agent</p>
           <form onSubmit={handleCreate} className="flex gap-3">
             <input
@@ -180,18 +232,54 @@ export default function DashboardPage() {
               {creating ? '...' : '创建'}
             </button>
           </form>
-          {error && <p className="mt-3 text-sm text-[var(--accent)]">{error}</p>}
-          <p className="mt-4 text-xs text-[var(--muted)]">
-            创建后 API Key 只显示一次，请妥善保存。
-          </p>
+          {createError && <p className="mt-3 text-sm text-[var(--accent)]">{createError}</p>}
+          <p className="mt-4 text-xs text-[var(--muted)]">API Key 只显示一次，请妥善保存。</p>
         </section>
       )}
 
-      {agents.filter((a) => a.status === 'active').length >= 3 && (
-        <p className="text-sm text-[var(--muted)] border-t border-[oklch(0.85_0_0)] pt-8">
-          已达到最大 Agent 数量（3 个）。撤销一个后可以创建新的。
-        </p>
-      )}
+      {/* Change password */}
+      <section className="border-t border-[oklch(0.85_0_0)] pt-10">
+        <button
+          onClick={() => { setShowChangePassword(!showChangePassword); setChangePwStatus('idle'); setChangePwMsg('') }}
+          className="kicker hover:text-[var(--foreground)] transition-colors"
+        >
+          {showChangePassword ? '取消修改密码' : '修改密码'}
+        </button>
+
+        {showChangePassword && (
+          <form onSubmit={handleChangePassword} className="mt-6 space-y-4">
+            <input
+              type="password"
+              required
+              value={currentPw}
+              onChange={(e) => setCurrentPw(e.target.value)}
+              placeholder="当前密码"
+              className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-3 text-sm outline-none focus:border-[var(--foreground)] transition placeholder:text-[var(--subtle)]"
+            />
+            <input
+              type="password"
+              required
+              minLength={8}
+              value={newPw}
+              onChange={(e) => setNewPw(e.target.value)}
+              placeholder="新密码（至少 8 位）"
+              className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-3 text-sm outline-none focus:border-[var(--foreground)] transition placeholder:text-[var(--subtle)]"
+            />
+            {changePwMsg && (
+              <p className={`text-sm ${changePwStatus === 'success' ? 'text-[var(--muted)]' : 'text-[var(--accent)]'}`}>
+                {changePwMsg}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={changePwStatus === 'loading'}
+              className="w-full bg-[var(--foreground)] text-[var(--background)] py-3 text-sm font-medium hover:opacity-80 transition-opacity disabled:opacity-50"
+            >
+              {changePwStatus === 'loading' ? '处理中...' : '确认修改'}
+            </button>
+          </form>
+        )}
+      </section>
     </div>
   )
 }

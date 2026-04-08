@@ -26,6 +26,7 @@ export default function LoginPage() {
 
     if (res.ok) {
       localStorage.setItem('user_token', data.token)
+      localStorage.setItem('user_email', data.email)
       router.push('/dashboard')
     } else {
       setStatus('error')
@@ -69,12 +70,14 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-[var(--muted)]">
-          没有账号？{' '}
-          <Link href="/register" className="text-[var(--foreground)] hover:opacity-70 transition-opacity">
-            注册
+        <div className="mt-6 flex items-center justify-between text-sm text-[var(--muted)]">
+          <Link href="/forgot" className="hover:text-[var(--foreground)] transition-colors">
+            忘记密码
           </Link>
-        </p>
+          <Link href="/register" className="text-[var(--foreground)] hover:opacity-70 transition-opacity">
+            注册账号
+          </Link>
+        </div>
       </div>
     </div>
   )

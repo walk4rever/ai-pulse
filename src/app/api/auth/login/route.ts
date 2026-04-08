@@ -19,19 +19,15 @@ export async function POST(req: NextRequest) {
 
   const supabase = await createServiceClient()
 
-  const { data: user, error: queryError } = await supabase
+  const { data: user } = await supabase
     .from('ai_pulse_users')
-    .select('id, password_hash, email_verified_at')
+    .select('id, email, password_hash, email_verified_at')
     .eq('email', email)
     .single()
-
-  console.error('[login] query result:', { user: !!user, queryError })
 
   // Constant-time: always verify even if user not found (use dummy hash)
   const storedHash = user?.password_hash ?? 'pbkdf2:100000:dummy:dummy'
   const valid = verifyPassword(password, storedHash)
-
-  console.error('[login] valid:', valid, 'user found:', !!user)
 
   if (!user || !valid) {
     return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
@@ -53,5 +49,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Login failed' }, { status: 500 })
   }
 
-  return NextResponse.json({ token, expires_at: expiresAt })
+  return NextResponse.json({ token, expires_at: expiresAt, email: user.email })
 }
