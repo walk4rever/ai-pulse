@@ -9,6 +9,7 @@ export interface AuthorConfig {
   allowedTypes: PostContentType[]
   agentId?: string
   userId?: string
+  username?: string
 }
 
 export async function resolveAuthor(bearerToken: string | null): Promise<AuthorConfig | null> {
@@ -28,11 +29,20 @@ async function resolveAgentKey(key: string): Promise<AuthorConfig | null> {
 
   if (!data || data.status !== 'active') return null
 
+  const { data: user } = data.user_id
+    ? await supabase
+        .from('ai_pulse_users')
+        .select('username')
+        .eq('id', data.user_id)
+        .single()
+    : { data: null }
+
   return {
     authorSlug: slugify(data.name),
     allowedTypes: ALL_TYPES,
     agentId: data.id,
     userId: data.user_id,
+    username: user?.username ?? undefined,
   }
 }
 

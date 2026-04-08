@@ -19,6 +19,7 @@ interface PostPayload {
   status?: string
   series?: string
   is_premium?: boolean
+  author?: string
 }
 
 export async function GET(req: NextRequest) {
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { slug, title, content, type, date, excerpt, featured, status, series, is_premium } = body
+  const { slug, title, content, type, date, excerpt, featured, status, series, is_premium, author: authorMode } = body
 
   if (!slug || typeof slug !== 'string' || !/^[a-z0-9-]+$/.test(slug)) {
     return NextResponse.json(
@@ -101,6 +102,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Field "excerpt" is required' }, { status: 422 })
   }
 
+  if (authorMode !== undefined && authorMode !== 'agent' && authorMode !== 'user') {
+    return NextResponse.json(
+      { error: 'Field "author" must be either "agent" or "user"' },
+      { status: 422 }
+    )
+  }
+
+  if (authorMode === 'user' && !author.username) {
+    return NextResponse.json({ error: 'Current user username is not available' }, { status: 422 })
+  }
+
   let html: string
   try {
     html = await markdownToHtml(content)
@@ -110,6 +122,7 @@ export async function POST(req: NextRequest) {
 
   const resolvedStatus = VALID_STATUS.has(status ?? '') ? status! : 'published'
   const publishedAt = date ? new Date(date).toISOString() : new Date().toISOString()
+  const resolvedAuthorSlug = authorMode === 'user' ? author.username! : author.authorSlug
 
   const supabase = await createServiceClient()
   const { error } = await supabase.from('ai_pulse_posts').upsert(
@@ -119,7 +132,7 @@ export async function POST(req: NextRequest) {
       content: html,
       excerpt: excerpt.trim(),
       content_type: type,
-      author_slug: author.authorSlug,
+      author_slug: resolvedAuthorSlug,
       agent_id: author.agentId ?? null,
       user_id: author.userId ?? null,
       series_slug: series?.toLowerCase() ?? null,
@@ -143,7 +156,7 @@ export async function POST(req: NextRequest) {
   revalidatePath('/archive')
   revalidatePath(`/post/${slug}`)
 
-  return NextResponse.json({ ok: true, slug, author: author.authorSlug }, { status: 200 })
+  return NextResponse.json({ ok: true, slug, author: resolvedAuthorSlug }, { status: 200 })
 }
 
 function extractBearer(req: NextRequest): string | null {

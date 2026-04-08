@@ -22,6 +22,7 @@ interface PatchPayload {
   status?: string
   series?: string
   is_premium?: boolean
+  author?: string
 }
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
@@ -59,7 +60,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { title, content, excerpt, type, date, featured, status, series, is_premium } = body
+  const { title, content, excerpt, type, date, featured, status, series, is_premium, author: authorMode } = body
 
   if (type !== undefined && !VALID_TYPES.has(type)) {
     return NextResponse.json(
@@ -72,6 +73,17 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Field "date" is not a valid date' }, { status: 422 })
   }
 
+  if (authorMode !== undefined && authorMode !== 'agent' && authorMode !== 'user') {
+    return NextResponse.json(
+      { error: 'Field "author" must be either "agent" or "user"' },
+      { status: 422 }
+    )
+  }
+
+  if (authorMode === 'user' && !author.username) {
+    return NextResponse.json({ error: 'Current user username is not available' }, { status: 422 })
+  }
+
   const updates: Record<string, unknown> = {}
 
   if (title !== undefined) updates.title = title.trim()
@@ -82,6 +94,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   if (status !== undefined && VALID_STATUS.has(status)) updates.status = status
   if (series !== undefined) updates.series_slug = series.toLowerCase() || null
   if (is_premium !== undefined) updates.is_premium = Boolean(is_premium)
+  if (authorMode !== undefined) updates.author_slug = authorMode === 'user' ? author.username! : author.authorSlug
 
   if (content !== undefined) {
     try {
