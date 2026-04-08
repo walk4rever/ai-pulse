@@ -8,14 +8,14 @@ import crypto from 'crypto'
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
-  let body: { email?: string; password?: string }
+  let body: { email?: string; password?: string; username?: string }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { email, password } = body
+  const { email, password, username } = body
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: 'Valid email is required' }, { status: 422 })
@@ -23,6 +23,13 @@ export async function POST(req: NextRequest) {
 
   if (!password || password.length < 8) {
     return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 422 })
+  }
+
+  if (!username || !/^[a-z0-9-]{3,30}$/.test(username)) {
+    return NextResponse.json(
+      { error: 'Username must be 3–30 characters: lowercase letters, numbers, hyphens only' },
+      { status: 422 }
+    )
   }
 
   const secret = process.env.EMAIL_CONFIRMATION_SECRET
@@ -42,6 +49,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Email already registered' }, { status: 409 })
   }
 
+  // Check username uniqueness (exclude current user if re-registering same email)
+  const { data: takenByOther } = await supabase
+    .from('ai_pulse_users')
+    .select('id')
+    .eq('username', username)
+    .neq('email', email)
+    .single()
+
+  if (takenByOther) {
+    return NextResponse.json({ error: 'Username already taken' }, { status: 409 })
+  }
+
   const nonce = crypto.randomBytes(16).toString('base64url')
   const nonceHash = hashConfirmationNonce({ nonce, secret })
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
@@ -50,6 +69,7 @@ export async function POST(req: NextRequest) {
   const { error } = await supabase.from('ai_pulse_users').upsert(
     {
       email,
+      username,
       password_hash: passwordHash,
       email_verified_at: null,
       verification_nonce_hash: nonceHash,

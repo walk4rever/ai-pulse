@@ -27,7 +27,7 @@ export default function MyPostEditPage() {
   const slug = params.slug as string
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
-  const [form, setForm] = useState({ title: '', excerpt: '', status: 'published', published_at: '', series_slug: '', is_premium: false })
+  const [form, setForm] = useState({ title: '', excerpt: '', status: 'published', published_at: '', series_slug: '', is_premium: false, author_slug: '' })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
@@ -53,6 +53,7 @@ export default function MyPostEditPage() {
       published_at: p.published_at ? p.published_at.slice(0, 10) : '',
       series_slug: p.series_slug ?? '',
       is_premium: p.is_premium,
+      author_slug: p.author_slug ?? '',
     })
     setLoading(false)
   }
@@ -133,6 +134,12 @@ export default function MyPostEditPage() {
         <div>
           <label className={labelClass}>系列 slug（可选）</label>
           <input type="text" value={form.series_slug} onChange={(e) => update('series_slug', e.target.value)} placeholder="harness" className={inputClass} />
+        </div>
+
+        <div>
+          <label className={labelClass}>署名</label>
+          <input type="text" value={form.author_slug} onChange={(e) => update('author_slug', e.target.value)} placeholder="留空使用 Agent 默认署名" className={inputClass} />
+          <p className="mt-1 text-xs text-[var(--muted)]">可填入你的用户名以署名自己，或留空保持 Agent 署名</p>
         </div>
 
         <div className="flex gap-8">

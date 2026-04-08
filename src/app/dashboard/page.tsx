@@ -18,6 +18,7 @@ function formatDate(value: string) {
 export default function DashboardPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [agents, setAgents] = useState<Agent[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -28,6 +29,12 @@ export default function DashboardPage() {
 
   // Displayed key (create or rotate)
   const [shownKey, setShownKey] = useState<{ agentName: string; key: string } | null>(null)
+
+  // Change username
+  const [showChangeUsername, setShowChangeUsername] = useState(false)
+  const [newUsername, setNewUsername] = useState('')
+  const [usernameStatus, setUsernameStatus] = useState<'idle' | 'loading' | 'error' | 'success'>('idle')
+  const [usernameMsg, setUsernameMsg] = useState('')
 
   // Change password
   const [showChangePassword, setShowChangePassword] = useState(false)
@@ -53,6 +60,16 @@ export default function DashboardPage() {
     setAgents(data.agents ?? [])
     setEmail(localStorage.getItem('user_email') ?? '')
     setIsAdmin(localStorage.getItem('user_role') === 'admin')
+
+    // Fetch profile for username
+    const profileRes = await fetch('/api/auth/profile', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (profileRes.ok) {
+      const profileData = await profileRes.json()
+      setUsername(profileData.profile?.username ?? '')
+    }
+
     setLoading(false)
   }
 
@@ -100,6 +117,29 @@ export default function DashboardPage() {
     })
     const data = await res.json()
     if (res.ok) setShownKey({ agentName: name, key: data.api_key })
+  }
+
+  async function handleChangeUsername(e: React.FormEvent) {
+    e.preventDefault()
+    setUsernameStatus('loading')
+    setUsernameMsg('')
+
+    const res = await fetch('/api/auth/profile', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({ username: newUsername }),
+    })
+    const data = await res.json()
+
+    if (res.ok) {
+      setUsername(data.username)
+      setUsernameStatus('success')
+      setUsernameMsg('用户名已更新。')
+      setNewUsername('')
+    } else {
+      setUsernameStatus('error')
+      setUsernameMsg(data.error || '修改失败')
+    }
   }
 
   async function handleChangePassword(e: React.FormEvent) {
@@ -250,6 +290,51 @@ export default function DashboardPage() {
           <p className="mt-4 text-xs text-[var(--muted)]">API Key 只显示一次，请妥善保存。</p>
         </section>
       )}
+
+      {/* Change username */}
+      <section className="border-t border-[oklch(0.85_0_0)] pt-10 mb-10">
+        <div className="flex items-center justify-between">
+          <div>
+            <button
+              onClick={() => { setShowChangeUsername(!showChangeUsername); setUsernameStatus('idle'); setUsernameMsg('') }}
+              className="kicker hover:text-[var(--foreground)] transition-colors"
+            >
+              {showChangeUsername ? '取消修改用户名' : '修改用户名'}
+            </button>
+            {!showChangeUsername && username && (
+              <span className="ml-3 text-sm text-[var(--muted)]">@{username}</span>
+            )}
+          </div>
+        </div>
+
+        {showChangeUsername && (
+          <form onSubmit={handleChangeUsername} className="mt-6 space-y-4">
+            <input
+              type="text"
+              required
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+              placeholder={`新用户名（当前：${username || '未设置'}）`}
+              minLength={3}
+              maxLength={30}
+              className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-3 text-sm outline-none focus:border-[var(--foreground)] transition placeholder:text-[var(--subtle)]"
+            />
+            <p className="text-xs text-[var(--muted)]">3–30 字符，仅小写字母、数字、连字符</p>
+            {usernameMsg && (
+              <p className={`text-sm ${usernameStatus === 'success' ? 'text-[var(--muted)]' : 'text-[var(--accent)]'}`}>
+                {usernameMsg}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={usernameStatus === 'loading'}
+              className="w-full bg-[var(--foreground)] text-[var(--background)] py-3 text-sm font-medium hover:opacity-80 transition-opacity disabled:opacity-50"
+            >
+              {usernameStatus === 'loading' ? '处理中...' : '确认修改'}
+            </button>
+          </form>
+        )}
+      </section>
 
       {/* Change password */}
       <section className="border-t border-[oklch(0.85_0_0)] pt-10">

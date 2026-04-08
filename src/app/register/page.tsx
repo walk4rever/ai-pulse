@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 export default function RegisterPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
@@ -19,7 +20,7 @@ export default function RegisterPage() {
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, username, password }),
     })
 
     const data = await res.json()
@@ -64,6 +65,20 @@ export default function RegisterPage() {
             placeholder="邮箱"
             className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-3 text-sm outline-none focus:border-[var(--foreground)] transition placeholder:text-[var(--subtle)]"
           />
+          <div>
+            <input
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+              placeholder="用户名（仅小写字母、数字、连字符）"
+              minLength={3}
+              maxLength={30}
+              pattern="[a-z0-9-]{3,30}"
+              className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-3 text-sm outline-none focus:border-[var(--foreground)] transition placeholder:text-[var(--subtle)]"
+            />
+            <p className="mt-1 text-xs text-[var(--muted)]">用于文章署名，注册后可修改</p>
+          </div>
           <input
             type="password"
             required

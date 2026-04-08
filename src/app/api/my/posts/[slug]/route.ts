@@ -7,30 +7,28 @@ interface RouteParams {
   params: Promise<{ slug: string }>
 }
 
-async function verifyOwnership(supabase: Awaited<ReturnType<typeof createServiceClient>>, slug: string, userId: string) {
+function extractBearer(req: NextRequest): string | null {
+  const h = req.headers.get('authorization') ?? ''
+  return h.startsWith('Bearer ') ? h.slice(7) : null
+}
+
+async function verifyOwnership(
+  supabase: Awaited<ReturnType<typeof createServiceClient>>,
+  slug: string,
+  userId: string
+) {
   const { data: post } = await supabase
     .from('ai_pulse_posts')
-    .select('slug, agent_id, title, excerpt, featured, status, published_at, series_slug, is_premium, content_type, author_slug')
+    .select('slug, agent_id, user_id, title, excerpt, featured, status, published_at, series_slug, is_premium, content_type, author_slug')
     .eq('slug', slug)
-    .single()
-
-  if (!post) return null
-
-  const { data: agent } = await supabase
-    .from('ai_pulse_agents')
-    .select('id')
-    .eq('id', post.agent_id)
     .eq('user_id', userId)
     .single()
 
-  if (!agent) return null
-
-  return post
+  return post ?? null
 }
 
 export async function GET(req: NextRequest, { params }: RouteParams) {
-  const token = extractBearer(req)
-  const user = await resolveSession(token)
+  const user = await resolveSession(extractBearer(req))
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { slug } = await params
@@ -43,8 +41,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 }
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
-  const token = extractBearer(req)
-  const user = await resolveSession(token)
+  const user = await resolveSession(extractBearer(req))
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { slug } = await params
@@ -55,7 +52,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
 
-  const allowed = ['title', 'excerpt', 'status', 'published_at', 'series_slug', 'is_premium']
+  const allowed = ['title', 'excerpt', 'status', 'published_at', 'series_slug', 'is_premium', 'author_slug']
   const update: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in body) update[key] = body[key]
@@ -76,8 +73,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 }
 
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
-  const token = extractBearer(req)
-  const user = await resolveSession(token)
+  const user = await resolveSession(extractBearer(req))
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { slug } = await params
@@ -93,9 +89,4 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
   revalidatePath(`/post/${slug}`)
 
   return NextResponse.json({ ok: true })
-}
-
-function extractBearer(req: NextRequest): string | null {
-  const h = req.headers.get('authorization') ?? ''
-  return h.startsWith('Bearer ') ? h.slice(7) : null
 }

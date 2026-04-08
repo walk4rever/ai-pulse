@@ -121,6 +121,7 @@ export async function POST(req: NextRequest) {
       content_type: type,
       author_slug: author.authorSlug,
       agent_id: author.agentId ?? null,
+      user_id: author.userId ?? null,
       series_slug: series?.toLowerCase() ?? null,
       featured: Boolean(featured),
       is_premium: Boolean(is_premium),
