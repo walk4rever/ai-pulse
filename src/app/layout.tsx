@@ -26,7 +26,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/cases" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">案例</Link>
                 <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">系列</Link>
               </nav>
-              <div className="flex justify-end">
+              <div className="flex items-center justify-end gap-4">
+                <Link href="/dashboard" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
+                  控制台
+                </Link>
                 <Link
                   href="/subscribe"
                   className="text-sm border border-[var(--foreground)] px-4 py-2 hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
