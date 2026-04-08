@@ -21,8 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Logo />
               </Link>
               <nav className="flex items-center justify-center gap-6">
-                <Link href="/latest" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">最新</Link>
-                <Link href="/weekly" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">周刊</Link>
+                <Link href="/brief" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">简讯</Link>
+                <Link href="/analysis" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">深度</Link>
+                <Link href="/cases" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">案例</Link>
                 <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">系列</Link>
               </nav>
               <div className="flex justify-end">

@@ -15,15 +15,15 @@ function buildKeyMap(): Map<string, AuthorConfig> {
     ],
     [
       process.env.API_KEY_MONICA ?? '',
-      { authorSlug: 'monica', allowedTypes: ['weekly'] },
+      { authorSlug: 'monica', allowedTypes: ['analysis'] },
     ],
     [
       process.env.API_KEY_DWIGHT ?? '',
-      { authorSlug: 'dwight', allowedTypes: ['daily'] },
+      { authorSlug: 'dwight', allowedTypes: ['brief'] },
     ],
     [
       process.env.API_KEY_ROSS ?? '',
-      { authorSlug: 'ross', allowedTypes: ['daily'] },
+      { authorSlug: 'ross', allowedTypes: ['brief'] },
     ],
   ]
 

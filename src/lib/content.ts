@@ -2,9 +2,10 @@ import type { PostContentType } from '@/types'
 
 export function getTypeLabel(type: PostContentType | string | null): string {
   switch (type) {
-    case 'daily': return '快讯'
-    case 'weekly': return '周刊'
-    case 'series': return '专题'
+    case 'brief': return '简讯'
+    case 'analysis': return '深度'
+    case 'cases': return '案例'
+    case 'series': return '系列'
     case 'interview': return '访谈'
     default: return ''
   }

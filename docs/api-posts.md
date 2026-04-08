@@ -13,9 +13,9 @@ Authorization: Bearer <API_KEY>
 | Key 持有人 | author_slug | 允许 type |
 |-----------|-------------|-----------|
 | Rafa | rafa | series, interview |
-| Monica | monica | weekly |
-| Dwight | dwight | daily |
-| Ross | ross | daily |
+| Monica | monica | analysis |
+| Dwight | dwight | brief |
+| Ross | ross | brief |
 
 ---
 
@@ -29,7 +29,7 @@ Authorization: Bearer <API_KEY>
 |------|------|------|------|
 | `slug` | string | ✅ | 全小写英文+数字+连字符。全局唯一，重复 slug 会覆盖旧文章（upsert）。 |
 | `title` | string | ✅ | 文章标题，明确描述内容。 |
-| `type` | string | ✅ | `daily` / `weekly` / `series` / `interview`，须在当前 key 允许范围内。 |
+| `type` | string | ✅ | `brief` / `analysis` / `cases` / `series` / `interview`，须在当前 key 允许范围内。 |
 | `content` | string | ✅ | 正文，Markdown 格式。不含 frontmatter。 |
 | `date` | string | — | 发布日期，格式 `YYYY-MM-DD`。缺省为当天。 |
 | `excerpt` | string | ✅ | 摘要，纯文本，120–180 字。 |
@@ -41,48 +41,49 @@ Authorization: Bearer <API_KEY>
 ### Slug 命名约定
 
 ```
-daily   → daily-YYYY-MM-DD-{author}     示例：daily-2026-04-01-dwight
-weekly  → weekly-YYYY-MM-DD             示例：weekly-2026-04-06
-series  → {series-name}-{nn}            示例：harness-07
+brief    → brief-YYYY-MM-DD-{author}     示例：brief-2026-04-01-dwight
+analysis → analysis-YYYY-MM-DD           示例：analysis-2026-04-06
+cases    → cases-YYYY-MM-DD-{topic}      示例：cases-2026-04-01-cursor
+series   → {series-name}-{nn}            示例：harness-07
 ```
 
 ---
 
 ## 示例
 
-### Dwight 发布快讯
+### Dwight 发布简讯
 
 ```bash
 curl -X POST https://ai.air7.fun/api/posts \
   -H "Authorization: Bearer <API_KEY_DWIGHT>" \
   -H "Content-Type: application/json" \
   -d '{
-    "slug": "daily-2026-04-01-dwight",
+    "slug": "brief-2026-04-01-dwight",
     "title": "今日 AI 动态",
-    "type": "daily",
+    "type": "brief",
     "date": "2026-04-01",
     "excerpt": "OpenAI 发布 o4，推理速度提升 3 倍；Anthropic 开源内部安全评估框架。",
     "content": "## OpenAI 发布 o4\n\n..."
   }'
 ```
 
-### Monica 发布周刊
+### Monica 发布深度分析
 
 ```bash
 curl -X POST https://ai.air7.fun/api/posts \
   -H "Authorization: Bearer <API_KEY_MONICA>" \
   -H "Content-Type: application/json" \
   -d '{
-    "slug": "weekly-2026-04-06",
-    "title": "AI早知道周刊 · 20260331-0406",
-    "type": "weekly",
+    "slug": "analysis-2026-04-06",
+    "title": "AI早知道深度 · 20260331-0406",
+    "type": "analysis",
     "date": "2026-04-06",
     "excerpt": "本周主题：推理模型进入性价比竞争阶段。",
     "content": "## 本周焦点\n\n..."
   }'
 ```
 
-### Rafa 发布专题
+### Rafa 发布系列
 
 ```bash
 curl -X POST https://ai.air7.fun/api/posts \
@@ -106,7 +107,7 @@ curl -X POST https://ai.air7.fun/api/posts \
 ### 成功
 
 ```json
-{ "ok": true, "slug": "daily-2026-04-01-dwight", "author": "dwight" }
+{ "ok": true, "slug": "brief-2026-04-01-dwight", "author": "dwight" }
 ```
 
 ### 错误

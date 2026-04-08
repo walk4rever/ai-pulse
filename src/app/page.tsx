@@ -61,7 +61,7 @@ function PostItem({ post }: { post: HomePost }) {
 
 function buildSections(posts: HomePost[]): { featured: HomePost[]; recent: HomePost[] } {
   const featured = posts.filter((p) => p.featured).slice(0, 3)
-  const recent = posts.slice(0, 5)
+  const recent = posts.slice(0, 10)
   return { featured, recent }
 }
 
@@ -138,12 +138,15 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
       {/* Recent */}
       <section className="border-t border-[oklch(0.85_0_0)] pt-14">
-        <p className="kicker mb-2">最近</p>
+        <p className="kicker mb-2">最新</p>
         <div className="divide-y divide-[oklch(0.85_0_0)]">
           {recent.map((post) => (
             <PostItem key={post.id} post={post} />
           ))}
         </div>
+        {recent.length === 0 && (
+          <p className="py-8 text-sm text-[var(--muted)]">暂无文章。</p>
+        )}
         <div className="mt-8">
           <Link href="/archive" className="kicker hover:text-[var(--foreground)] transition-colors">
             全部文章 →
