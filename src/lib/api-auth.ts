@@ -1,43 +1,56 @@
 import type { PostContentType } from '@/types'
+import { createServiceClient } from '@/lib/supabase/server'
+import { hashToken } from '@/lib/auth/token'
 
-interface AuthorConfig {
+const ALL_TYPES: PostContentType[] = ['brief', 'analysis', 'cases', 'series', 'interview']
+
+export interface AuthorConfig {
   authorSlug: string
   allowedTypes: PostContentType[]
+  agentId?: string
+  userId?: string
 }
 
-function buildKeyMap(): Map<string, AuthorConfig> {
-  const map = new Map<string, AuthorConfig>()
+// Legacy env-var config (backward compat for existing agents)
+const LEGACY_KEY_MAP: Record<string, AuthorConfig> = {
+  [process.env.API_KEY_RAFA ?? '__unset__']: { authorSlug: 'rafa', allowedTypes: ['series', 'interview'] },
+  [process.env.API_KEY_MONICA ?? '__unset__']: { authorSlug: 'monica', allowedTypes: ['analysis'] },
+  [process.env.API_KEY_DWIGHT ?? '__unset__']: { authorSlug: 'dwight', allowedTypes: ['brief'] },
+  [process.env.API_KEY_ROSS ?? '__unset__']: { authorSlug: 'ross', allowedTypes: ['brief'] },
+}
 
-  const entries: Array<[string, AuthorConfig]> = [
-    [
-      process.env.API_KEY_RAFA ?? '',
-      { authorSlug: 'rafa', allowedTypes: ['series', 'interview'] },
-    ],
-    [
-      process.env.API_KEY_MONICA ?? '',
-      { authorSlug: 'monica', allowedTypes: ['analysis'] },
-    ],
-    [
-      process.env.API_KEY_DWIGHT ?? '',
-      { authorSlug: 'dwight', allowedTypes: ['brief'] },
-    ],
-    [
-      process.env.API_KEY_ROSS ?? '',
-      { authorSlug: 'ross', allowedTypes: ['brief'] },
-    ],
-  ]
+export async function resolveAuthor(bearerToken: string | null): Promise<AuthorConfig | null> {
+  if (!bearerToken) return null
 
-  for (const [key, config] of entries) {
-    if (key) map.set(key, config)
+  // New system: keys prefixed with aipk_
+  if (bearerToken.startsWith('aipk_')) {
+    return resolveAgentKey(bearerToken)
   }
 
-  return map
+  // Legacy: env-var keys
+  return LEGACY_KEY_MAP[bearerToken] ?? null
 }
 
-export function resolveAuthor(
-  bearerToken: string | null
-): AuthorConfig | null {
-  if (!bearerToken) return null
-  const map = buildKeyMap()
-  return map.get(bearerToken) ?? null
+async function resolveAgentKey(key: string): Promise<AuthorConfig | null> {
+  const hash = hashToken(key)
+  const supabase = await createServiceClient()
+
+  const { data } = await supabase
+    .from('ai_pulse_agents')
+    .select('id, name, status, user_id')
+    .eq('key_hash', hash)
+    .single()
+
+  if (!data || data.status !== 'active') return null
+
+  return {
+    authorSlug: slugify(data.name),
+    allowedTypes: ALL_TYPES,
+    agentId: data.id,
+    userId: data.user_id,
+  }
+}
+
+function slugify(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 }
