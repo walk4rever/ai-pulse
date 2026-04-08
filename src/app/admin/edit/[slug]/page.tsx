@@ -1,28 +1,59 @@
-import { createServiceClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
-import { redirect, notFound } from 'next/navigation'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter, useParams } from 'next/navigation'
 import { EditForm } from './EditForm'
 
-export const dynamic = 'force-dynamic'
-
-interface Props {
-  params: Promise<{ slug: string }>
+interface Post {
+  slug: string
+  title: string
+  excerpt: string
+  featured: boolean
+  status: string
+  published_at: string | null
+  series_slug: string | null
+  is_premium: boolean
+  content_type: string
+  author_slug: string | null
 }
 
-export default async function EditPage({ params }: Props) {
-  const cookieStore = await cookies()
-  const session = cookieStore.get('admin_session')?.value
-  if (session !== process.env.ADMIN_PASSWORD) redirect('/admin/login')
+function getToken() {
+  return typeof window !== 'undefined' ? localStorage.getItem('user_token') : null
+}
 
-  const { slug } = await params
-  const supabase = await createServiceClient()
-  const { data: post } = await supabase
-    .from('ai_pulse_posts')
-    .select('slug, title, excerpt, featured, status, published_at, series_slug, is_premium, content_type, author_slug')
-    .eq('slug', slug)
-    .single()
+export default function EditPage() {
+  const router = useRouter()
+  const params = useParams()
+  const slug = params.slug as string
+  const [post, setPost] = useState<Post | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  if (!post) notFound()
+  useEffect(() => {
+    const role = localStorage.getItem('user_role')
+    if (!getToken() || role !== 'admin') { router.push('/login'); return }
+    fetchPost()
+  }, [slug])
+
+  async function fetchPost() {
+    const res = await fetch(`/api/admin/posts/${slug}`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+    if (res.status === 401) { router.push('/login'); return }
+    if (res.status === 404) { router.push('/admin'); return }
+    const data = await res.json()
+    setPost(data.post)
+    setLoading(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-sm text-[var(--muted)]">加载中...</p>
+      </div>
+    )
+  }
+
+  if (!post) return null
 
   return (
     <div className="min-h-screen p-8">

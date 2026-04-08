@@ -1,0 +1,160 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter, useParams } from 'next/navigation'
+
+interface Post {
+  slug: string
+  title: string
+  excerpt: string
+  status: string
+  published_at: string | null
+  series_slug: string | null
+  is_premium: boolean
+  content_type: string
+}
+
+function getToken() {
+  return typeof window !== 'undefined' ? localStorage.getItem('user_token') : null
+}
+
+const inputClass = 'w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-4 py-2.5 text-sm outline-none focus:border-[var(--foreground)] transition'
+const labelClass = 'kicker mb-2 block'
+
+export default function MyPostEditPage() {
+  const router = useRouter()
+  const params = useParams()
+  const slug = params.slug as string
+  const [post, setPost] = useState<Post | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [form, setForm] = useState({ title: '', excerpt: '', status: 'published', published_at: '', series_slug: '', is_premium: false })
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!getToken()) { router.push('/login'); return }
+    fetchPost()
+  }, [slug])
+
+  async function fetchPost() {
+    const res = await fetch(`/api/my/posts/${slug}`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+    if (res.status === 401) { router.push('/login'); return }
+    if (res.status === 404) { router.push('/my/posts'); return }
+    const data = await res.json()
+    const p = data.post
+    setPost(p)
+    setForm({
+      title: p.title,
+      excerpt: p.excerpt ?? '',
+      status: p.status,
+      published_at: p.published_at ? p.published_at.slice(0, 10) : '',
+      series_slug: p.series_slug ?? '',
+      is_premium: p.is_premium,
+    })
+    setLoading(false)
+  }
+
+  function update<K extends keyof typeof form>(key: K, value: typeof form[K]) {
+    setForm((prev) => ({ ...prev, [key]: value }))
+    setSaved(false)
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setSaving(true)
+    setError('')
+
+    const res = await fetch(`/api/my/posts/${slug}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({
+        title: form.title,
+        excerpt: form.excerpt,
+        status: form.status,
+        published_at: form.published_at ? new Date(form.published_at).toISOString() : null,
+        series_slug: form.series_slug || null,
+        is_premium: form.is_premium,
+      }),
+    })
+
+    if (res.ok) {
+      setSaved(true)
+    } else {
+      const data = await res.json()
+      setError(data.error ?? '保存失败')
+    }
+    setSaving(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-[40vh] flex items-center justify-center">
+        <p className="text-sm text-[var(--muted)]">加载中...</p>
+      </div>
+    )
+  }
+
+  if (!post) return null
+
+  return (
+    <div className="max-w-2xl">
+      <div className="flex items-center justify-between mb-8">
+        <a href="/my/posts" className="kicker text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
+          ← 我的文章
+        </a>
+        <a href={`/post/${post.slug}`} target="_blank" className="kicker text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
+          查看文章 →
+        </a>
+      </div>
+
+      <p className="text-lg font-semibold mb-6">编辑文章</p>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <p className="text-xs text-[var(--muted)]">{post.content_type} · {post.slug}</p>
+
+        <div>
+          <label className={labelClass}>标题</label>
+          <input type="text" value={form.title} onChange={(e) => update('title', e.target.value)} required className={inputClass} />
+        </div>
+
+        <div>
+          <label className={labelClass}>摘要</label>
+          <textarea value={form.excerpt} onChange={(e) => update('excerpt', e.target.value)} rows={4} className={inputClass} />
+        </div>
+
+        <div>
+          <label className={labelClass}>发布日期</label>
+          <input type="date" value={form.published_at} onChange={(e) => update('published_at', e.target.value)} className={inputClass} />
+        </div>
+
+        <div>
+          <label className={labelClass}>系列 slug（可选）</label>
+          <input type="text" value={form.series_slug} onChange={(e) => update('series_slug', e.target.value)} placeholder="harness" className={inputClass} />
+        </div>
+
+        <div className="flex gap-8">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={form.is_premium} onChange={(e) => update('is_premium', e.target.checked)} />
+            <span className="kicker">付费</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={form.status === 'published'} onChange={(e) => update('status', e.target.checked ? 'published' : 'draft')} />
+            <span className="kicker">已发布</span>
+          </label>
+        </div>
+
+        {error && <p className="text-sm text-[var(--accent)]">{error}</p>}
+
+        <div className="flex items-center gap-4 pt-2">
+          <button type="submit" disabled={saving} className="bg-[var(--foreground)] text-[var(--background)] px-6 py-2.5 text-sm hover:opacity-80 transition-opacity disabled:opacity-50">
+            {saving ? '保存中...' : '保存'}
+          </button>
+          {saved && <span className="text-sm text-[var(--muted)]">已保存</span>}
+        </div>
+      </form>
+    </div>
+  )
+}

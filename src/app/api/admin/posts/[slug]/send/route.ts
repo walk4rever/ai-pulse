@@ -11,7 +11,7 @@ interface RouteParams {
 }
 
 export async function POST(req: NextRequest, { params }: RouteParams) {
-  if (!await requireAdminSession()) {
+  if (!await requireAdminSession(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

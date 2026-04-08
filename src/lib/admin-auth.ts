@@ -1,7 +1,9 @@
-import { cookies } from 'next/headers'
+import { NextRequest } from 'next/server'
+import { resolveSession } from '@/lib/auth/session'
 
-export async function requireAdminSession(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const session = cookieStore.get('admin_session')?.value
-  return session === process.env.ADMIN_PASSWORD
+export async function requireAdminSession(req: NextRequest): Promise<boolean> {
+  const header = req.headers.get('authorization') ?? ''
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null
+  const user = await resolveSession(token)
+  return user?.role === 'admin'
 }

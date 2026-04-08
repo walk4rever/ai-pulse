@@ -52,6 +52,7 @@ export default function DashboardPage() {
     const data = await res.json()
     setAgents(data.agents ?? [])
     setEmail(localStorage.getItem('user_email') ?? '')
+    setIsAdmin(localStorage.getItem('user_role') === 'admin')
     setLoading(false)
   }
 
@@ -124,9 +125,12 @@ export default function DashboardPage() {
     }
   }
 
+  const [isAdmin, setIsAdmin] = useState(false)
+
   function handleLogout() {
     localStorage.removeItem('user_token')
     localStorage.removeItem('user_email')
+    localStorage.removeItem('user_role')
     router.push('/login')
   }
 
@@ -148,12 +152,22 @@ export default function DashboardPage() {
           <p className="kicker">控制台</p>
           <p className="text-sm text-[var(--muted)] mt-1">{email}</p>
         </div>
-        <button
-          onClick={handleLogout}
-          className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
-        >
-          退出登录
-        </button>
+        <div className="flex items-center gap-5">
+          <a href="/my/posts" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
+            我的文章
+          </a>
+          {isAdmin && (
+            <a href="/admin" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
+              管理后台
+            </a>
+          )}
+          <button
+            onClick={handleLogout}
+            className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+          >
+            退出登录
+          </button>
+        </div>
       </div>
 
       {/* Key banner */}

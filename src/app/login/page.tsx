@@ -27,6 +27,7 @@ export default function LoginPage() {
     if (res.ok) {
       localStorage.setItem('user_token', data.token)
       localStorage.setItem('user_email', data.email)
+      localStorage.setItem('user_role', data.role)
       router.push('/dashboard')
     } else {
       setStatus('error')

@@ -53,9 +53,10 @@ export function EditForm({ post }: { post: Post }) {
       is_premium: form.is_premium,
     }
 
+    const token = localStorage.getItem('user_token')
     const res = await fetch(`/api/admin/posts/${post.slug}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(body),
     })
 
@@ -74,8 +75,10 @@ export function EditForm({ post }: { post: Post }) {
     setError('')
     setSendResult('')
 
+    const token = localStorage.getItem('user_token')
     const res = await fetch(`/api/admin/posts/${post.slug}/send`, {
       method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
     })
 
     const data = await res.json().catch(() => null)

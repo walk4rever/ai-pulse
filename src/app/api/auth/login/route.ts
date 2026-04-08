@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
   const { data: user } = await supabase
     .from('ai_pulse_users')
-    .select('id, email, password_hash, email_verified_at')
+    .select('id, email, role, password_hash, email_verified_at')
     .eq('email', email)
     .single()
 
@@ -49,5 +49,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Login failed' }, { status: 500 })
   }
 
-  return NextResponse.json({ token, expires_at: expiresAt, email: user.email })
+  return NextResponse.json({ token, expires_at: expiresAt, email: user.email, role: user.role })
 }

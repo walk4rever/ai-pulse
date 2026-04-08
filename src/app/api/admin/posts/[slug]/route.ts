@@ -7,8 +7,26 @@ interface RouteParams {
   params: Promise<{ slug: string }>
 }
 
-export async function DELETE(_req: NextRequest, { params }: RouteParams) {
-  if (!await requireAdminSession()) {
+export async function GET(req: NextRequest, { params }: RouteParams) {
+  if (!await requireAdminSession(req)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { slug } = await params
+  const supabase = await createServiceClient()
+  const { data: post, error } = await supabase
+    .from('ai_pulse_posts')
+    .select('slug, title, excerpt, featured, status, published_at, series_slug, is_premium, content_type, author_slug')
+    .eq('slug', slug)
+    .single()
+
+  if (error || !post) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  return NextResponse.json({ post })
+}
+
+export async function DELETE(req: NextRequest, { params }: RouteParams) {
+  if (!await requireAdminSession(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -19,7 +37,6 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   revalidatePath('/')
-  revalidatePath('/latest')
   revalidatePath('/archive')
   revalidatePath(`/post/${slug}`)
 
@@ -27,7 +44,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
 }
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
-  if (!await requireAdminSession()) {
+  if (!await requireAdminSession(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -51,7 +68,6 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   revalidatePath('/')
-  revalidatePath('/latest')
   revalidatePath('/archive')
   revalidatePath(`/post/${slug}`)
 
