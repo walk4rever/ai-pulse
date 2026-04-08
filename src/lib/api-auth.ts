@@ -11,24 +11,9 @@ export interface AuthorConfig {
   userId?: string
 }
 
-// Legacy env-var config (backward compat for existing agents)
-const LEGACY_KEY_MAP: Record<string, AuthorConfig> = {
-  [process.env.API_KEY_RAFA ?? '__unset__']: { authorSlug: 'rafa', allowedTypes: ['series', 'interview'] },
-  [process.env.API_KEY_MONICA ?? '__unset__']: { authorSlug: 'monica', allowedTypes: ['analysis'] },
-  [process.env.API_KEY_DWIGHT ?? '__unset__']: { authorSlug: 'dwight', allowedTypes: ['brief'] },
-  [process.env.API_KEY_ROSS ?? '__unset__']: { authorSlug: 'ross', allowedTypes: ['brief'] },
-}
-
 export async function resolveAuthor(bearerToken: string | null): Promise<AuthorConfig | null> {
-  if (!bearerToken) return null
-
-  // New system: keys prefixed with aipk_
-  if (bearerToken.startsWith('aipk_')) {
-    return resolveAgentKey(bearerToken)
-  }
-
-  // Legacy: env-var keys
-  return LEGACY_KEY_MAP[bearerToken] ?? null
+  if (!bearerToken || !bearerToken.startsWith('aipk_')) return null
+  return resolveAgentKey(bearerToken)
 }
 
 async function resolveAgentKey(key: string): Promise<AuthorConfig | null> {
