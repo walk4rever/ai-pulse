@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getTypeLabel } from '@/lib/content'
+import { SeriesManager } from './SeriesManager'
 
 interface Post {
   id: string
@@ -90,14 +91,11 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen p-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="flex items-baseline justify-between mb-8">
           <p className="text-lg font-semibold">管理后台</p>
           <div className="flex items-center gap-6">
             <span className="text-sm text-[var(--muted)]">{posts.length} 篇 · 精选 {featuredCount}/3</span>
-            <a href="/admin/series" className="kicker text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
-              系列管理
-            </a>
             <a href="/dashboard" className="kicker text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
               控制台
             </a>
@@ -110,47 +108,54 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="divide-y divide-[oklch(0.85_0_0)]">
-          {posts.map((post) => (
-            <div key={post.id} className="py-4 flex items-center gap-4">
-              <span className="date shrink-0 w-24">{formatDate(post.published_at)}</span>
-              <span className="kicker shrink-0 w-12">{getTypeLabel(post.content_type)}</span>
-              <div className="flex-1 min-w-0">
-                <a
-                  href={`/post/${post.slug}`}
-                  target="_blank"
-                  className="text-sm leading-snug hover:text-[var(--accent)] transition-colors"
-                >
-                  {post.title}
-                </a>
-                <p className="text-xs text-[var(--muted)] mt-0.5">{post.author_slug}</p>
-              </div>
-              {post.status === 'draft' && (
-                <span className="kicker text-[var(--muted)] shrink-0">草稿</span>
-              )}
-              <div className="flex items-center gap-3 shrink-0">
-                <a
-                  href={`/admin/edit/${post.slug}`}
-                  className="kicker text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
-                >
-                  编辑
-                </a>
-                <button
-                  onClick={() => toggleFeatured(post.slug, post.featured, featuredCount)}
-                  className={`kicker transition-colors ${post.featured ? 'text-[var(--accent)]' : 'text-[var(--muted)] hover:text-[var(--foreground)]'}`}
-                >
-                  {post.featured ? '★ 精选' : '☆ 精选'}
-                </button>
-                <button
-                  onClick={() => deletePost(post.slug)}
-                  className="kicker text-[var(--muted)] hover:text-red-500 transition-colors"
-                >
-                  删除
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="mb-12">
+          <SeriesManager />
         </div>
+
+        <section>
+          <p className="text-lg font-semibold mb-4">文章管理</p>
+          <div className="divide-y divide-[oklch(0.85_0_0)]">
+            {posts.map((post) => (
+              <div key={post.id} className="py-4 flex items-center gap-4">
+                <span className="date shrink-0 w-24">{formatDate(post.published_at)}</span>
+                <span className="kicker shrink-0 w-12">{getTypeLabel(post.content_type)}</span>
+                <div className="flex-1 min-w-0">
+                  <a
+                    href={`/post/${post.slug}`}
+                    target="_blank"
+                    className="text-sm leading-snug hover:text-[var(--accent)] transition-colors"
+                  >
+                    {post.title}
+                  </a>
+                  <p className="text-xs text-[var(--muted)] mt-0.5">{post.author_slug}</p>
+                </div>
+                {post.status === 'draft' && (
+                  <span className="kicker text-[var(--muted)] shrink-0">草稿</span>
+                )}
+                <div className="flex items-center gap-3 shrink-0">
+                  <a
+                    href={`/admin/edit/${post.slug}`}
+                    className="kicker text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+                  >
+                    编辑
+                  </a>
+                  <button
+                    onClick={() => toggleFeatured(post.slug, post.featured, featuredCount)}
+                    className={`kicker transition-colors ${post.featured ? 'text-[var(--accent)]' : 'text-[var(--muted)] hover:text-[var(--foreground)]'}`}
+                  >
+                    {post.featured ? '★ 精选' : '☆ 精选'}
+                  </button>
+                  <button
+                    onClick={() => deletePost(post.slug)}
+                    className="kicker text-[var(--muted)] hover:text-red-500 transition-colors"
+                  >
+                    删除
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   )
