@@ -297,7 +297,7 @@ export function SeriesManager() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[360px_1fr] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
         <section className="bg-[var(--background)] border border-[var(--subtle)] border-opacity-35 p-4 space-y-4">
           <p className="kicker">新建系列</p>
           <input

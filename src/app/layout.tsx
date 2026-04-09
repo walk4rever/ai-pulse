@@ -16,27 +16,39 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="antialiased">
         <div className="mx-auto max-w-3xl bg-[var(--background)]">
         <header>
-          <div className="px-6 py-12">
-            <div className="grid grid-cols-3 items-center">
+          <div className="px-5 md:px-6 py-6 md:py-12">
+            {/* Top row: logo + actions (mobile: flex, desktop: grid cols 3 with centered nav) */}
+            <div className="flex items-center justify-between md:grid md:grid-cols-3">
               <Link href="/" className="block">
                 <Logo />
               </Link>
-              <nav className="flex items-center justify-center gap-6">
+              {/* Desktop nav — center column */}
+              <nav className="hidden md:flex items-center justify-center gap-6">
                 <Link href="/brief" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">简讯</Link>
                 <Link href="/analysis" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">深度</Link>
                 <Link href="/cases" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">案例</Link>
+                <Link href="/interview" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">访谈</Link>
                 <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">系列</Link>
               </nav>
-              <div className="flex items-center justify-end gap-4">
+              <div className="flex items-center justify-end gap-3 md:gap-4">
                 <NavUser />
                 <Link
                   href="/subscribe"
-                  className="text-sm border border-[var(--foreground)] px-4 py-2 hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
+                  className="text-sm border border-[var(--foreground)] px-3 py-1.5 md:px-4 md:py-2 hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
                 >
                   订阅
                 </Link>
               </div>
             </div>
+
+            {/* Mobile nav — second row, horizontal scrollable */}
+            <nav className="md:hidden mt-5 -mx-5 px-5 flex items-center gap-6 overflow-x-auto scrollbar-hide">
+              <Link href="/brief" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">简讯</Link>
+              <Link href="/analysis" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">深度</Link>
+              <Link href="/cases" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">案例</Link>
+              <Link href="/interview" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">访谈</Link>
+              <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">系列</Link>
+            </nav>
           </div>
         </header>
 

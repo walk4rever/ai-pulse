@@ -1,9 +1,11 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { getTypeLabel } from '@/lib/content'
 import { SeriesManager } from './SeriesManager'
+
+type AdminTab = 'posts' | 'series'
 
 interface Post {
   id: string
@@ -27,11 +29,37 @@ function getToken() {
 }
 
 export default function AdminPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-sm text-[var(--muted)]">加载中...</p>
+      </div>
+    }>
+      <AdminConsole />
+    </Suspense>
+  )
+}
+
+function AdminConsole() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get('tab')
+  const activeTab: AdminTab = tabParam === 'series' ? 'series' : 'posts'
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const pageSize = 50
+
+  const setActiveTab = useCallback((next: AdminTab) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (next === 'posts') {
+      params.delete('tab')
+    } else {
+      params.set('tab', next)
+    }
+    const qs = params.toString()
+    router.replace(qs ? `/admin?${qs}` : '/admin', { scroll: false })
+  }, [router, searchParams])
 
   const fetchPosts = useCallback(async () => {
     const res = await fetch('/api/admin/posts', {
@@ -103,13 +131,13 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen p-6 lg:p-10">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <header className="bg-[color-mix(in_oklch,var(--background)_90%,var(--accent)_10%)] border border-[color-mix(in_oklch,var(--subtle)_45%,var(--accent)_20%)] p-6 lg:p-8">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-10">
+      <div className="max-w-7xl mx-auto space-y-6 lg:space-y-8">
+        <header className="bg-[color-mix(in_oklch,var(--background)_90%,var(--accent)_10%)] border border-[color-mix(in_oklch,var(--subtle)_45%,var(--accent)_20%)] p-5 sm:p-6 lg:p-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
               <p className="kicker mb-2">Admin Console</p>
-              <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight">内容编排后台</h1>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight">内容编排后台</h1>
               <p className="text-sm text-[var(--muted)] mt-3">管理系列结构与文章发布节奏。</p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -128,7 +156,7 @@ export default function AdminPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+          <div className="grid grid-cols-3 gap-3 mt-6">
             <div className="bg-[var(--background)] border border-[var(--subtle)] border-opacity-30 px-4 py-3">
               <p className="kicker">文章总数</p>
               <p className="text-xl font-semibold mt-1">{posts.length}</p>
@@ -144,9 +172,38 @@ export default function AdminPage() {
           </div>
         </header>
 
-        <SeriesManager />
+        {/* Tab bar */}
+        <div className="sticky top-0 z-10 bg-[var(--surface)] -mx-4 sm:-mx-6 lg:-mx-10 px-4 sm:px-6 lg:px-10 pt-2 pb-px border-b border-[var(--subtle)] border-opacity-25">
+          <div className="max-w-7xl mx-auto flex items-center gap-8">
+            <button
+              onClick={() => setActiveTab('posts')}
+              className={`py-3 text-sm tracking-tight transition-colors border-b-2 -mb-px ${
+                activeTab === 'posts'
+                  ? 'border-[var(--foreground)] text-[var(--foreground)] font-medium'
+                  : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]'
+              }`}
+            >
+              文章管理
+            </button>
+            <button
+              onClick={() => setActiveTab('series')}
+              className={`py-3 text-sm tracking-tight transition-colors border-b-2 -mb-px ${
+                activeTab === 'series'
+                  ? 'border-[var(--foreground)] text-[var(--foreground)] font-medium'
+                  : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]'
+              }`}
+            >
+              系列编排
+            </button>
+          </div>
+        </div>
 
-        <section className="bg-[var(--background)] border border-[var(--subtle)] border-opacity-35 p-4 lg:p-6">
+        {/* Series panel (kept mounted, toggled via hidden to preserve state) */}
+        <div className={activeTab === 'series' ? '' : 'hidden'}>
+          <SeriesManager />
+        </div>
+
+        <section className={`bg-[var(--background)] border border-[var(--subtle)] border-opacity-35 p-4 lg:p-6 ${activeTab === 'posts' ? '' : 'hidden'}`}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="kicker">Editorial Queue</p>
