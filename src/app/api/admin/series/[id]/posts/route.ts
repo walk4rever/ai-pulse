@@ -6,18 +6,20 @@ interface RouteParams {
   params: Promise<{ id: string }>
 }
 
+interface RelatedPost {
+  id: string
+  slug: string
+  title: string
+  content_type: string
+  status: string
+  published_at: string | null
+}
+
 interface RelationRow {
   post_id: string
   order_index: number
   created_at: string
-  ai_pulse_posts: {
-    id: string
-    slug: string
-    title: string
-    content_type: string
-    status: string
-    published_at: string | null
-  }
+  ai_pulse_posts: RelatedPost | RelatedPost[] | null
 }
 
 async function nextOrderIndex(seriesId: string): Promise<number> {
@@ -49,12 +51,21 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  const posts = ((relations ?? []) as RelationRow[]).map((item) => ({
-    post_id: item.post_id,
-    order_index: item.order_index,
-    joined_at: item.created_at,
-    post: item.ai_pulse_posts,
-  }))
+  const rows = (relations ?? []) as unknown as RelationRow[]
+  const posts = rows
+    .map((item) => {
+      const post = Array.isArray(item.ai_pulse_posts)
+        ? item.ai_pulse_posts[0]
+        : item.ai_pulse_posts
+      if (!post) return null
+      return {
+        post_id: item.post_id,
+        order_index: item.order_index,
+        joined_at: item.created_at,
+        post,
+      }
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null)
 
   return NextResponse.json({ posts })
 }
