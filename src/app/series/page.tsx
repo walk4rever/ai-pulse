@@ -16,12 +16,14 @@ interface SeriesItem {
 interface SeriesPostRow {
   series_id: string
   order_index: number
-  ai_pulse_posts: {
-    id: string
-    slug: string
-    title: string
-    published_at: string | null
-  }
+  post_id: string
+}
+
+interface PublishedPost {
+  id: string
+  slug: string
+  title: string
+  published_at: string | null
 }
 
 function formatDate(value: string | null | undefined) {
@@ -40,12 +42,23 @@ export default async function SeriesPage() {
 
   const { data: relations } = await supabase
     .from('ai_pulse_series_posts')
-    .select('series_id, order_index, ai_pulse_posts!inner(id, slug, title, published_at, status)')
-    .eq('ai_pulse_posts.status', 'published')
+    .select('series_id, post_id, order_index')
     .order('order_index', { ascending: true })
 
   const seriesList = (series ?? []) as SeriesItem[]
-  const relationRows = (relations ?? []) as unknown as SeriesPostRow[]
+  const relationRows = (relations ?? []) as SeriesPostRow[]
+
+  const postIds = [...new Set(relationRows.map((row) => row.post_id))]
+  let postMap = new Map<string, PublishedPost>()
+  if (postIds.length > 0) {
+    const { data: publishedPosts } = await supabase
+      .from('ai_pulse_posts')
+      .select('id, slug, title, published_at')
+      .eq('status', 'published')
+      .in('id', postIds)
+
+    postMap = new Map((publishedPosts ?? []).map((post) => [post.id, post as PublishedPost]))
+  }
 
   const grouped = new Map<string, SeriesPostRow[]>()
   for (const row of relationRows) {
@@ -76,7 +89,8 @@ export default async function SeriesPage() {
 
               <div className="divide-y divide-[oklch(0.85_0_0)]">
                 {items.map((item) => {
-                  const post = item.ai_pulse_posts
+                  const post = postMap.get(item.post_id)
+                  if (!post) return null
                   return (
                     <article key={post.id} className="py-4 flex items-baseline gap-6">
                       <span className="kicker shrink-0 w-6">{String(item.order_index).padStart(2, '0')}</span>
