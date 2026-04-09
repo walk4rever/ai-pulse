@@ -32,6 +32,12 @@ function getToken() {
   return typeof window !== 'undefined' ? localStorage.getItem('user_token') : null
 }
 
+function formatDate(value: string | null) {
+  if (!value) return '未发布'
+  const d = new Date(value)
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
+}
+
 export function SeriesManager() {
   const router = useRouter()
   const [seriesList, setSeriesList] = useState<Series[]>([])
@@ -274,52 +280,62 @@ export function SeriesManager() {
   const postOptions = allPosts.filter((post) => !seriesPosts.some((item) => item.post_id === post.id))
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-[color-mix(in_oklch,var(--background)_93%,var(--accent)_7%)] border border-[color-mix(in_oklch,var(--subtle)_45%,var(--accent)_15%)] p-6 lg:p-8 space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-lg font-semibold">系列管理</p>
-          <p className="text-sm text-[var(--muted)] mt-1">管理员可创建系列，并将任意类型文章加入系列排序。</p>
+          <p className="kicker mb-2">Series Studio</p>
+          <p className="text-2xl font-semibold tracking-tight">系列编排</p>
+          <p className="text-sm text-[var(--muted)] mt-2">创建系列、关联文章、维护顺序。</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="px-3 py-1.5 text-xs border border-[var(--subtle)] border-opacity-40 bg-[var(--background)]">
+            系列 {seriesList.length}
+          </span>
+          <span className="px-3 py-1.5 text-xs border border-[var(--subtle)] border-opacity-40 bg-[var(--background)]">
+            已编排 {seriesPosts.length}
+          </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
-        <section className="border border-[var(--subtle)] border-opacity-30 p-4 space-y-4">
+      <div className="grid grid-cols-1 xl:grid-cols-[360px_1fr] gap-6">
+        <section className="bg-[var(--background)] border border-[var(--subtle)] border-opacity-35 p-4 space-y-4">
           <p className="kicker">新建系列</p>
           <input
             value={newSeriesName}
             onChange={(e) => setNewSeriesName(e.target.value)}
-            placeholder="系列名"
-            className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-3 py-2 text-sm outline-none"
+            placeholder="例如：Harness"
+            className="w-full border border-[var(--subtle)] border-opacity-35 bg-[var(--background)] px-3 py-2.5 text-sm outline-none focus:border-[var(--foreground)] transition-colors"
           />
           <textarea
             value={newSeriesDescription}
             onChange={(e) => setNewSeriesDescription(e.target.value)}
-            placeholder="描述（可选）"
+            placeholder="一句话描述这个系列的主题（可选）"
             rows={3}
-            className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-3 py-2 text-sm outline-none"
+            className="w-full border border-[var(--subtle)] border-opacity-35 bg-[var(--background)] px-3 py-2.5 text-sm outline-none focus:border-[var(--foreground)] transition-colors"
           />
           <button
             onClick={createSeries}
             disabled={saving}
-            className="bg-[var(--foreground)] text-[var(--background)] px-4 py-2 text-sm disabled:opacity-50"
+            className="w-full bg-[var(--foreground)] text-[var(--background)] px-4 py-2.5 text-sm disabled:opacity-50"
           >
-            创建
+            创建系列
           </button>
 
-          <div className="pt-4 border-t border-[var(--subtle)] border-opacity-30">
-            <p className="kicker mb-3">已有系列</p>
-            <div className="space-y-2 max-h-[420px] overflow-auto">
+          <div className="pt-4 border-t border-[var(--subtle)] border-opacity-30 space-y-2">
+            <p className="kicker">已有系列</p>
+            <div className="space-y-2 max-h-[420px] overflow-auto pr-1">
               {seriesList.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setSelectedSeriesId(item.id)}
-                  className={`w-full text-left px-3 py-2 text-sm border transition-colors ${
+                  className={`w-full text-left px-3 py-2.5 text-sm border transition-colors ${
                     selectedSeriesId === item.id
-                      ? 'border-[var(--foreground)] text-[var(--foreground)]'
-                      : 'border-[var(--subtle)] border-opacity-30 text-[var(--muted)] hover:text-[var(--foreground)]'
+                      ? 'border-[var(--foreground)] bg-[color-mix(in_oklch,var(--foreground)_5%,var(--background)_95%)]'
+                      : 'border-[var(--subtle)] border-opacity-35 hover:border-[var(--foreground)]'
                   }`}
                 >
-                  {item.name}
+                  <p className="font-medium">{item.name}</p>
+                  <p className="text-xs text-[var(--muted)] mt-1">{item.description || '无描述'}</p>
                 </button>
               ))}
               {seriesList.length === 0 && <p className="text-xs text-[var(--muted)]">暂无系列</p>}
@@ -327,33 +343,35 @@ export function SeriesManager() {
           </div>
         </section>
 
-        <section className="border border-[var(--subtle)] border-opacity-30 p-4">
+        <section className="bg-[var(--background)] border border-[var(--subtle)] border-opacity-35 p-4">
           {!selectedSeries && (
-            <p className="text-sm text-[var(--muted)]">请先在左侧创建或选择一个系列。</p>
+            <p className="text-sm text-[var(--muted)]">先在左侧创建一个系列，或选择已有系列。</p>
           )}
 
           {selectedSeries && (
             <div className="space-y-6">
-              <div className="space-y-3">
-                <p className="kicker">系列信息</p>
-                <input
-                  value={selectedSeries.name}
-                  onChange={(e) => setSeriesList((prev) => prev.map((item) => item.id === selectedSeries.id ? { ...item, name: e.target.value } : item))}
-                  className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-3 py-2 text-sm outline-none"
-                />
-                <textarea
-                  value={selectedSeries.description}
-                  onChange={(e) => setSeriesList((prev) => prev.map((item) => item.id === selectedSeries.id ? { ...item, description: e.target.value } : item))}
-                  rows={3}
-                  className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-3 py-2 text-sm outline-none"
-                />
-                <div className="flex items-center gap-3">
+              <div className="pb-4 border-b border-[var(--subtle)] border-opacity-30">
+                <p className="kicker mb-3">系列信息</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <input
+                    value={selectedSeries.name}
+                    onChange={(e) => setSeriesList((prev) => prev.map((item) => item.id === selectedSeries.id ? { ...item, name: e.target.value } : item))}
+                    className="w-full border border-[var(--subtle)] border-opacity-35 bg-[var(--background)] px-3 py-2.5 text-sm outline-none focus:border-[var(--foreground)] transition-colors"
+                  />
+                  <textarea
+                    value={selectedSeries.description}
+                    onChange={(e) => setSeriesList((prev) => prev.map((item) => item.id === selectedSeries.id ? { ...item, description: e.target.value } : item))}
+                    rows={2}
+                    className="w-full border border-[var(--subtle)] border-opacity-35 bg-[var(--background)] px-3 py-2.5 text-sm outline-none focus:border-[var(--foreground)] transition-colors"
+                  />
+                </div>
+                <div className="flex flex-wrap items-center gap-3 mt-3">
                   <button
                     onClick={updateSeries}
                     disabled={saving}
                     className="bg-[var(--foreground)] text-[var(--background)] px-4 py-2 text-sm disabled:opacity-50"
                   >
-                    保存系列
+                    保存信息
                   </button>
                   <button
                     onClick={deleteSeries}
@@ -365,13 +383,13 @@ export function SeriesManager() {
                 </div>
               </div>
 
-              <div className="space-y-3 border-t border-[var(--subtle)] border-opacity-30 pt-4">
-                <p className="kicker">加入文章</p>
-                <div className="grid grid-cols-1 md:grid-cols-[1fr_120px_auto] gap-3 items-center">
+              <div className="pb-4 border-b border-[var(--subtle)] border-opacity-30">
+                <p className="kicker mb-3">加入文章</p>
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_130px_auto] gap-3">
                   <select
                     value={selectedPostId}
                     onChange={(e) => setSelectedPostId(e.target.value)}
-                    className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-3 py-2 text-sm outline-none"
+                    className="w-full border border-[var(--subtle)] border-opacity-35 bg-[var(--background)] px-3 py-2.5 text-sm outline-none focus:border-[var(--foreground)] transition-colors"
                   >
                     <option value="">选择文章</option>
                     {postOptions.map((post) => (
@@ -384,35 +402,35 @@ export function SeriesManager() {
                     value={customOrder}
                     onChange={(e) => setCustomOrder(e.target.value)}
                     placeholder="顺序(可选)"
-                    className="w-full border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-3 py-2 text-sm outline-none"
+                    className="w-full border border-[var(--subtle)] border-opacity-35 bg-[var(--background)] px-3 py-2.5 text-sm outline-none focus:border-[var(--foreground)] transition-colors"
                   />
                   <button
                     onClick={addPostToSeries}
                     disabled={saving || !selectedPostId}
-                    className="bg-[var(--foreground)] text-[var(--background)] px-4 py-2 text-sm disabled:opacity-50"
+                    className="bg-[var(--foreground)] text-[var(--background)] px-4 py-2.5 text-sm disabled:opacity-50"
                   >
-                    加入
+                    加入系列
                   </button>
                 </div>
-                <p className="text-xs text-[var(--muted)]">不填顺序时，自动按加入时间排在最后。</p>
+                <p className="text-xs text-[var(--muted)] mt-2">不填顺序时自动追加到末尾。</p>
               </div>
 
-              <div className="space-y-3 border-t border-[var(--subtle)] border-opacity-30 pt-4">
-                <p className="kicker">系列文章</p>
+              <div>
+                <p className="kicker mb-3">系列文章</p>
                 <div className="divide-y divide-[var(--subtle)] divide-opacity-30">
                   {seriesPosts.map((item) => (
-                    <div key={item.post_id} className="py-3 flex items-center gap-4">
+                    <div key={item.post_id} className="py-3 grid grid-cols-[66px_1fr_auto] gap-3 items-center">
                       <input
                         type="number"
                         min={1}
                         defaultValue={item.order_index}
                         onBlur={(e) => { void updateOrder(item.post_id, e.target.value) }}
-                        className="w-16 border border-[var(--subtle)] border-opacity-30 bg-[var(--background)] px-2 py-1 text-sm outline-none"
+                        className="w-16 border border-[var(--subtle)] border-opacity-35 bg-[var(--background)] px-2 py-1.5 text-sm outline-none focus:border-[var(--foreground)] transition-colors"
                       />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm leading-snug">{item.post.title}</p>
+                      <div className="min-w-0">
+                        <p className="text-sm leading-snug truncate">{item.post.title}</p>
                         <p className="text-xs text-[var(--muted)] mt-1">
-                          {getTypeLabel(item.post.content_type)} · {item.post.slug}
+                          {getTypeLabel(item.post.content_type)} · {item.post.slug} · {formatDate(item.post.published_at)}
                         </p>
                       </div>
                       <button

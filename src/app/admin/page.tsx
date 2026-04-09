@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getTypeLabel } from '@/lib/content'
 import { SeriesManager } from './SeriesManager'
@@ -17,7 +17,7 @@ interface Post {
 }
 
 function formatDate(value: string | null) {
-  if (!value) return ''
+  if (!value) return '未发布'
   const d = new Date(value)
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
@@ -30,6 +30,8 @@ export default function AdminPage() {
   const router = useRouter()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const pageSize = 50
 
   const fetchPosts = useCallback(async () => {
     const res = await fetch('/api/admin/posts', {
@@ -37,7 +39,12 @@ export default function AdminPage() {
     })
     if (res.status === 401) { router.push('/login'); return }
     const data = await res.json()
-    setPosts(data.posts ?? [])
+    const nextPosts = data.posts ?? []
+    setPosts(nextPosts)
+    setPage((prev) => {
+      const totalPages = Math.max(1, Math.ceil(nextPosts.length / pageSize))
+      return Math.min(prev, totalPages)
+    })
     setLoading(false)
   }, [router])
 
@@ -79,6 +86,14 @@ export default function AdminPage() {
     router.push('/login')
   }
 
+  const featuredCount = useMemo(() => posts.filter((p) => p.featured).length, [posts])
+  const draftCount = useMemo(() => posts.filter((p) => p.status === 'draft').length, [posts])
+  const totalPages = Math.max(1, Math.ceil(posts.length / pageSize))
+  const pagedPosts = useMemo(() => {
+    const start = (page - 1) * pageSize
+    return posts.slice(start, start + pageSize)
+  }, [page, posts])
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -87,39 +102,91 @@ export default function AdminPage() {
     )
   }
 
-  const featuredCount = posts.filter((p) => p.featured).length
-
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-baseline justify-between mb-8">
-          <p className="text-lg font-semibold">管理后台</p>
-          <div className="flex items-center gap-6">
-            <span className="text-sm text-[var(--muted)]">{posts.length} 篇 · 精选 {featuredCount}/3</span>
-            <a href="/dashboard" className="kicker text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
-              控制台
-            </a>
-            <button
-              onClick={handleLogout}
-              className="kicker text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
-            >
-              退出
-            </button>
+    <div className="min-h-screen p-6 lg:p-10">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <header className="bg-[color-mix(in_oklch,var(--background)_90%,var(--accent)_10%)] border border-[color-mix(in_oklch,var(--subtle)_45%,var(--accent)_20%)] p-6 lg:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div>
+              <p className="kicker mb-2">Admin Console</p>
+              <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight">内容编排后台</h1>
+              <p className="text-sm text-[var(--muted)] mt-3">管理系列结构与文章发布节奏。</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <a
+                href="/dashboard"
+                className="px-4 py-2 text-sm border border-[var(--subtle)] border-opacity-35 hover:border-[var(--foreground)] transition-colors"
+              >
+                控制台
+              </a>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-sm border border-[var(--subtle)] border-opacity-35 hover:border-[var(--foreground)] transition-colors"
+              >
+                退出
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="mb-12">
-          <SeriesManager />
-        </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+            <div className="bg-[var(--background)] border border-[var(--subtle)] border-opacity-30 px-4 py-3">
+              <p className="kicker">文章总数</p>
+              <p className="text-xl font-semibold mt-1">{posts.length}</p>
+            </div>
+            <div className="bg-[var(--background)] border border-[var(--subtle)] border-opacity-30 px-4 py-3">
+              <p className="kicker">草稿</p>
+              <p className="text-xl font-semibold mt-1">{draftCount}</p>
+            </div>
+            <div className="bg-[var(--background)] border border-[var(--subtle)] border-opacity-30 px-4 py-3">
+              <p className="kicker">精选</p>
+              <p className="text-xl font-semibold mt-1">{featuredCount} / 3</p>
+            </div>
+          </div>
+        </header>
 
-        <section>
-          <p className="text-lg font-semibold mb-4">文章管理</p>
-          <div className="divide-y divide-[oklch(0.85_0_0)]">
-            {posts.map((post) => (
-              <div key={post.id} className="py-4 flex items-center gap-4">
-                <span className="date shrink-0 w-24">{formatDate(post.published_at)}</span>
-                <span className="kicker shrink-0 w-12">{getTypeLabel(post.content_type)}</span>
-                <div className="flex-1 min-w-0">
+        <SeriesManager />
+
+        <section className="bg-[var(--background)] border border-[var(--subtle)] border-opacity-35 p-4 lg:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="kicker">Editorial Queue</p>
+              <p className="text-2xl font-semibold tracking-tight mt-1">文章管理</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                disabled={page <= 1}
+                className="px-3 py-1.5 text-xs border border-[var(--subtle)] border-opacity-35 disabled:opacity-40"
+              >
+                上一页
+              </button>
+              <span className="text-xs text-[var(--muted)]">
+                第 {page} / {totalPages} 页
+              </span>
+              <button
+                onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                disabled={page >= totalPages}
+                className="px-3 py-1.5 text-xs border border-[var(--subtle)] border-opacity-35 disabled:opacity-40"
+              >
+                下一页
+              </button>
+            </div>
+          </div>
+
+          <div className="hidden md:grid md:grid-cols-[110px_90px_1fr_70px_170px] px-2 pb-2 border-b border-[var(--subtle)] border-opacity-25 text-xs text-[var(--muted)]">
+            <span>日期</span>
+            <span>类型</span>
+            <span>标题</span>
+            <span>状态</span>
+            <span className="text-right">操作</span>
+          </div>
+
+          <div className="divide-y divide-[var(--subtle)] divide-opacity-25">
+            {pagedPosts.map((post) => (
+              <div key={post.id} className="py-3 md:grid md:grid-cols-[110px_90px_1fr_70px_170px] md:items-center gap-3">
+                <p className="date">{formatDate(post.published_at)}</p>
+                <p className="kicker mt-1 md:mt-0">{getTypeLabel(post.content_type)}</p>
+                <div className="mt-2 md:mt-0 min-w-0">
                   <a
                     href={`/post/${post.slug}`}
                     target="_blank"
@@ -127,12 +194,12 @@ export default function AdminPage() {
                   >
                     {post.title}
                   </a>
-                  <p className="text-xs text-[var(--muted)] mt-0.5">{post.author_slug}</p>
+                  <p className="text-xs text-[var(--muted)] mt-1">{post.author_slug || '—'}</p>
                 </div>
-                {post.status === 'draft' && (
-                  <span className="kicker text-[var(--muted)] shrink-0">草稿</span>
-                )}
-                <div className="flex items-center gap-3 shrink-0">
+                <p className="kicker mt-2 md:mt-0">
+                  {post.status === 'draft' ? '草稿' : '发布'}
+                </p>
+                <div className="mt-3 md:mt-0 flex md:justify-end items-center gap-3">
                   <a
                     href={`/admin/edit/${post.slug}`}
                     className="kicker text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
@@ -155,6 +222,30 @@ export default function AdminPage() {
               </div>
             ))}
           </div>
+          {posts.length > pageSize && (
+            <div className="mt-4 pt-3 border-t border-[var(--subtle)] border-opacity-25 flex items-center justify-between">
+              <p className="text-xs text-[var(--muted)]">共 {posts.length} 篇，每页 {pageSize} 篇</p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                  disabled={page <= 1}
+                  className="px-3 py-1.5 text-xs border border-[var(--subtle)] border-opacity-35 disabled:opacity-40"
+                >
+                  上一页
+                </button>
+                <span className="text-xs text-[var(--muted)]">
+                  {page}/{totalPages}
+                </span>
+                <button
+                  onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                  disabled={page >= totalPages}
+                  className="px-3 py-1.5 text-xs border border-[var(--subtle)] border-opacity-35 disabled:opacity-40"
+                >
+                  下一页
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </div>
