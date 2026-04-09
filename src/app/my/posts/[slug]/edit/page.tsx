@@ -9,9 +9,9 @@ interface Post {
   excerpt: string
   status: string
   published_at: string | null
-  series_slug: string | null
   is_premium: boolean
   content_type: string
+  author_slug: string | null
 }
 
 function getToken() {
@@ -27,7 +27,7 @@ export default function MyPostEditPage() {
   const slug = params.slug as string
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
-  const [form, setForm] = useState({ title: '', excerpt: '', status: 'published', published_at: '', series_slug: '', is_premium: false, author_slug: '' })
+  const [form, setForm] = useState({ title: '', excerpt: '', status: 'published', published_at: '', is_premium: false, author_slug: '' })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
@@ -46,7 +46,6 @@ export default function MyPostEditPage() {
       excerpt: p.excerpt ?? '',
       status: p.status,
       published_at: p.published_at ? p.published_at.slice(0, 10) : '',
-      series_slug: p.series_slug ?? '',
       is_premium: p.is_premium,
       author_slug: p.author_slug ?? '',
     })
@@ -76,8 +75,8 @@ export default function MyPostEditPage() {
         excerpt: form.excerpt,
         status: form.status,
         published_at: form.published_at ? new Date(form.published_at).toISOString() : null,
-        series_slug: form.series_slug || null,
         is_premium: form.is_premium,
+        author_slug: form.author_slug || null,
       }),
     })
 
@@ -129,11 +128,6 @@ export default function MyPostEditPage() {
         <div>
           <label className={labelClass}>发布日期</label>
           <input type="date" value={form.published_at} onChange={(e) => update('published_at', e.target.value)} className={inputClass} />
-        </div>
-
-        <div>
-          <label className={labelClass}>系列 slug（可选）</label>
-          <input type="text" value={form.series_slug} onChange={(e) => update('series_slug', e.target.value)} placeholder="harness" className={inputClass} />
         </div>
 
         <div>

@@ -16,7 +16,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   const supabase = await createServiceClient()
   const { data: post, error } = await supabase
     .from('ai_pulse_posts')
-    .select('slug, title, excerpt, featured, status, published_at, series_slug, is_premium, content_type, author_slug')
+    .select('slug, title, excerpt, featured, status, published_at, is_premium, content_type, author_slug')
     .eq('slug', slug)
     .single()
 
@@ -38,6 +38,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
 
   revalidatePath('/')
   revalidatePath('/archive')
+  revalidatePath('/series')
   revalidatePath(`/post/${slug}`)
 
   return NextResponse.json({ ok: true })
@@ -52,7 +53,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
 
-  const allowed = ['title', 'excerpt', 'featured', 'status', 'published_at', 'series_slug', 'is_premium']
+  const allowed = ['title', 'excerpt', 'featured', 'status', 'published_at', 'is_premium']
   const update: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in body) update[key] = body[key]
@@ -69,6 +70,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
   revalidatePath('/')
   revalidatePath('/archive')
+  revalidatePath('/series')
   revalidatePath(`/post/${slug}`)
 
   return NextResponse.json({ ok: true })

@@ -10,7 +10,6 @@ interface Post {
   featured: boolean
   status: string
   published_at: string | null
-  series_slug: string | null
   is_premium: boolean
   content_type: string
   author_slug: string | null
@@ -24,7 +23,6 @@ export function EditForm({ post }: { post: Post }) {
     featured: post.featured,
     status: post.status,
     published_at: post.published_at ? post.published_at.slice(0, 10) : '',
-    series_slug: post.series_slug ?? '',
     is_premium: post.is_premium,
   })
   const [saving, setSaving] = useState(false)
@@ -49,7 +47,6 @@ export function EditForm({ post }: { post: Post }) {
       featured: form.featured,
       status: form.status,
       published_at: form.published_at ? new Date(form.published_at).toISOString() : null,
-      series_slug: form.series_slug || null,
       is_premium: form.is_premium,
     }
 
@@ -133,17 +130,6 @@ export function EditForm({ post }: { post: Post }) {
           type="date"
           value={form.published_at}
           onChange={(e) => update('published_at', e.target.value)}
-          className={inputClass}
-        />
-      </div>
-
-      <div>
-        <label className={labelClass}>系列 slug（可选）</label>
-        <input
-          type="text"
-          value={form.series_slug}
-          onChange={(e) => update('series_slug', e.target.value)}
-          placeholder="harness"
           className={inputClass}
         />
       </div>

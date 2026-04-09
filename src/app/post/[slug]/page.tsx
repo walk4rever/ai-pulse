@@ -46,15 +46,6 @@ function formatPublishedAt(value: string | null) {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
 
-
-function formatSeriesLabel(seriesSlug: string | null) {
-  if (!seriesSlug) return null
-  return seriesSlug
-    .split('-')
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-    .join(' ')
-}
-
 function formatAuthorLabel(authorSlug: string | null) {
   if (!authorSlug) return '编辑部'
   if (authorSlug === 'rafa') return 'RAFA'
@@ -78,7 +69,6 @@ export default async function PostPage({ params }: Props) {
   if (!post) notFound()
 
   const contentTypeLabel = getTypeLabel(post.content_type)
-  const seriesLabel = formatSeriesLabel(post.series_slug)
   const authorLabel = formatAuthorLabel(post.author_slug)
 
   return (
@@ -90,7 +80,6 @@ export default async function PostPage({ params }: Props) {
       <header className="mb-12 pb-8 border-b border-[var(--subtle)] border-opacity-20">
         <div className="flex flex-wrap items-center gap-4 mb-6">
           <span className="kicker">{contentTypeLabel}</span>
-          {seriesLabel && <span className="kicker">系列 · {seriesLabel}</span>}
           {post.is_premium && <span className="kicker text-[var(--accent)]">付费内容</span>}
         </div>
         <h1 className="text-3xl lg:text-4xl font-semibold leading-tight tracking-tight">

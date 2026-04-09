@@ -5,7 +5,7 @@ import { markdownToHtml } from '@/lib/markdown'
 import { resolveAuthor } from '@/lib/api-auth'
 import type { PostContentType } from '@/types'
 
-const VALID_TYPES = new Set<PostContentType>(['brief', 'analysis', 'cases', 'series', 'interview'])
+const VALID_TYPES = new Set<PostContentType>(['brief', 'analysis', 'case', 'interview'])
 const VALID_STATUS = new Set(['draft', 'published'])
 
 interface PostPayload {
@@ -17,7 +17,6 @@ interface PostPayload {
   excerpt: string
   featured?: boolean
   status?: string
-  series?: string
   is_premium?: boolean
   author?: string
 }
@@ -35,7 +34,7 @@ export async function GET(req: NextRequest) {
   const supabase = await createServiceClient()
   let query = supabase
     .from('ai_pulse_posts')
-    .select('id, slug, title, excerpt, content_type, author_slug, agent_id, published_at, featured, is_premium, series_slug, content')
+    .select('id, slug, title, excerpt, content_type, author_slug, agent_id, published_at, featured, is_premium, content')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .range(offset, offset + limit - 1)
@@ -63,7 +62,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { slug, title, content, type, date, excerpt, featured, status, series, is_premium, author: authorMode } = body
+  const { slug, title, content, type, date, excerpt, featured, status, is_premium, author: authorMode } = body
 
   if (!slug || typeof slug !== 'string' || !/^[a-z0-9-]+$/.test(slug)) {
     return NextResponse.json(
@@ -82,7 +81,7 @@ export async function POST(req: NextRequest) {
 
   if (!VALID_TYPES.has(type)) {
     return NextResponse.json(
-      { error: `Field "type" must be one of: brief, analysis, cases, series, interview` },
+      { error: 'Field "type" must be one of: brief, analysis, case, interview' },
       { status: 422 }
     )
   }
@@ -135,7 +134,6 @@ export async function POST(req: NextRequest) {
       author_slug: resolvedAuthorSlug,
       agent_id: author.agentId ?? null,
       user_id: author.userId ?? null,
-      series_slug: series?.toLowerCase() ?? null,
       featured: Boolean(featured),
       is_premium: Boolean(is_premium),
       status: resolvedStatus,

@@ -95,6 +95,9 @@ export default function AdminPage() {
           <p className="text-lg font-semibold">管理后台</p>
           <div className="flex items-center gap-6">
             <span className="text-sm text-[var(--muted)]">{posts.length} 篇 · 精选 {featuredCount}/3</span>
+            <a href="/admin/series" className="kicker text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
+              系列管理
+            </a>
             <a href="/dashboard" className="kicker text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
               控制台
             </a>

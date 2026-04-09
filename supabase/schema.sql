@@ -7,13 +7,33 @@ CREATE TABLE IF NOT EXISTS ai_pulse_posts (
   excerpt TEXT NOT NULL DEFAULT '',
   is_premium BOOLEAN NOT NULL DEFAULT false,
   status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
-  content_type TEXT NOT NULL DEFAULT 'daily' CHECK (content_type IN ('daily', 'weekly', 'series', 'interview')),
+  content_type TEXT NOT NULL DEFAULT 'brief' CHECK (content_type IN ('brief', 'analysis', 'case', 'interview')),
   featured BOOLEAN NOT NULL DEFAULT false,
   series_slug TEXT,
   author_slug TEXT,
   published_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- AI Pulse series table
+CREATE TABLE IF NOT EXISTS ai_pulse_series (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT UNIQUE NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- AI Pulse series-post relation table
+CREATE TABLE IF NOT EXISTS ai_pulse_series_posts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  series_id UUID NOT NULL REFERENCES ai_pulse_series(id) ON DELETE CASCADE,
+  post_id UUID NOT NULL REFERENCES ai_pulse_posts(id) ON DELETE CASCADE,
+  order_index INTEGER NOT NULL CHECK (order_index > 0),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT ai_pulse_series_posts_unique_series_post UNIQUE (series_id, post_id),
+  CONSTRAINT ai_pulse_series_posts_unique_series_order UNIQUE (series_id, order_index)
 );
 
 -- AI Pulse subscribers table
@@ -54,19 +74,28 @@ CREATE TRIGGER ai_pulse_posts_updated_at
   BEFORE UPDATE ON ai_pulse_posts
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+CREATE TRIGGER ai_pulse_series_updated_at
+  BEFORE UPDATE ON ai_pulse_series
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
 -- RLS: AI Pulse posts are publicly readable when published
 ALTER TABLE ai_pulse_posts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read published ai_pulse_posts" ON ai_pulse_posts
   FOR SELECT USING (status = 'published');
 
--- RLS: AI Pulse subscribers can only be inserted/updated via service role
+-- RLS: service-role managed tables
 ALTER TABLE ai_pulse_subscribers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ai_pulse_series ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ai_pulse_series_posts ENABLE ROW LEVEL SECURITY;
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_ai_pulse_posts_status_published_at ON ai_pulse_posts (status, published_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ai_pulse_posts_content_type_published_at ON ai_pulse_posts (content_type, published_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ai_pulse_posts_featured_published_at ON ai_pulse_posts (featured, published_at DESC) WHERE status = 'published';
 CREATE INDEX IF NOT EXISTS idx_ai_pulse_posts_series_slug_published_at ON ai_pulse_posts (series_slug, published_at DESC) WHERE series_slug IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ai_pulse_series_created_at ON ai_pulse_series (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_pulse_series_posts_series_order ON ai_pulse_series_posts (series_id, order_index ASC);
+CREATE INDEX IF NOT EXISTS idx_ai_pulse_series_posts_post_id ON ai_pulse_series_posts (post_id);
 CREATE INDEX IF NOT EXISTS idx_ai_pulse_subscribers_email ON ai_pulse_subscribers (email);
 CREATE INDEX IF NOT EXISTS idx_ai_pulse_subscribers_confirmed ON ai_pulse_subscribers (confirmed_at) WHERE confirmed_at IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_ai_pulse_subscribers_status ON ai_pulse_subscribers (status);
@@ -76,6 +105,8 @@ GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO postgres, service_role;
 GRANT SELECT ON ai_pulse_posts TO anon, authenticated;
 GRANT ALL ON ai_pulse_subscribers TO service_role;
+GRANT ALL ON ai_pulse_series TO service_role;
+GRANT ALL ON ai_pulse_series_posts TO service_role;
 GRANT ALL ON ai_pulse_email_sends TO service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO postgres, service_role;
 GRANT ALL ON ALL ROUTINES IN SCHEMA public TO postgres, service_role;

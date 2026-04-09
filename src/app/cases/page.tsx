@@ -26,7 +26,7 @@ export default async function CasesPage() {
     .from('ai_pulse_posts')
     .select('id, slug, title, excerpt, published_at, content_type, series_slug')
     .eq('status', 'published')
-    .eq('content_type', 'cases')
+    .eq('content_type', 'case')
     .order('published_at', { ascending: false }).order('created_at', { ascending: false })
 
   const allPosts = (posts ?? []) as ListPost[]

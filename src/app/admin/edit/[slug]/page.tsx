@@ -11,7 +11,6 @@ interface Post {
   featured: boolean
   status: string
   published_at: string | null
-  series_slug: string | null
   is_premium: boolean
   content_type: string
   author_slug: string | null

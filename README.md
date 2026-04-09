@@ -2,17 +2,18 @@
 
 帮你读懂 AI，而不只是跟上 AI。
 
-`AI早知道` 面向所有关注 AI 的用户，围绕**创造力、判断与审美**三个维度，筛选真正重要的变化，通过**周刊**与**深度专题**帮助读者理解这些变化的长期意义。
+`AI早知道` 面向所有关注 AI 的用户，围绕**创造力、判断与审美**三个维度，筛选真正重要的变化，通过**简讯 / 深度 / 案例 / 访谈**帮助读者理解变化的长期意义。
 
 Powered by [Air7.fun](https://air7.fun)
 
 ## 当前能力
 
-- 极简首页：单一文章列表（周刊 / 深度 / Brief 混排）
+- 极简首页：单一文章列表（简讯 / 深度 / 案例 / 访谈混排）
 - 文章详情页：适合中文长文阅读的 editorial 排版
 - 邮件订阅页
 - 双重确认订阅流程
 - 草稿 / 已发布内容工作流
+- 系列管理（管理员）：创建系列、把文章加入多个系列、设置系列内顺序
 - Vault Markdown → Supabase 内容导入脚本
 - 付费内容占位式 paywall
 
@@ -69,6 +70,8 @@ cp .env.example .env.local
 当前 schema 会创建以下表：
 
 - `ai_pulse_posts`
+- `ai_pulse_series`
+- `ai_pulse_series_posts`
 - `ai_pulse_subscribers`
 - `ai_pulse_email_sends`
 

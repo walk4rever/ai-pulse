@@ -5,7 +5,7 @@ import { markdownToHtml } from '@/lib/markdown'
 import { resolveAuthor } from '@/lib/api-auth'
 import type { PostContentType } from '@/types'
 
-const VALID_TYPES = new Set<PostContentType>(['brief', 'analysis', 'cases', 'series', 'interview'])
+const VALID_TYPES = new Set<PostContentType>(['brief', 'analysis', 'case', 'interview'])
 const VALID_STATUS = new Set(['draft', 'published'])
 
 interface RouteParams {
@@ -20,7 +20,6 @@ interface PatchPayload {
   date?: string
   featured?: boolean
   status?: string
-  series?: string
   is_premium?: boolean
   author?: string
 }
@@ -60,11 +59,11 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { title, content, excerpt, type, date, featured, status, series, is_premium, author: authorMode } = body
+  const { title, content, excerpt, type, date, featured, status, is_premium, author: authorMode } = body
 
   if (type !== undefined && !VALID_TYPES.has(type)) {
     return NextResponse.json(
-      { error: `Field "type" must be one of: brief, analysis, cases, series, interview` },
+      { error: 'Field "type" must be one of: brief, analysis, case, interview' },
       { status: 422 }
     )
   }
@@ -92,7 +91,6 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   if (date !== undefined) updates.published_at = new Date(date).toISOString()
   if (featured !== undefined) updates.featured = Boolean(featured)
   if (status !== undefined && VALID_STATUS.has(status)) updates.status = status
-  if (series !== undefined) updates.series_slug = series.toLowerCase() || null
   if (is_premium !== undefined) updates.is_premium = Boolean(is_premium)
   if (authorMode !== undefined) updates.author_slug = authorMode === 'user' ? author.username! : author.authorSlug
 
