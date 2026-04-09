@@ -69,11 +69,11 @@ export default async function SeriesPage() {
 
   return (
     <div>
-      <p className="kicker mb-2">系列</p>
-      <p className="text-sm text-[var(--muted)] mb-10">{seriesList.length} 个系列</p>
+      <p className="kicker mb-2">专题</p>
+      <p className="text-sm text-[var(--muted)] mb-10">{seriesList.length} 个专题</p>
 
       {seriesList.length === 0 && (
-        <p className="text-sm text-[var(--muted)]">系列内容即将发布。</p>
+        <p className="text-sm text-[var(--muted)]">专题内容即将发布。</p>
       )}
 
       <div className="space-y-14">
@@ -107,7 +107,7 @@ export default async function SeriesPage() {
                 })}
 
                 {items.length === 0 && (
-                  <p className="text-sm text-[var(--muted)] py-2">这个系列还没有公开文章。</p>
+                  <p className="text-sm text-[var(--muted)] py-2">这个专题还没有公开文章。</p>
                 )}
               </div>
             </section>

@@ -132,7 +132,7 @@ export function SeriesManager() {
 
     const data = await res.json().catch(() => null)
     if (!res.ok) {
-      alert(data?.error ?? '创建系列失败')
+      alert(data?.error ?? '创建专题失败')
       setSaving(false)
       return
     }
@@ -163,7 +163,7 @@ export function SeriesManager() {
 
     const data = await res.json().catch(() => null)
     if (!res.ok) {
-      alert(data?.error ?? '更新系列失败')
+      alert(data?.error ?? '更新专题失败')
       setSaving(false)
       return
     }
@@ -175,7 +175,7 @@ export function SeriesManager() {
 
   async function deleteSeries() {
     if (!selectedSeries) return
-    if (!confirm(`确认删除系列「${selectedSeries.name}」？`)) return
+    if (!confirm(`确认删除专题「${selectedSeries.name}」？`)) return
 
     setSaving(true)
     const res = await fetch(`/api/admin/series/${selectedSeries.id}`, {
@@ -185,7 +185,7 @@ export function SeriesManager() {
 
     const data = await res.json().catch(() => null)
     if (!res.ok) {
-      alert(data?.error ?? '删除系列失败')
+      alert(data?.error ?? '删除专题失败')
       setSaving(false)
       return
     }
@@ -218,7 +218,7 @@ export function SeriesManager() {
 
     const data = await res.json().catch(() => null)
     if (!res.ok) {
-      alert(data?.error ?? '加入系列失败')
+      alert(data?.error ?? '加入专题失败')
       setSaving(false)
       return
     }
@@ -284,12 +284,12 @@ export function SeriesManager() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="kicker mb-2">Series Studio</p>
-          <p className="text-2xl font-semibold tracking-tight">系列编排</p>
-          <p className="text-sm text-[var(--muted)] mt-2">创建系列、关联文章、维护顺序。</p>
+          <p className="text-2xl font-semibold tracking-tight">专题编排</p>
+          <p className="text-sm text-[var(--muted)] mt-2">创建专题、关联文章、维护顺序。</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="px-3 py-1.5 text-xs border border-[var(--subtle)] border-opacity-40 bg-[var(--background)]">
-            系列 {seriesList.length}
+            专题 {seriesList.length}
           </span>
           <span className="px-3 py-1.5 text-xs border border-[var(--subtle)] border-opacity-40 bg-[var(--background)]">
             已编排 {seriesPosts.length}
@@ -299,7 +299,7 @@ export function SeriesManager() {
 
       <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
         <section className="bg-[var(--background)] border border-[var(--subtle)] border-opacity-35 p-4 space-y-4">
-          <p className="kicker">新建系列</p>
+          <p className="kicker">新建专题</p>
           <input
             value={newSeriesName}
             onChange={(e) => setNewSeriesName(e.target.value)}
@@ -309,7 +309,7 @@ export function SeriesManager() {
           <textarea
             value={newSeriesDescription}
             onChange={(e) => setNewSeriesDescription(e.target.value)}
-            placeholder="一句话描述这个系列的主题（可选）"
+            placeholder="一句话描述这个专题的主题（可选）"
             rows={3}
             className="w-full border border-[var(--subtle)] border-opacity-35 bg-[var(--background)] px-3 py-2.5 text-sm outline-none focus:border-[var(--foreground)] transition-colors"
           />
@@ -318,11 +318,11 @@ export function SeriesManager() {
             disabled={saving}
             className="w-full bg-[var(--foreground)] text-[var(--background)] px-4 py-2.5 text-sm disabled:opacity-50"
           >
-            创建系列
+            创建专题
           </button>
 
           <div className="pt-4 border-t border-[var(--subtle)] border-opacity-30 space-y-2">
-            <p className="kicker">已有系列</p>
+            <p className="kicker">已有专题</p>
             <div className="space-y-2 max-h-[420px] overflow-auto pr-1">
               {seriesList.map((item) => (
                 <button
@@ -338,20 +338,20 @@ export function SeriesManager() {
                   <p className="text-xs text-[var(--muted)] mt-1">{item.description || '无描述'}</p>
                 </button>
               ))}
-              {seriesList.length === 0 && <p className="text-xs text-[var(--muted)]">暂无系列</p>}
+              {seriesList.length === 0 && <p className="text-xs text-[var(--muted)]">暂无专题</p>}
             </div>
           </div>
         </section>
 
         <section className="bg-[var(--background)] border border-[var(--subtle)] border-opacity-35 p-4">
           {!selectedSeries && (
-            <p className="text-sm text-[var(--muted)]">先在左侧创建一个系列，或选择已有系列。</p>
+            <p className="text-sm text-[var(--muted)]">先在左侧创建一个专题，或选择已有专题。</p>
           )}
 
           {selectedSeries && (
             <div className="space-y-6">
               <div className="pb-4 border-b border-[var(--subtle)] border-opacity-30">
-                <p className="kicker mb-3">系列信息</p>
+                <p className="kicker mb-3">专题信息</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <input
                     value={selectedSeries.name}
@@ -378,7 +378,7 @@ export function SeriesManager() {
                     disabled={saving}
                     className="border border-red-500 text-red-500 px-4 py-2 text-sm disabled:opacity-50"
                   >
-                    删除系列
+                    删除专题
                   </button>
                 </div>
               </div>
@@ -409,14 +409,14 @@ export function SeriesManager() {
                     disabled={saving || !selectedPostId}
                     className="bg-[var(--foreground)] text-[var(--background)] px-4 py-2.5 text-sm disabled:opacity-50"
                   >
-                    加入系列
+                    加入专题
                   </button>
                 </div>
                 <p className="text-xs text-[var(--muted)] mt-2">不填顺序时自动追加到末尾。</p>
               </div>
 
               <div>
-                <p className="kicker mb-3">系列文章</p>
+                <p className="kicker mb-3">专题文章</p>
                 <div className="divide-y divide-[var(--subtle)] divide-opacity-30">
                   {seriesPosts.map((item) => (
                     <div key={item.post_id} className="py-3 grid grid-cols-[66px_1fr_auto] gap-3 items-center">
@@ -442,7 +442,7 @@ export function SeriesManager() {
                     </div>
                   ))}
                   {seriesPosts.length === 0 && (
-                    <p className="text-sm text-[var(--muted)] py-2">当前系列还没有文章。</p>
+                    <p className="text-sm text-[var(--muted)] py-2">当前专题还没有文章。</p>
                   )}
                 </div>
               </div>

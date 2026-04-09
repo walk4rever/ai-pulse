@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/analysis" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">深度</Link>
                 <Link href="/cases" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">案例</Link>
                 <Link href="/interview" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">访谈</Link>
-                <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">系列</Link>
+                <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">专题</Link>
               </nav>
               <div className="flex items-center justify-end gap-3 md:gap-4">
                 <NavUser />
@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/analysis" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">深度</Link>
               <Link href="/cases" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">案例</Link>
               <Link href="/interview" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">访谈</Link>
-              <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">系列</Link>
+              <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">专题</Link>
             </nav>
           </div>
         </header>
@@ -55,15 +55,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="px-6 pb-20">{children}</main>
 
         <footer className="border-t border-[var(--subtle)] border-opacity-20">
-          <div className="px-6 py-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <span className="text-sm text-[var(--muted)]">AI早知道 © 2026</span>
-            <span className="text-xs text-[var(--subtle)]">Powered by Air7.fun</span>
-            <Link
-              href="/docs"
-              className="text-sm text-[var(--muted)] underline decoration-[var(--subtle)] underline-offset-4 transition-colors hover:text-[var(--foreground)]"
-            >
-              开发者文档
-            </Link>
+          <div className="px-5 md:px-6 py-8 md:py-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+            <div className="flex items-center gap-2 text-[var(--muted)]">
+              <span className="text-sm">AI早知道 © 2026</span>
+              <span className="text-xs text-[var(--subtle)]">·</span>
+              <span className="text-xs text-[var(--subtle)]">Powered by Air7.fun</span>
+            </div>
+            <div className="flex items-center gap-4 text-sm">
+              <Link
+                href="/docs"
+                className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+              >
+                API
+              </Link>
+              <span className="text-[var(--subtle)] opacity-40 cursor-not-allowed" aria-disabled="true">
+                RSS
+              </span>
+              <a
+                href="mailto:walkklaw@gmail.com"
+                className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+              >
+                联系
+              </a>
+            </div>
           </div>
         </footer>
         </div>

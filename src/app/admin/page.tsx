@@ -138,7 +138,7 @@ function AdminConsole() {
             <div>
               <p className="kicker mb-2">Admin Console</p>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight">内容编排后台</h1>
-              <p className="text-sm text-[var(--muted)] mt-3">管理系列结构与文章发布节奏。</p>
+              <p className="text-sm text-[var(--muted)] mt-3">管理专题结构与文章发布节奏。</p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <a
@@ -193,7 +193,7 @@ function AdminConsole() {
                   : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]'
               }`}
             >
-              系列编排
+              专题编排
             </button>
           </div>
         </div>
