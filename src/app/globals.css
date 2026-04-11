@@ -39,11 +39,16 @@ body {
   font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Microsoft YaHei", system-ui, sans-serif;
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: "Noto Serif SC", "PingFang SC", "Hiragino Sans GB", "Source Han Serif SC", serif;
   font-weight: 600;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 @layer base {
@@ -78,6 +83,8 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.0625rem;
   line-height: 1.9;
   color: var(--foreground);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .prose p {
