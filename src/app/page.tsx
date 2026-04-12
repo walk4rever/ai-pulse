@@ -24,13 +24,13 @@ function formatDate(value: string | null | undefined) {
 
 function FeaturedCard({ post }: { post: HomePost }) {
   return (
-    <article className="border border-[oklch(0.85_0_0)] p-6 flex flex-col gap-4 hover:border-[var(--foreground)] transition-colors">
+    <article className="bg-[var(--background)] rounded-2xl p-6 flex flex-col gap-4 shadow-[0_0_0_1px_var(--border-subtle),0_4px_24px_rgba(20,20,19,0.04)] transition-shadow hover:shadow-[0_0_0_1px_var(--ring),0_8px_32px_rgba(20,20,19,0.08)]">
       <div className="flex items-center justify-between">
-        <span className="kicker">{getTypeLabel(post.content_type)}</span>
+        <span className="kicker" style={{ color: 'var(--accent)' }}>{getTypeLabel(post.content_type)}</span>
         <span className="date">{formatDate(post.published_at)}</span>
       </div>
       <Link href={`/post/${post.slug}`} className="group flex-1">
-        <h3 className="text-base font-semibold leading-snug group-hover:text-[var(--accent)] transition-colors">
+        <h3 className="font-serif text-xl font-medium leading-snug group-hover:text-[var(--accent)] transition-colors">
           {post.title}
         </h3>
         {post.excerpt && (
@@ -45,16 +45,16 @@ function FeaturedCard({ post }: { post: HomePost }) {
 
 function PostItem({ post }: { post: HomePost }) {
   return (
-    <article className="py-5 flex items-baseline gap-6">
+    <article className="py-6 flex items-baseline gap-6">
       <span className="date shrink-0 w-24">{formatDate(post.published_at)}</span>
       <div className="flex-1 min-w-0">
         <Link href={`/post/${post.slug}`} className="group">
-          <h3 className="text-base leading-snug group-hover:text-[var(--accent)] transition-colors">
+          <h3 className="font-serif text-lg md:text-xl font-medium leading-snug group-hover:text-[var(--accent)] transition-colors">
             {post.title}
           </h3>
         </Link>
       </div>
-      <span className="kicker shrink-0">{getTypeLabel(post.content_type)}</span>
+      <span className="kicker shrink-0" style={{ color: 'var(--accent)' }}>{getTypeLabel(post.content_type)}</span>
     </article>
   )
 }
@@ -95,38 +95,27 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       )}
 
       {/* Hero */}
-      <section className="mb-16">
-        <p className="text-lg font-semibold leading-relaxed">
-          帮你读懂 AI，而不只是跟上 AI。
+      <section className="mb-20 md:mb-28">
+        <p className="kicker mb-6" style={{ color: 'var(--accent)' }}>AI 早知道 · 每周</p>
+        <h1 className="font-serif text-[2.5rem] md:text-6xl font-medium leading-[1.1] tracking-tight text-[var(--foreground)]">
+          帮你读懂 AI，<br />而不只是跟上 AI。
+        </h1>
+        <p className="mt-8 text-lg md:text-xl text-[var(--muted)] leading-relaxed max-w-2xl">
+          AI 降低了执行的门槛，放大了判断力与审美的差距。我们不追所有新闻，只解释真正值得跟进的变化 —— 给 AI 工程师的每周精选、深度分析与长期判断。
         </p>
-      </section>
-
-      {/* Three dimensions */}
-      <section className="mb-16 grid grid-cols-1 md:grid-cols-3 gap-10 border-t border-[oklch(0.85_0_0)] pt-14">
-        {[
-          {
-            label: '创造力',
-            body: 'AI 降低了执行的门槛，但放大了想象力的差距。真正的问题不是会不会用工具，而是用来做什么。',
-          },
-          {
-            label: '判断力',
-            body: '每天都有新模型、新工具、新突破。知道哪些值得跟进，哪些是噪音，才是真正的竞争优势。',
-          },
-          {
-            label: '审美',
-            body: '好的 AI 工程师不只是会调用 API。他们知道什么是好的系统，好的产品，好的决策。',
-          },
-        ].map((item) => (
-          <div key={item.label}>
-            <p className="text-base font-semibold mb-3">{item.label}</p>
-            <p className="text-sm text-[var(--muted)] leading-relaxed">{item.body}</p>
-          </div>
-        ))}
+        <div className="mt-10">
+          <Link
+            href="/subscribe"
+            className="inline-flex items-center bg-[var(--accent)] text-[#faf9f5] px-6 py-3 rounded-xl text-base font-medium hover:bg-[var(--accent-coral)] transition-colors shadow-[0_0_0_1px_var(--accent),0_4px_24px_rgba(201,100,66,0.2)]"
+          >
+            免费订阅 →
+          </Link>
+        </div>
       </section>
 
       {/* Featured */}
       {featured.length > 0 && (
-        <section className="mb-16 border-t border-[oklch(0.85_0_0)] pt-14">
+        <section className="mb-20 border-t border-[var(--border)] pt-14">
           <p className="kicker mb-8">精选</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {featured.map((post) => (
@@ -136,10 +125,23 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </section>
       )}
 
+      {/* Dark chapter break */}
+      <section className="mb-20 -mx-6 bg-[#141413] px-8 md:px-12 py-16 md:py-20 rounded-3xl">
+        <p className="kicker mb-6" style={{ color: 'var(--accent-coral)' }}>
+          Editor&apos;s note
+        </p>
+        <blockquote className="font-serif text-2xl md:text-3xl font-medium leading-[1.3] text-[#faf9f5] max-w-xl">
+          在噪音里挑信号，在信号里挑判断 —— 这是我们每期在做的事。
+        </blockquote>
+        <p className="mt-6 text-sm text-[#b0aea5] leading-relaxed max-w-xl">
+          如果你只有十分钟读 AI 相关内容，我们希望那十分钟花在这里。
+        </p>
+      </section>
+
       {/* Recent */}
-      <section className="border-t border-[oklch(0.85_0_0)] pt-14">
+      <section className="border-t border-[var(--border)] pt-14">
         <p className="kicker mb-2">最新</p>
-        <div className="divide-y divide-[oklch(0.85_0_0)]">
+        <div className="divide-y divide-[var(--border-subtle)]">
           {recent.map((post) => (
             <PostItem key={post.id} post={post} />
           ))}
@@ -148,7 +150,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <p className="py-8 text-sm text-[var(--muted)]">暂无文章。</p>
         )}
         <div className="mt-8">
-          <Link href="/archive" className="kicker hover:text-[var(--foreground)] transition-colors">
+          <Link href="/archive" className="kicker hover:text-[var(--accent)] transition-colors">
             全部文章 →
           </Link>
         </div>

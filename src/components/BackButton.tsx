@@ -7,7 +7,8 @@ export function BackButton() {
   return (
     <button
       onClick={() => router.back()}
-      className="kicker hover:text-[var(--foreground)] transition-colors"
+      className="kicker hover:text-[var(--accent)] transition-colors"
+      style={{ borderRadius: 0 }}
     >
       ← 返回
     </button>

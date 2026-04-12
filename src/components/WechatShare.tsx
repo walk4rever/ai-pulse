@@ -68,10 +68,10 @@ export function WechatShare({ title, description, imageUrl }: WechatShareProps) 
   }
 
   return (
-    <div className="mt-12 pt-8 border-t border-[var(--subtle)] border-opacity-20 flex justify-end">
+    <div className="mt-14 pt-8 border-t border-[var(--border)] flex justify-end">
       <button
         onClick={copyLink}
-        className="text-sm border border-[var(--foreground)] px-4 py-2 hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
+        className="inline-flex items-center gap-2 bg-[var(--surface-sand)] text-[var(--charcoal)] px-5 py-2.5 text-sm font-medium rounded-xl hover:bg-[var(--border)] transition-colors shadow-[0_0_0_1px_var(--ring)]"
       >
         {copied ? '已复制链接' : '分享链接'}
       </button>

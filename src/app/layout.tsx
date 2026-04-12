@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
 import { NavUser } from '@/components/NavUser'
+import { NavLinks } from '@/components/NavLinks'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -23,18 +24,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Logo />
               </Link>
               {/* Desktop nav — center column */}
-              <nav className="hidden md:flex items-center justify-center gap-6">
-                <Link href="/brief" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">简讯</Link>
-                <Link href="/analysis" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">深度</Link>
-                <Link href="/cases" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">案例</Link>
-                <Link href="/interview" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">访谈</Link>
-                <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">专题</Link>
-              </nav>
+              <NavLinks variant="desktop" />
               <div className="flex items-center justify-end gap-3 md:gap-4">
                 <NavUser />
                 <Link
                   href="/subscribe"
-                  className="text-sm border border-[var(--foreground)] px-3 py-1.5 md:px-4 md:py-2 hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
+                  className="text-sm font-medium bg-[var(--accent)] text-[#faf9f5] px-4 py-2 md:px-5 md:py-2.5 rounded-xl hover:bg-[var(--accent-coral)] transition-colors shadow-[0_0_0_1px_var(--accent),0_4px_12px_rgba(201,100,66,0.2)]"
                 >
                   订阅
                 </Link>
@@ -42,41 +37,42 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
 
             {/* Mobile nav — second row, horizontal scrollable */}
-            <nav className="md:hidden mt-5 -mx-5 px-5 flex items-center gap-6 overflow-x-auto scrollbar-hide">
-              <Link href="/brief" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">简讯</Link>
-              <Link href="/analysis" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">深度</Link>
-              <Link href="/cases" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">案例</Link>
-              <Link href="/interview" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">访谈</Link>
-              <Link href="/series" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors whitespace-nowrap">专题</Link>
-            </nav>
+            <NavLinks variant="mobile" />
           </div>
         </header>
 
         <main className="px-6 pb-20">{children}</main>
 
-        <footer className="border-t border-[var(--subtle)] border-opacity-20">
-          <div className="px-5 md:px-6 py-8 md:py-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
-            <div className="flex items-center gap-2 text-[var(--muted)]">
-              <span className="text-sm">AI早知道 © 2026</span>
-              <span className="text-xs text-[var(--subtle)]">·</span>
-              <span className="text-xs text-[var(--subtle)]">Powered by Air7.fun</span>
+        <footer className="mt-24 border-t border-[var(--border)]">
+          <div className="px-5 md:px-6 py-10 md:py-14">
+            <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-serif text-lg font-medium text-[var(--foreground)]">AI早知道</p>
+                <p className="mt-1 text-sm text-[var(--muted)]">
+                  帮你读懂 AI，而不只是跟上 AI。
+                </p>
+              </div>
+              <nav className="flex items-center gap-6 text-sm">
+                <Link
+                  href="/docs"
+                  className="font-medium text-[var(--foreground-soft)] hover:text-[var(--accent)] transition-colors"
+                >
+                  API
+                </Link>
+                <span className="text-[var(--subtle)] opacity-40 cursor-not-allowed" aria-disabled="true">
+                  RSS
+                </span>
+                <a
+                  href="mailto:walkklaw@gmail.com"
+                  className="font-medium text-[var(--foreground-soft)] hover:text-[var(--accent)] transition-colors"
+                >
+                  联系
+                </a>
+              </nav>
             </div>
-            <div className="flex items-center gap-4 text-sm">
-              <Link
-                href="/docs"
-                className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
-              >
-                API
-              </Link>
-              <span className="text-[var(--subtle)] opacity-40 cursor-not-allowed" aria-disabled="true">
-                RSS
-              </span>
-              <a
-                href="mailto:walkklaw@gmail.com"
-                className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
-              >
-                联系
-              </a>
+            <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs text-[var(--subtle)]">AI早知道 © 2026 · Powered by Air7.fun</p>
+              <p className="text-xs text-[var(--subtle)]">Made with warm pixels.</p>
             </div>
           </div>
         </footer>

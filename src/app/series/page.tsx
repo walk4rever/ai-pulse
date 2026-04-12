@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
+import { ListPageHeader } from '@/components/ListPageHeader'
 
 export const revalidate = 60
 
@@ -69,34 +70,44 @@ export default async function SeriesPage() {
 
   return (
     <div>
-      <p className="kicker mb-2">专题</p>
-      <p className="text-sm text-[var(--muted)] mb-10">{seriesList.length} 个专题</p>
+      <ListPageHeader
+        kicker="Series"
+        title="专题"
+        description="围绕一个主题组织起来的系列文章 —— 从线索到全貌。"
+        count={seriesList.length}
+      />
 
       {seriesList.length === 0 && (
         <p className="text-sm text-[var(--muted)]">专题内容即将发布。</p>
       )}
 
-      <div className="space-y-14">
+      <div className="space-y-16">
         {seriesList.map((seriesItem) => {
           const items = grouped.get(seriesItem.id) ?? []
           return (
-            <section key={seriesItem.id} className="border-t border-[oklch(0.85_0_0)] pt-10">
-              <p className="text-base font-semibold mb-1">{seriesItem.name}</p>
+            <section key={seriesItem.id}>
+              <h2 className="font-serif text-2xl md:text-3xl font-medium mb-2 text-[var(--foreground)]">
+                {seriesItem.name}
+              </h2>
               {seriesItem.description && (
-                <p className="text-sm text-[var(--muted)] mb-6">{seriesItem.description}</p>
+                <p className="text-base text-[var(--muted)] mb-6 leading-relaxed">
+                  {seriesItem.description}
+                </p>
               )}
               {!seriesItem.description && <div className="mb-6" />}
 
-              <div className="divide-y divide-[oklch(0.85_0_0)]">
+              <div className="divide-y divide-[var(--border-subtle)]">
                 {items.map((item) => {
                   const post = postMap.get(item.post_id)
                   if (!post) return null
                   return (
-                    <article key={post.id} className="py-4 flex items-baseline gap-6">
-                      <span className="kicker shrink-0 w-6">{String(item.order_index).padStart(2, '0')}</span>
+                    <article key={post.id} className="py-5 flex items-baseline gap-6">
+                      <span className="kicker shrink-0 w-8" style={{ color: 'var(--accent)' }}>
+                        {String(item.order_index).padStart(2, '0')}
+                      </span>
                       <div className="flex-1 min-w-0">
                         <Link href={`/post/${post.slug}`} className="group">
-                          <h3 className="text-base leading-snug group-hover:text-[var(--accent)] transition-colors">
+                          <h3 className="font-serif text-lg md:text-xl font-medium leading-snug group-hover:text-[var(--accent)] transition-colors">
                             {post.title}
                           </h3>
                         </Link>

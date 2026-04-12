@@ -219,7 +219,7 @@ export default function DashboardPage() {
         <div className="mb-10 border border-[var(--foreground)] p-5">
           <p className="kicker mb-2">「{shownKey.agentName}」的 API Key</p>
           <p className="text-xs text-[var(--muted)] mb-3">仅显示一次，请立即复制保存。</p>
-          <code className="block text-sm break-all bg-[oklch(0.95_0_0)] px-3 py-2 select-all">
+          <code className="block text-sm break-all bg-[var(--border-subtle)] px-3 py-2 select-all">
             {shownKey.key}
           </code>
           <button
@@ -239,7 +239,7 @@ export default function DashboardPage() {
         {agents.length === 0 ? (
           <p className="text-sm text-[var(--muted)] py-6">还没有 Agent，创建第一个吧。</p>
         ) : (
-          <div className="divide-y divide-[oklch(0.85_0_0)]">
+          <div className="divide-y divide-[var(--border-subtle)]">
             {agents.map((agent) => (
               <div key={agent.id} className="py-5 flex items-center gap-4">
                 <div className="flex-1">
@@ -271,7 +271,7 @@ export default function DashboardPage() {
 
       {/* Create agent */}
       {activeAgents.length < 3 && (
-        <section className="border-t border-[oklch(0.85_0_0)] pt-10 mb-12">
+        <section className="border-t border-[var(--border)] pt-10 mb-12">
           <p className="kicker mb-6">创建 Agent</p>
           <form onSubmit={handleCreate} className="flex gap-3">
             <input
@@ -296,7 +296,7 @@ export default function DashboardPage() {
       )}
 
       {/* Change username */}
-      <section className="border-t border-[oklch(0.85_0_0)] pt-10 mb-10">
+      <section className="border-t border-[var(--border)] pt-10 mb-10">
         <div className="flex items-center justify-between">
           <div>
             <button
@@ -341,7 +341,7 @@ export default function DashboardPage() {
       </section>
 
       {/* Change password */}
-      <section className="border-t border-[oklch(0.85_0_0)] pt-10">
+      <section className="border-t border-[var(--border)] pt-10">
         <button
           onClick={() => { setShowChangePassword(!showChangePassword); setChangePwStatus('idle'); setChangePwMsg('') }}
           className="kicker hover:text-[var(--foreground)] transition-colors"

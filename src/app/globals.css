@@ -1,21 +1,47 @@
 @import "tailwindcss";
 
 /*
-  AI早知道 - 极简/极致美学
-  核心原则：
-  - 最大化负空间
-  - 极致排版层次
-  - 克制色彩（黑白为主，少量暖调）
-  - 拒绝所有装饰性元素
+  AI早知道 — Claude-inspired warm editorial
+  Core tokens follow DESIGN.md (Anthropic warm parchment + terracotta + serif).
 */
 
 :root {
-  --background: oklch(0.987 0.003 90); /* 极浅暖白，内容列 */
-  --surface: oklch(0.91 0.008 80);     /* 页面大背景，暖灰 */
-  --foreground: oklch(0.15 0 0); /* 深炭黑 */
-  --muted: oklch(0.45 0 0);
-  --subtle: oklch(0.65 0 0);
-  --accent: oklch(0.55 0.12 260); /* 克制的靛蓝 */
+  /* Surfaces */
+  --background: #faf9f5;      /* Ivory — content column */
+  --surface: #f5f4ed;         /* Parchment — page canvas */
+  --surface-sand: #e8e6dc;    /* Warm Sand — buttons, prominent surfaces */
+  --surface-dark: #30302e;    /* Dark Surface */
+  --surface-deep: #141413;    /* Deep Dark */
+
+  /* Text */
+  --foreground: #141413;      /* Anthropic Near Black */
+  --foreground-soft: #3d3d3a; /* Dark Warm */
+  --muted: #5e5d59;           /* Olive Gray */
+  --subtle: #87867f;           /* Stone Gray */
+  --charcoal: #4d4c48;        /* Charcoal Warm */
+  --silver: #b0aea5;          /* Warm Silver (on dark) */
+
+  /* Brand */
+  --accent: #c96442;          /* Terracotta — primary CTA */
+  --accent-coral: #d97757;    /* Coral — secondary emphasis */
+
+  /* Borders & rings */
+  --border: #e8e6dc;          /* Border Warm */
+  --border-subtle: #f0eee6;   /* Border Cream */
+  --ring: #d1cfc5;            /* Ring Warm */
+  --ring-deep: #c2c0b6;       /* Ring Deep */
+
+  /* Semantic */
+  --error: #b53333;
+  --focus: #3898ec;
+
+  /* Radius scale */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
 }
 
 @theme inline {
@@ -45,8 +71,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Noto Serif SC", "PingFang SC", "Hiragino Sans GB", "Source Han Serif SC", serif;
-  font-weight: 600;
+  font-family: "Noto Serif SC", "PingFang SC", "Hiragino Sans GB", "Source Han Serif SC", Georgia, serif;
+  font-weight: 500;
   overflow-wrap: break-word;
   word-break: break-word;
 }
@@ -56,18 +82,28 @@ h1, h2, h3, h4, h5, h6 {
     color: inherit;
     text-decoration: none;
   }
+  button,
+  input,
+  textarea,
+  select {
+    border-radius: var(--radius-md);
+  }
 }
 
 ::selection {
-  background: oklch(0.9 0.05 260);
+  background: #f0d8c9;
   color: var(--foreground);
 }
 
-/* 极简排版工具类 */
+.font-serif {
+  font-family: "Noto Serif SC", "PingFang SC", "Hiragino Sans GB", "Source Han Serif SC", Georgia, serif;
+}
+
+/* Warm editorial utilities */
 .kicker {
   font-family: "Noto Sans SC", system-ui, sans-serif;
   font-size: 0.6875rem; /* 11px */
-  letter-spacing: 0.25em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--subtle);
 }
@@ -79,9 +115,23 @@ h1, h2, h3, h4, h5, h6 {
   font-variant-numeric: tabular-nums;
 }
 
+/* Shadow system — ring halos + whisper drop */
+.ring-shadow {
+  box-shadow: 0 0 0 1px var(--ring);
+}
+.ring-shadow-deep {
+  box-shadow: 0 0 0 1px var(--ring-deep);
+}
+.whisper-shadow {
+  box-shadow: 0 4px 24px rgba(20, 20, 19, 0.05);
+}
+.ring-whisper {
+  box-shadow: 0 0 0 1px var(--ring), 0 4px 24px rgba(20, 20, 19, 0.05);
+}
+
 .prose {
   font-size: 1.0625rem;
-  line-height: 1.9;
+  line-height: 1.7;
   color: var(--foreground);
   overflow-wrap: break-word;
   word-break: break-word;
@@ -94,7 +144,8 @@ h1, h2, h3, h4, h5, h6 {
 .prose h2,
 .prose h3,
 .prose h4 {
-  font-family: "Noto Serif SC", serif;
+  font-family: "Noto Serif SC", Georgia, serif;
+  font-weight: 500;
   color: var(--foreground);
   line-height: 1.3;
   margin-top: 2.8rem;
@@ -105,7 +156,6 @@ h1, h2, h3, h4, h5, h6 {
 .prose h3 { font-size: 1.25rem; }
 .prose h4 { font-size: 1.05rem; }
 
-/* headings as links (rehype-autolink-headings) */
 .prose h2 a,
 .prose h3 a,
 .prose h4 a {
@@ -113,39 +163,34 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
 }
 
-/* lists */
 .prose ul { list-style: disc; margin: 0 0 1.4rem 1.5rem; }
 .prose ol { list-style: decimal; margin: 0 0 1.4rem 1.5rem; }
 .prose li { margin-bottom: 0.45rem; }
 .prose li > ul,
 .prose li > ol { margin-top: 0.4rem; margin-bottom: 0; }
 
-/* task lists (GFM) */
 .prose input[type="checkbox"] {
   margin-right: 0.4rem;
-  accent-color: var(--foreground);
+  accent-color: var(--accent);
 }
 
-/* blockquote */
 .prose blockquote {
   margin: 2rem 0;
   padding: 0 0 0 1.5rem;
-  border-left: 2px solid oklch(0.82 0 0);
+  border-left: 2px solid var(--border);
   color: var(--muted);
   font-style: italic;
 }
 .prose blockquote p { margin-bottom: 0; }
 
-/* inline code */
 .prose :not(pre) > code {
   font-family: "SF Mono", "Monaco", "Fira Mono", "Source Code Pro", monospace;
   font-size: 0.85em;
-  background: oklch(0.96 0.008 80);
+  background: var(--border-subtle);
   padding: 0.15rem 0.4rem;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
 }
 
-/* code blocks — Shiki via rehype-pretty-code */
 .prose figure[data-rehype-pretty-code-figure] {
   margin: 1.75rem 0;
 }
@@ -159,10 +204,10 @@ h1, h2, h3, h4, h5, h6 {
 .prose pre {
   margin: 0;
   padding: 1.25rem 1.5rem;
-  background: oklch(0.97 0.005 80) !important;
-  border: 1px solid oklch(0.89 0.005 80);
+  background: var(--background) !important;
+  border: 1px solid var(--border-subtle);
   overflow-x: auto;
-  border-radius: 2px;
+  border-radius: var(--radius-lg);
 }
 .prose pre code {
   font-family: "SF Mono", "Monaco", "Fira Mono", "Source Code Pro", monospace;
@@ -175,9 +220,9 @@ h1, h2, h3, h4, h5, h6 {
 .prose .mermaid {
   margin: 1.75rem 0;
   padding: 1.25rem 1rem;
-  background: oklch(0.985 0.004 80);
-  border: 1px solid oklch(0.89 0.005 80);
-  border-radius: 2px;
+  background: var(--background);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   overflow-x: auto;
 }
 .prose .mermaid svg {
@@ -186,15 +231,14 @@ h1, h2, h3, h4, h5, h6 {
   height: auto;
   margin: 0 auto;
 }
-/* line highlights */
+
 .prose [data-highlighted-line] {
-  background: oklch(0.93 0.01 260 / 0.4);
+  background: rgba(201, 100, 66, 0.08);
   margin: 0 -1.5rem;
   padding: 0 1.5rem;
   display: block;
 }
 
-/* tables (GFM) */
 .prose table {
   display: block;
   width: 100%;
@@ -206,7 +250,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .prose th {
   font-family: "Noto Sans SC", system-ui, sans-serif;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -217,36 +261,33 @@ h1, h2, h3, h4, h5, h6 {
 }
 .prose td {
   padding: 0.65rem 1rem;
-  border-bottom: 1px solid oklch(0.88 0 0);
+  border-bottom: 1px solid var(--border);
   vertical-align: top;
   color: var(--muted);
 }
 .prose tr:last-child td { border-bottom: none; }
 
-/* hr */
 .prose hr {
   border: none;
-  border-top: 1px solid oklch(0.88 0 0);
+  border-top: 1px solid var(--border);
   margin: 2.5rem 0;
 }
 
-/* links */
 .prose a {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
 }
-.prose a:hover { opacity: 0.75; }
+.prose a:hover { color: var(--accent-coral); }
 
-/* images */
 .prose img {
   max-width: 100%;
   height: auto;
   margin: 1.75rem 0;
+  border-radius: var(--radius-xl);
 }
 
-/* hide scrollbar for horizontal scroll strips (mobile nav etc) */
 .scrollbar-hide {
   scrollbar-width: none;
   -ms-overflow-style: none;

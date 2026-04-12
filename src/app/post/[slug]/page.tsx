@@ -77,16 +77,21 @@ export default async function PostPage({ params }: Props) {
         <BackButton />
       </div>
 
-      <header className="mb-12 pb-8 border-b border-[var(--subtle)] border-opacity-20">
-        <div className="flex flex-wrap items-center gap-4 mb-6">
-          <span className="kicker">{contentTypeLabel}</span>
-          {post.is_premium && <span className="kicker text-[var(--accent)]">付费内容</span>}
+      <header className="mb-14 pb-10 border-b border-[var(--border)]">
+        <div className="flex flex-wrap items-center gap-4 mb-8">
+          <span className="kicker" style={{ color: 'var(--accent)' }}>{contentTypeLabel}</span>
+          {post.is_premium && <span className="kicker">付费内容</span>}
+          <span className="kicker text-[var(--subtle)]">·</span>
+          <span className="kicker">{authorLabel}</span>
+          <span className="kicker text-[var(--subtle)]">·</span>
+          <span className="kicker">{formatPublishedAt(post.published_at)}</span>
         </div>
-        <h1 className="text-3xl lg:text-4xl font-semibold leading-tight tracking-tight">
+        <h1 className="font-serif text-4xl md:text-5xl lg:text-[3.5rem] font-medium leading-[1.15] tracking-tight text-[var(--foreground)]">
           {post.title}
         </h1>
-        <p className="mt-6 text-lg text-[var(--muted)] leading-relaxed">{post.excerpt}</p>
-        <p className="mt-6 date">{authorLabel} · {formatPublishedAt(post.published_at)}</p>
+        {post.excerpt && (
+          <p className="mt-8 text-lg md:text-xl text-[var(--muted)] leading-relaxed">{post.excerpt}</p>
+        )}
       </header>
 
       {post.is_premium ? (
@@ -110,9 +115,9 @@ function PremiumPaywall({ excerpt }: { excerpt: string }) {
       <MermaidContent className="prose" html={excerpt} />
       <div className="relative mt-12">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-transparent to-[var(--background)]" />
-        <div className="mt-8 border border-[var(--subtle)] border-opacity-30 px-8 py-10 text-center">
-          <p className="kicker mb-4">Members Edition</p>
-          <h3 className="text-2xl font-semibold leading-tight tracking-tight">
+        <div className="mt-8 bg-[var(--background)] border border-[var(--border-subtle)] rounded-2xl px-8 py-10 text-center shadow-[0_4px_24px_rgba(20,20,19,0.05)]">
+          <p className="kicker mb-4" style={{ color: 'var(--accent)' }}>Members Edition</p>
+          <h3 className="font-serif text-2xl md:text-3xl font-medium leading-tight tracking-tight">
             订阅以阅读完整内容
           </h3>
           <p className="mt-4 text-[var(--muted)] leading-relaxed max-w-md mx-auto">
@@ -121,9 +126,9 @@ function PremiumPaywall({ excerpt }: { excerpt: string }) {
           <div className="mt-8">
             <Link
               href="/subscribe"
-              className="inline-block bg-[var(--foreground)] text-[var(--background)] px-6 py-3 text-sm hover:opacity-80 transition-opacity"
+              className="inline-flex items-center bg-[var(--accent)] text-[#faf9f5] px-6 py-3 rounded-xl text-base font-medium hover:bg-[var(--accent-coral)] transition-colors shadow-[0_0_0_1px_var(--accent),0_4px_12px_rgba(201,100,66,0.2)]"
             >
-              免费订阅
+              免费订阅 →
             </Link>
           </div>
         </div>

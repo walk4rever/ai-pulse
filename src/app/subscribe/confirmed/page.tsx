@@ -81,23 +81,23 @@ export default async function ConfirmedPage({ searchParams }: ConfirmationPagePr
 
   return (
     <div className="max-w-2xl">
-      <div className="border-l-2 border-[var(--foreground)] pl-6 py-2">
-        <p className="kicker mb-3">{content.label}</p>
-        <h1 className="text-3xl font-semibold leading-tight tracking-tight">
+      <div className="border-l-4 border-[var(--accent)] pl-6 py-2">
+        <p className="kicker mb-4" style={{ color: 'var(--accent)' }}>{content.label}</p>
+        <h1 className="font-serif text-4xl md:text-5xl font-medium leading-[1.15] tracking-tight">
           {content.title}
         </h1>
       </div>
-      <p className="mt-8 text-[var(--muted)] leading-relaxed">{content.description}</p>
-      <div className="mt-10 flex flex-wrap gap-4 pt-8 border-t border-[var(--subtle)] border-opacity-20">
+      <p className="mt-8 text-lg text-[var(--muted)] leading-relaxed">{content.description}</p>
+      <div className="mt-10 flex flex-wrap gap-4 pt-8 border-t border-[var(--border)]">
         <Link
           href="/subscribe"
-          className="bg-[var(--foreground)] text-[var(--background)] px-6 py-3 text-sm hover:opacity-80 transition-opacity"
+          className="inline-flex items-center bg-[var(--accent)] text-[#faf9f5] px-6 py-3 rounded-xl text-base font-medium hover:bg-[var(--accent-coral)] transition-colors shadow-[0_0_0_1px_var(--accent),0_4px_12px_rgba(201,100,66,0.2)]"
         >
           {isUnsubscribeFlow ? '重新订阅' : '返回订阅'}
         </Link>
         <Link
           href="/"
-          className="border border-[var(--foreground)] px-6 py-3 text-sm hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
+          className="inline-flex items-center bg-[var(--surface-sand)] text-[var(--charcoal)] px-6 py-3 rounded-xl text-base font-medium hover:bg-[var(--border)] transition-colors shadow-[0_0_0_1px_var(--ring)]"
         >
           返回首页
         </Link>

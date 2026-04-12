@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { getSupabaseEnv } from '@/lib/supabase/env'
 import { Post } from '@/types'
-import { getTypeLabel } from '@/lib/content'
-import Link from 'next/link'
+import { ArticleListItem } from '@/components/ArticleListItem'
+import { ListPageHeader } from '@/components/ListPageHeader'
 
 export const revalidate = 60
 
@@ -10,14 +10,7 @@ export const metadata = {
   title: '最新 | AI早知道',
 }
 
-type ListPost = Pick<Post, 'id' | 'slug' | 'title' | 'published_at' | 'content_type' | 'series_slug'>
-
-function formatDate(value: string | null | undefined) {
-  if (!value) return ''
-  const d = new Date(value)
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
-}
-
+type ListPost = Pick<Post, 'id' | 'slug' | 'title' | 'excerpt' | 'published_at' | 'content_type' | 'series_slug'>
 
 export default async function LatestPage() {
   const { hasPublicEnv } = getSupabaseEnv()
@@ -26,7 +19,7 @@ export default async function LatestPage() {
   const supabase = await createClient()
   const { data: posts } = await supabase
     .from('ai_pulse_posts')
-    .select('id, slug, title, published_at, content_type, series_slug')
+    .select('id, slug, title, excerpt, published_at, content_type, series_slug')
     .eq('status', 'published')
     .order('published_at', { ascending: false }).order('created_at', { ascending: false })
 
@@ -34,21 +27,15 @@ export default async function LatestPage() {
 
   return (
     <div>
-      <p className="kicker mb-2">最新</p>
-      <p className="text-sm text-[var(--muted)] mb-10">{allPosts.length} 篇</p>
-      <div className="divide-y divide-[oklch(0.85_0_0)]">
+      <ListPageHeader
+        kicker="Latest"
+        title="最新"
+        description="所有内容的时间流 —— 最近发生了什么。"
+        count={allPosts.length}
+      />
+      <div className="divide-y divide-[var(--border-subtle)]">
         {allPosts.map((post) => (
-          <article key={post.id} className="py-5 flex items-baseline gap-6">
-            <span className="date shrink-0 w-24">{formatDate(post.published_at)}</span>
-            <div className="flex-1 min-w-0">
-              <Link href={`/post/${post.slug}`} className="group">
-                <h3 className="text-base leading-snug group-hover:text-[var(--accent)] transition-colors">
-                  {post.title}
-                </h3>
-              </Link>
-            </div>
-            <span className="kicker shrink-0">{getTypeLabel(post.content_type)}</span>
-          </article>
+          <ArticleListItem key={post.id} post={post} showType showExcerpt={false} />
         ))}
       </div>
     </div>

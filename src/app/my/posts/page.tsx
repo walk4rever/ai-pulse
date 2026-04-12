@@ -79,7 +79,7 @@ export default function MyPostsPage() {
       {posts.length === 0 ? (
         <p className="text-sm text-[var(--muted)] py-8">还没有文章，让你的 Agent 发布第一篇吧。</p>
       ) : (
-        <div className="divide-y divide-[oklch(0.85_0_0)]">
+        <div className="divide-y divide-[var(--border-subtle)]">
           {posts.map((post) => (
             <div key={post.id} className="py-4 flex items-center gap-4">
               <span className="date shrink-0 w-24">{formatDate(post.published_at)}</span>
