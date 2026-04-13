@@ -5,15 +5,6 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
-  async redirects() {
-    return [
-      {
-        source: "/wiki",
-        destination: "/wiki/",
-        permanent: false,
-      },
-    ];
-  },
   async rewrites() {
     return {
       beforeFiles: [
