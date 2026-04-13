@@ -59,6 +59,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 >
                   API
                 </Link>
+                <Link
+                  href="/wiki"
+                  className="font-medium text-[var(--foreground-soft)] hover:text-[var(--accent)] transition-colors"
+                >
+                  Wiki
+                </Link>
                 <span className="text-[var(--subtle)] opacity-40 cursor-not-allowed" aria-disabled="true">
                   RSS
                 </span>

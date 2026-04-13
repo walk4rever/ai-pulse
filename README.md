@@ -10,6 +10,7 @@ Powered by [Air7.fun](https://air7.fun)
 
 - 极简首页：单一文章列表（简讯 / 深度 / 案例 / 访谈混排）
 - 文章详情页：适合中文长文阅读的 editorial 排版
+- `/wiki`：Quartz 静态知识库子站，挂在 `ai.air7.fun/wiki/`
 - 邮件订阅页
 - 双重确认订阅流程
 - 草稿 / 已发布内容工作流
