@@ -171,16 +171,19 @@ const WIKI_THEME_STYLE = `
       return true;
     }
 
+    function rewriteAttr(el, attrName) {
+      var href = el.getAttribute(attrName);
+      if (shouldRewrite(href)) {
+        el.setAttribute(attrName, WIKI_BASE + href);
+      }
+    }
+
     function normalizeLinks(root) {
       var scope = root || document;
-      var anchors = scope.querySelectorAll(
-        ".explorer-content a[href], .search-layout a[href], .popover-inner a[href], .page-header a[href]"
-      );
+      var anchors = scope.querySelectorAll("a[href], a[xlink\\:href]");
       for (var i = 0; i < anchors.length; i++) {
-        var href = anchors[i].getAttribute("href");
-        if (shouldRewrite(href)) {
-          anchors[i].setAttribute("href", WIKI_BASE + href);
-        }
+        rewriteAttr(anchors[i], "href");
+        rewriteAttr(anchors[i], "xlink:href");
       }
     }
 
@@ -198,7 +201,12 @@ const WIKI_THEME_STYLE = `
           }
         }
       });
-      observer.observe(target, { childList: true, subtree: true });
+      observer.observe(target, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["href", "xlink:href"],
+      });
     }
 
     if (document.readyState === "loading") {
