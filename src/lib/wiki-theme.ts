@@ -158,6 +158,64 @@ const WIKI_THEME_STYLE = `
     }
   }
 </style>
+<script id="ai-pulse-wiki-link-fix">
+  (function () {
+    var WIKI_BASE = "/wiki";
+    var SKIP_PREFIXES = ["/wiki", "/_next", "/_vercel", "/api"];
+
+    function shouldRewrite(href) {
+      if (!href || href[0] !== "/" || href.startsWith("//")) return false;
+      for (var i = 0; i < SKIP_PREFIXES.length; i++) {
+        if (href.startsWith(SKIP_PREFIXES[i])) return false;
+      }
+      return true;
+    }
+
+    function normalizeLinks(root) {
+      var scope = root || document;
+      var anchors = scope.querySelectorAll(
+        ".explorer-content a[href], .search-layout a[href], .popover-inner a[href], .page-header a[href]"
+      );
+      for (var i = 0; i < anchors.length; i++) {
+        var href = anchors[i].getAttribute("href");
+        if (shouldRewrite(href)) {
+          anchors[i].setAttribute("href", WIKI_BASE + href);
+        }
+      }
+    }
+
+    function startObserver() {
+      var target = document.getElementById("quartz-body") || document.body;
+      if (!target) return;
+      var observer = new MutationObserver(function (mutations) {
+        for (var i = 0; i < mutations.length; i++) {
+          var mutation = mutations[i];
+          for (var j = 0; j < mutation.addedNodes.length; j++) {
+            var node = mutation.addedNodes[j];
+            if (node && node.nodeType === 1) {
+              normalizeLinks(node);
+            }
+          }
+        }
+      });
+      observer.observe(target, { childList: true, subtree: true });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function () {
+        normalizeLinks(document);
+        startObserver();
+      });
+    } else {
+      normalizeLinks(document);
+      startObserver();
+    }
+
+    document.addEventListener("nav", function () {
+      normalizeLinks(document);
+    });
+  })();
+</script>
 `
 
 function normalizeRootHtml(html: string) {
@@ -180,4 +238,3 @@ export function transformWikiHtml(html: string, options?: { root?: boolean }) {
   const normalized = options?.root ? normalizeRootHtml(html) : html
   return injectTheme(normalized)
 }
-
