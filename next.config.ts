@@ -5,6 +5,25 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  async redirects() {
+    return [
+      {
+        source: "/wiki",
+        destination: "/wiki/",
+        permanent: false,
+      },
+    ];
+  },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/wiki/:path*",
+          destination: "https://air.air7.fun/wiki/:path*",
+        },
+      ],
+    };
+  },
 };
 
 export default nextConfig;
