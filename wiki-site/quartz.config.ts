@@ -11,7 +11,7 @@ const config: QuartzConfig = {
       provider: 'vercel',
     },
     locale: 'zh-CN',
-    baseUrl: 'ai.air7.fun',
+    baseUrl: 'ai.air7.fun/wiki',
     ignorePatterns: ['private', 'templates', '.obsidian', '.git', 'node_modules'],
     defaultDateType: 'modified',
     theme: {
