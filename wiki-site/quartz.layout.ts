@@ -33,15 +33,12 @@ export const defaultContentPageLayout: PageLayout = {
           grow: true,
         },
         { Component: Component.Darkmode() },
-        { Component: Component.ReaderMode() },
       ],
     }),
     Component.Explorer(),
   ],
   right: [
-    Component.Graph(),
     Component.DesktopOnly(Component.TableOfContents()),
-    Component.Backlinks(),
   ],
 }
 

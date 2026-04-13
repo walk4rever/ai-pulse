@@ -1,15 +1,7 @@
 import { loadWikiResponse } from '@/lib/wiki-site'
+import { transformWikiHtml } from '@/lib/wiki-theme'
 
 export const dynamic = 'force-dynamic'
-
-function normalizeRootHtml(html: string) {
-  return html
-    .replaceAll('href="./', 'href="/wiki/')
-    .replaceAll('src="./', 'src="/wiki/')
-    .replaceAll('fetch("./', 'fetch("/wiki/')
-    .replaceAll("fetch('./", "fetch('/wiki/")
-    .replaceAll('href="."', 'href="/wiki"')
-}
 
 export async function GET() {
   const response = await loadWikiResponse(undefined)
@@ -20,7 +12,7 @@ export async function GET() {
 
   const contentType = response.headers.get('Content-Type') ?? ''
   const body = typeof response.body === 'string' && contentType.includes('text/html')
-    ? normalizeRootHtml(response.body)
+    ? transformWikiHtml(response.body, { root: true })
     : response.body
 
   return new Response(body, {
