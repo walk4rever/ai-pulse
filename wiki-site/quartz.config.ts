@@ -5,8 +5,8 @@ const config: QuartzConfig = {
   configuration: {
     pageTitle: 'AI早知道 Wiki',
     pageTitleSuffix: '',
-    enableSPA: true,
-    enablePopovers: true,
+    enableSPA: false,
+    enablePopovers: false,
     analytics: {
       provider: 'vercel',
     },
