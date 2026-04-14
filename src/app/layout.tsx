@@ -45,13 +45,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <footer className="mt-24 border-t border-[var(--border)]">
           <div className="px-5 md:px-6 py-10 md:py-14">
-            <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="font-serif text-lg font-medium text-[var(--foreground)]">AI早知道</p>
-                <p className="mt-1 text-sm text-[var(--muted)]">
-                  帮你读懂 AI，而不只是跟上 AI。
-                </p>
-              </div>
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs text-[var(--subtle)]">AI早知道 © 2026 · Powered by Air7.fun</p>
               <nav className="flex items-center gap-6 text-sm">
                 <Link
                   href="/docs"
@@ -65,9 +60,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 >
                   Wiki
                 </Link>
-                <span className="text-[var(--subtle)] opacity-40 cursor-not-allowed" aria-disabled="true">
-                  RSS
-                </span>
                 <a
                   href="mailto:walkklaw@gmail.com"
                   className="font-medium text-[var(--foreground-soft)] hover:text-[var(--accent)] transition-colors"
@@ -75,10 +67,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   联系
                 </a>
               </nav>
-            </div>
-            <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs text-[var(--subtle)]">AI早知道 © 2026 · Powered by Air7.fun</p>
-              <p className="text-xs text-[var(--subtle)]">Made with warm pixels.</p>
             </div>
           </div>
         </footer>
