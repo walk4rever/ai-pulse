@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Harness 工程 · 从黑箱到可见</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================
+   THEME: Dark Botanical
+   ========================================================= */
+:root {
+  --bg-primary: #0f0f0f;
+  --bg-soft: #161513;
+  --text-primary: #e8e4df;
+  --text-secondary: #9a9590;
+  --text-muted: #6a6560;
+  --accent-warm: #d4a574;
+  --accent-pink: #e8b4b8;
+  --accent-gold: #c9b896;
+  --accent-sage: #8a9a84;
+  --line: rgba(232,228,223,0.12);
+  --line-strong: rgba(232,228,223,0.22);
+
+  --font-display: "Cormorant", Georgia, serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", Menlo, monospace;
+
+  --title-size: clamp(1.8rem, 5.2vw, 4.2rem);
+  --h2-size: clamp(1.4rem, 3.4vw, 2.6rem);
+  --h3-size: clamp(1.05rem, 2.2vw, 1.65rem);
+  --body-size: clamp(0.82rem, 1.25vw, 1.05rem);
+  --small-size: clamp(0.7rem, 1vw, 0.88rem);
+
+  --slide-padding: clamp(1.5rem, 5vw, 5rem);
+  --content-gap: clamp(0.75rem, 2vw, 1.75rem);
+  --element-gap: clamp(0.4rem, 1vw, 1rem);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-normal: 0.75s;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow-x: hidden; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: var(--body-size);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.slide {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: var(--slide-padding);
+}
+
+.slide-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-height: 100%;
+  overflow: hidden;
+  gap: var(--content-gap);
+  position: relative;
+  z-index: 2;
+}
+
+.slide::before,
+.slide::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+}
+.slide::before {
+  width: min(45vw, 520px);
+  height: min(45vw, 520px);
+  background: radial-gradient(circle, var(--accent-warm) 0%, transparent 65%);
+  top: -10%;
+  right: -12%;
+}
+.slide::after {
+  width: min(40vw, 440px);
+  height: min(40vw, 440px);
+  background: radial-gradient(circle, var(--accent-pink) 0%, transparent 70%);
+  bottom: -18%;
+  left: -14%;
+  opacity: 0.22;
+}
+
+.slide > .grain {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.08; letter-spacing: -0.01em; color: var(--text-primary); }
+h1 { font-size: var(--title-size); font-weight: 400; }
+h2 { font-size: var(--h2-size); font-weight: 500; }
+h3 { font-size: var(--h3-size); font-weight: 500; }
+
+em, .italic { font-style: italic; font-family: var(--font-display); color: var(--accent-warm); font-weight: 400; }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--small-size);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-warm);
+  font-weight: 400;
+}
+
+.page-num {
+  position: absolute;
+  top: calc(var(--slide-padding) * 0.55);
+  right: calc(var(--slide-padding) * 0.55);
+  font-family: var(--font-mono);
+  font-size: var(--small-size);
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  z-index: 3;
+}
+
+.chapter-tag {
+  position: absolute;
+  top: calc(var(--slide-padding) * 0.55);
+  left: calc(var(--slide-padding) * 0.55);
+  font-family: var(--font-mono);
+  font-size: var(--small-size);
+  color: var(--text-muted);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 3;
+}
+
+.source-tag {
+  position: absolute;
+  bottom: calc(var(--slide-padding) * 0.5);
+  right: calc(var(--slide-padding) * 0.55);
+  font-family: var(--font-mono);
+  font-size: var(--small-size);
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  z-index: 3;
+  opacity: 0.75;
+}
+
+p { color: var(--text-secondary); max-width: 72ch; }
+p.lede { color: var(--text-primary); font-size: calc(var(--body-size) * 1.15); }
+
+ul { list-style: none; display: flex; flex-direction: column; gap: var(--element-gap); }
+ul.bullet-list li {
+  position: relative;
+  padding-left: 1.4em;
+  color: var(--text-secondary);
+  font-size: var(--body-size);
+  line-height: 1.55;
+}
+ul.bullet-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 0.65em;
+  height: 1px;
+  background: var(--accent-warm);
+}
+ul.bullet-list li strong { color: var(--text-primary); font-weight: 500; }
+
+blockquote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.3rem, 2.8vw, 2rem);
+  line-height: 1.35;
+  color: var(--text-primary);
+  max-width: 30ch;
+  border-left: 1px solid var(--accent-warm);
+  padding-left: clamp(1rem, 2vw, 2rem);
+}
+blockquote + cite {
+  display: block;
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: var(--small-size);
+  font-style: normal;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+code, .mono { font-family: var(--font-mono); font-size: 0.92em; color: var(--accent-gold); }
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 3.5vw, 3.5rem);
+  align-items: start;
+}
+.three-col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+.stack { display: flex; flex-direction: column; gap: var(--element-gap); }
+
+.card {
+  background: rgba(232,228,223,0.035);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: clamp(0.9rem, 1.8vw, 1.5rem);
+  display: flex; flex-direction: column;
+  gap: 0.5rem;
+}
+.card h3 { font-size: var(--h3-size); }
+.card .num {
+  font-family: var(--font-mono);
+  font-size: var(--small-size);
+  color: var(--accent-warm);
+  letter-spacing: 0.2em;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--body-size);
+}
+th, td {
+  padding: clamp(0.45rem, 1vw, 0.8rem) clamp(0.5rem, 1.2vw, 1rem);
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  font-family: var(--font-mono);
+  font-size: var(--small-size);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent-warm);
+}
+td { color: var(--text-secondary); }
+td strong { color: var(--text-primary); font-weight: 500; }
+
+.title-slide { justify-content: center; align-items: flex-start; }
+.title-slide h1 {
+  font-size: clamp(2.5rem, 7.5vw, 6rem);
+  font-weight: 400;
+  max-width: 16ch;
+}
+.title-slide .sub {
+  margin-top: 1.2rem;
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  color: var(--text-secondary);
+  max-width: 48ch;
+}
+.title-slide .meta {
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  display: flex; gap: 2rem;
+  font-family: var(--font-mono);
+  font-size: var(--small-size);
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.divider { align-items: center; justify-content: center; text-align: center; }
+.divider h2 { max-width: 20ch; }
+.divider .eyebrow { margin-bottom: 1rem; }
+
+.quote-slide { justify-content: center; }
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--duration-normal) var(--ease-out-expo),
+              transform var(--duration-normal) var(--ease-out-expo);
+}
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.slide.visible .reveal:nth-child(1) { transition-delay: 0.1s; }
+.slide.visible .reveal:nth-child(2) { transition-delay: 0.22s; }
+.slide.visible .reveal:nth-child(3) { transition-delay: 0.34s; }
+.slide.visible .reveal:nth-child(4) { transition-delay: 0.46s; }
+.slide.visible .reveal:nth-child(5) { transition-delay: 0.58s; }
+.slide.visible .reveal:nth-child(6) { transition-delay: 0.7s; }
+
+.slide::before { animation: drift 22s ease-in-out infinite; }
+.slide::after { animation: drift 28s ease-in-out infinite reverse; }
+@keyframes drift {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(-3%, 4%) scale(1.08); }
+}
+
+.progress-bar {
+  position: fixed; top: 0; left: 0;
+  height: 2px;
+  background: var(--accent-warm);
+  z-index: 1000;
+  transition: width 0.25s ease;
+}
+
+.nav-dots {
+  position: fixed;
+  right: clamp(0.8rem, 1.5vw, 1.4rem);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex; flex-direction: column;
+  gap: 0.55rem;
+  z-index: 100;
+}
+.nav-dots button {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  cursor: pointer; padding: 0;
+  transition: all 0.3s ease;
+}
+.nav-dots button.active {
+  background: var(--accent-warm);
+  border-color: var(--accent-warm);
+  transform: scale(1.4);
+}
+
+.keyboard-hint {
+  position: fixed;
+  bottom: clamp(0.8rem, 1.5vw, 1.4rem);
+  left: calc(var(--slide-padding) * 0.55);
+  font-family: var(--font-mono);
+  font-size: var(--small-size);
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  z-index: 100;
+  opacity: 0.6;
+}
+
+/* Inline edit */
+.edit-hotzone {
+  position: fixed; top: 0; left: 0;
+  width: 80px; height: 80px;
+  z-index: 10000; cursor: pointer;
+}
+.edit-toggle {
+  position: fixed;
+  top: 18px; left: 18px;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--bg-soft);
+  border: 1px solid var(--line-strong);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 10001;
+  display: flex; align-items: center; justify-content: center;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-toggle.active { background: var(--accent-warm); color: var(--bg-primary); }
+
+.edit-banner {
+  position: fixed;
+  bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-soft);
+  border: 1px solid var(--accent-warm);
+  color: var(--text-primary);
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: var(--small-size);
+  letter-spacing: 0.08em;
+  z-index: 10001;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.edit-banner.active { opacity: 1; }
+
+body.edit-active [contenteditable] {
+  outline: 1px dashed var(--accent-warm);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+body.edit-active [contenteditable]:focus {
+  outline: 1px solid var(--accent-warm);
+  background: rgba(212,165,116,0.05);
+}
+
+@media (max-height: 700px) {
+  :root {
+    --slide-padding: clamp(1rem, 3vw, 2.5rem);
+    --content-gap: clamp(0.5rem, 1.5vw, 1.2rem);
+  }
+}
+@media (max-height: 600px) {
+  .nav-dots, .keyboard-hint { display: none; }
+  .page-num, .chapter-tag, .source-tag { top: 0.8rem; }
+}
+@media (max-width: 760px) {
+  .two-col, .three-col { grid-template-columns: 1fr; }
+  table { font-size: 0.8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.2s !important;
+  }
+  html { scroll-behavior: auto; }
+  .slide::before, .slide::after { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
+<div class="keyboard-hint">← → · space · scroll</div>
+
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">✎</button>
+<div class="edit-banner" id="editBanner">Edit mode · Ctrl+S to save file</div>
+
+<!-- ============================================================
+     ACT 1 · 开场（1-3）
+     ============================================================ -->
+
+<!-- 1 · 主题页 -->
+<section class="slide title-slide">
+  <div class="grain"></div>
+  <span class="page-num">01 / 30</span>
+  <span class="chapter-tag">Opening</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">一场关于 AI 运行环境的演讲</p>
+    <h1 class="reveal"><em>Harness</em> 工程<br/>从黑箱到可见</h1>
+    <p class="sub reveal">2026 年 AI 工程师的核心议题 ——<br/>5 套真实工程实践 · 6 个判断</p>
+    <div class="meta reveal">
+      <span>60 min</span>
+      <span>30 slides</span>
+      <span>基于《Harness 系列》六篇</span>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · 千里马的挽具 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">02 / 30</span>
+  <span class="chapter-tag">Opening · Metaphor</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">开场隐喻</p>
+    <h2 class="reveal">大模型是<em>千里马</em>，但千里马随处可得。</h2>
+    <ul class="bullet-list reveal" style="margin-top: 0.8rem;">
+      <li>问题不是"去哪里找更强的模型"，<strong>而是能不能驾驭它</strong></li>
+      <li>你需要的是一整套 <strong>挽具（Harness）</strong>，不只是骑手和马</li>
+      <li>Harness = 围绕 AI 模型构建的<strong>运行环境的总和</strong></li>
+      <li>2026 年的质变：从理论走向生产 —— 前沿模型终于足够可靠</li>
+    </ul>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 1</span>
+</section>
+
+<!-- 3 · 信息工具 vs 生产工具 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">03 / 30</span>
+  <span class="chapter-tag">Opening · The Shift</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">一道门 · 两种用法</p>
+    <h2 class="reveal">从<em>信息工具</em>到<em>生产工具</em>。</h2>
+    <div class="two-col reveal" style="margin-top: 0.8rem;">
+      <div class="card">
+        <span class="num">没有 HARNESS</span>
+        <h3>信息工具</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">输入问题 → 输出答案<br/>世界不变。</p>
+      </div>
+      <div class="card">
+        <span class="num">有设计的 HARNESS</span>
+        <h3>生产工具</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">文件被修改，代码被运行，状态改变。<br/>世界变了。</p>
+      </div>
+    </div>
+    <p class="reveal" style="font-style: italic;">Harness 是跨越这道门的关键。今天的演讲，就是拆开它。</p>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 1</span>
+</section>
+
+<!-- ============================================================
+     ACT 2 · 五个维度（4-8）
+     ============================================================ -->
+
+<!-- 4 · 维度一 · Context -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">04 / 30</span>
+  <span class="chapter-tag">Dimension · 01 / 05</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">维度一</p>
+    <h2 class="reveal">上下文管理 · <em>最稀缺的资源</em></h2>
+    <ul class="bullet-list reveal">
+      <li><strong>工作记忆即瓶颈</strong> —— Agent 的思考半径就是它的 context</li>
+      <li><strong>Context Anxiety</strong> —— 接近上限时模型提前收尾，给出次优解</li>
+      <li><strong>张力</strong> —— 全量注入 <em>vs</em> 渐进式披露</li>
+      <li><strong>经典做法</strong> —— 目录 100 行 + 子目录详情按需加载</li>
+    </ul>
+    <p class="reveal" style="font-style: italic; margin-top: 0.4rem;">"你的 context 窗口是不可再生的。"</p>
+  </div>
+  <span class="source-tag">篇 1 · 篇 3</span>
+</section>
+
+<!-- 5 · 维度二 · 工具集 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">05 / 30</span>
+  <span class="chapter-tag">Dimension · 02 / 05</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">维度二</p>
+    <h2 class="reveal">工具集设计 · <em>粒度决定成本</em></h2>
+    <ul class="bullet-list reveal">
+      <li><strong>Playwright MCP</strong> —— 21 个工具，<strong>13,700 token</strong>，占上下文 <em>9%</em></li>
+      <li><strong>第一句话还没说</strong>，预算已烧掉近一成</li>
+      <li><strong>Mario 的替代</strong> —— 4 个基础工具 + CLI README（按需加载）</li>
+      <li><strong>原则</strong> —— 渐进式披露，而不是一次性倾倒</li>
+    </ul>
+  </div>
+  <span class="source-tag">篇 1 · 篇 4</span>
+</section>
+
+<!-- 6 · 维度三 · 反馈回路 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">06 / 30</span>
+  <span class="chapter-tag">Dimension · 03 / 05</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">维度三 · 最被忽视，也最关键</p>
+    <h2 class="reveal">反馈回路 · <em>让 AI 知道自己做得对不对</em></h2>
+    <ul class="bullet-list reveal">
+      <li><strong>AI 自评永远给好评</strong> —— 这是默认行为，不是偶发现象</li>
+      <li><strong>GAN 的启发</strong> —— Generator 与 Evaluator 必须分离</li>
+      <li><strong>独立的刻薄质检员</strong> —— 事前给出 27 条验收标准</li>
+      <li><strong>反面</strong> —— "应该完成了"这种模糊期望直接失效</li>
+    </ul>
+    <p class="reveal" style="font-style: italic;">最稀缺的能力，不是让 AI 生成更多，<em>而是让 AI 知道"更多"里哪些是好的。</em></p>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 2</span>
+</section>
+
+<!-- 7 · 维度四 · 记忆 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">07 / 30</span>
+  <span class="chapter-tag">Dimension · 04 / 05</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">维度四</p>
+    <h2 class="reveal">状态与记忆 · <em>所有方案都收敛到文件</em></h2>
+    <ul class="bullet-list reveal">
+      <li><strong>大模型无持久记忆</strong> —— 每次从零开始</li>
+      <li><strong>为什么是文件</strong> —— Agent 可读 · 人类可读 · 可版本控制 · 跨 session 持久</li>
+      <li><strong>常见载体</strong> —— <code>PLAN.md</code> · <code>TODO.md</code> · <code>AGENTS.md</code> · <code>program.md</code></li>
+      <li><strong>三层记忆</strong> —— 热 <code>MEMORY.md</code> · 暖 日归档 · 冷 检索库</li>
+    </ul>
+  </div>
+  <span class="source-tag">篇 1 · 篇 4 · 篇 5</span>
+</section>
+
+<!-- 8 · 维度五 · 约束 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">08 / 30</span>
+  <span class="chapter-tag">Dimension · 05 / 05</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">维度五</p>
+    <h2 class="reveal">约束与架构 · <em>速度的倍增器</em></h2>
+    <ul class="bullet-list reveal">
+      <li><strong>OpenAI 的困境</strong> —— 每周五花 20% 时间清 "AI 垃圾代码"</li>
+      <li><strong>反模式会被 AI 无限复制</strong> —— 一处坏味道 → 十处复刻</li>
+      <li><strong>约束不是限制</strong> —— 是"快速而不腐烂"的前提</li>
+      <li><strong>机械强制 &gt; 依赖自觉</strong> —— CI linter 对人和机器都强制</li>
+      <li><strong>吞吐量改变哲学</strong> —— <strong>3.5 PRs / 人 / 天</strong></li>
+    </ul>
+  </div>
+  <span class="source-tag">篇 1 · 篇 3</span>
+</section>
+
+<!-- ============================================================
+     ACT 3 · 三套工程实践（9-18）
+     ============================================================ -->
+
+<!-- 9 · Anthropic · 概述 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">09 / 30</span>
+  <span class="chapter-tag">Practice · 01 / 03 · Anthropic</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">实践一：Anthropic</p>
+    <h2 class="reveal">Prithvi 的 <em>5 个月实验</em></h2>
+    <ul class="bullet-list reveal">
+      <li><strong>核心问题</strong> —— 如何让 AI 持续高质量，而不只是第一轮凑合？</li>
+      <li><strong>答案工具</strong> —— Generator-Evaluator + Sprint Contract</li>
+      <li><strong>对照实验</strong> —— 单 agent <strong>$9 / 20 分钟</strong>（游戏坏掉）</li>
+      <li><strong>完整 harness</strong> —— <strong>$200 / 6 小时</strong>（能玩，10 个细粒度特性）</li>
+    </ul>
+    <p class="reveal" style="font-style: italic;">20 倍成本，100 倍质量。这不是砸钱，是系统设计。</p>
+  </div>
+  <span class="source-tag">篇 2 · Anthropic Labs 2026-03</span>
+</section>
+
+<!-- 10 · Generator-Evaluator -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">10 / 30</span>
+  <span class="chapter-tag">Anthropic · G vs E</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">刻薄的质检员</p>
+    <h2 class="reveal">Generator-Evaluator <em>分离</em></h2>
+    <div class="two-col reveal">
+      <ul class="bullet-list">
+        <li><strong>为什么分离</strong> —— AI 自评永远网开一面</li>
+        <li><strong>GAN 启发</strong> —— 对抗性反馈推动迭代</li>
+        <li><strong>四维评分（前端）</strong> —— 设计质量 / 原创性 / 工艺 / 可用性</li>
+        <li><strong>避免</strong> —— "紫色渐变 + 白卡"的 AI slop</li>
+      </ul>
+      <div class="card">
+        <span class="num">真实案例</span>
+        <h3>荷兰博物馆 · CSS 3D 交互室</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">第 10 轮迭代，Evaluator 自主决策引入一个从未要求过的交互设计。</p>
+      </div>
+    </div>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 2</span>
+</section>
+
+<!-- 11 · Sprint Contract -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">11 / 30</span>
+  <span class="chapter-tag">Anthropic · Contract</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">先协商，再开工</p>
+    <h2 class="reveal">Sprint Contract · <em>把"完成"变成机械可验证</em></h2>
+    <ul class="bullet-list reveal">
+      <li><strong>事前锁定</strong> —— Generator 与 Evaluator 事前达成验收标准</li>
+      <li><strong>27 条具体标准</strong> —— 比"应该完成"具体 1000 倍</li>
+      <li><strong>案例</strong> —— 矩形填充工具验收失败 → 指向具体代码行</li>
+      <li><strong>打回机制</strong> —— 不是建议改进，而是拒绝交付</li>
+    </ul>
+    <p class="reveal" style="font-style: italic;">把"什么叫完成"从感觉变成<em>机械可验证的标准</em>。</p>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 2</span>
+</section>
+
+<!-- 12 · 模型升级让 harness 瘦身 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">12 / 30</span>
+  <span class="chapter-tag">Anthropic · Evolution</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">诚实承认</p>
+    <h2 class="reveal">Harness 里的每个组件，<em>都是一个会过期的假设</em>。</h2>
+    <ul class="bullet-list reveal">
+      <li><strong>Opus 4.5 时代</strong> —— 必须 Sprint 分解，否则任务漂移</li>
+      <li><strong>Opus 4.6 突破</strong> —— 单次连续 build 4 小时不中断</li>
+      <li><strong>费用下降</strong> —— $200 → <strong>$124</strong></li>
+      <li><strong>原则</strong> —— Harness 不是搭好就不动，要定期 stress test</li>
+    </ul>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 2</span>
+</section>
+
+<!-- 13 · OpenAI · 概述 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">13 / 30</span>
+  <span class="chapter-tag">Practice · 02 / 03 · OpenAI</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">实践二：OpenAI</p>
+    <h2 class="reveal">Project Hulk · <em>0 行人工，百万行 AI</em></h2>
+    <ul class="bullet-list reveal">
+      <li><strong>5 个月</strong> —— 零行人工代码进入生产</li>
+      <li><strong>核心问题</strong> —— 7 倍吞吐量下，代码库的<em>传染性</em></li>
+      <li><strong>答案工具</strong> —— GC Agent + Knowledge as Code + 严格分层</li>
+      <li><strong>纪律转移</strong> —— 从审查代码本身，<em>转向审查产生代码的 harness</em></li>
+    </ul>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 3</span>
+</section>
+
+<!-- 14 · 代码有传染性 -->
+<section class="slide quote-slide">
+  <div class="grain"></div>
+  <span class="page-num">14 / 30</span>
+  <span class="chapter-tag">OpenAI · Contagion</span>
+  <div class="slide-content">
+    <blockquote class="reveal">AI 没有品味，只有频率识别。</blockquote>
+    <cite class="reveal">Harness 系列 · 篇 3</cite>
+    <ul class="bullet-list reveal" style="margin-top: 1.6rem; max-width: 60ch;">
+      <li><strong>人工编码时期</strong> —— 坏模式停在那里，很少被复制</li>
+      <li><strong>AI 时代</strong> —— 一处反模式出现 → 被复制到 10 个地方</li>
+      <li><strong>传统 PR review 失效</strong> —— 跟不上 3.5 PRs/人/天的速度</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 15 · GC Agent -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">15 / 30</span>
+  <span class="chapter-tag">OpenAI · GC Agent</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">第二类 Agent</p>
+    <h2 class="reveal">GC Agent · <em>自动垃圾回收</em></h2>
+    <ul class="bullet-list reveal">
+      <li><strong>使命</strong> —— 找冗余代码、过时代码、规范违反</li>
+      <li><strong>原周五 20% 时间</strong> —— 自动化吞掉</li>
+      <li><strong>工程师角色变化</strong> —— 从逐行审查 → 看 "这个 PR 做了什么、为什么"</li>
+      <li><strong>核心洞见</strong> —— 升级产生代码的 harness，而不是改代码</li>
+    </ul>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 3</span>
+</section>
+
+<!-- 16 · Knowledge as Code -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">16 / 30</span>
+  <span class="chapter-tag">OpenAI · KaC</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">Knowledge as Code</p>
+    <h2 class="reveal">Slack 里的决策，对 Agent 而言<em>不存在</em>。</h2>
+    <ul class="bullet-list reveal">
+      <li><strong>原则</strong> —— 所有影响 agent 行为的知识必须结构化入 repo</li>
+      <li><strong>不只是"是什么"</strong> —— 还要有"为什么不是另一种"</li>
+      <li><strong>形式</strong> —— <code>AGENTS.md</code> 100 行地图 + 分层 README</li>
+      <li><strong>等式</strong> —— Agent 能访问 = 能推理 = 能一致复用</li>
+    </ul>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 3</span>
+</section>
+
+<!-- 17 · 约束 = 护栏 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">17 / 30</span>
+  <span class="chapter-tag">OpenAI · Constraints</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">约束的悖论</p>
+    <h2 class="reveal">AI 时代，约束是<em>唯一的护栏</em>。</h2>
+    <div class="two-col reveal">
+      <ul class="bullet-list">
+        <li><strong>AI 擅长</strong> —— 局部优化、频率学习</li>
+        <li><strong>AI 不擅长</strong> —— 全局耦合、架构风险</li>
+        <li><strong>解法</strong> —— CI linter 机械强制</li>
+      </ul>
+      <blockquote style="font-size: 1.15rem;">
+        约束是让 AI<br/>能快速移动<br/>而不腐烂的护栏。
+      </blockquote>
+    </div>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 3</span>
+</section>
+
+<!-- 18 · Mario · 概述 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">18 / 30</span>
+  <span class="chapter-tag">Practice · 03 / 03 · Mario</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">实践三：一位 DOS 时代的工程师</p>
+    <h2 class="reveal">Mario · <em>我受够了黑箱</em></h2>
+    <ul class="bullet-list reveal">
+      <li><strong>核心问题</strong> —— 你的 context 窗口里有什么？你根本不知道</li>
+      <li><strong>答案工具</strong> —— 4 个工具 / 900 token / 极简 / 透明</li>
+      <li><strong>Benchmark</strong> —— Terminal-Bench 与 Claude Code 不相上下</li>
+    </ul>
+    <p class="reveal" style="font-style: italic;">你以为在做 context engineering，<em>但你连 context 里有什么都不知道</em>。</p>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 4</span>
+</section>
+
+<!-- ============================================================
+     ACT 4 · 极简哲学 + 独立开发者统合（19-24）
+     ============================================================ -->
+
+<!-- 19 · Mario 的四个工具 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">19 / 30</span>
+  <span class="chapter-tag">Mario · Minimalism</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">极简方案</p>
+    <h2 class="reveal"><em>4 个工具 · 900 token</em>，够了。</h2>
+    <table class="reveal">
+      <thead><tr><th>工具</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><code>read</code></td><td>读文件</td></tr>
+        <tr><td><code>write</code></td><td>写文件</td></tr>
+        <tr><td><code>edit</code></td><td>局部编辑</td></tr>
+        <tr><td><code>bash</code></td><td>执行一切</td></tr>
+      </tbody>
+    </table>
+    <p class="reveal" style="font-style: italic;">对比：Claude Code 数万 token。<em>2026 年的前沿模型天生懂 coding agent，不需要长操作手册。</em></p>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 4</span>
+</section>
+
+<!-- 20 · 文件是唯一诚实的状态 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">20 / 30</span>
+  <span class="chapter-tag">Mario · State</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">砍掉一切不透明的状态</p>
+    <h2 class="reveal">文件是唯一<em>诚实</em>的状态载体。</h2>
+    <ul class="bullet-list reveal">
+      <li><strong>砍掉 Plan Mode</strong> —— 只读分析，看不见思考过程</li>
+      <li><strong>砍掉内置 Todo</strong> —— 额外维护的隐藏状态</li>
+      <li><strong>改用</strong> —— <code>PLAN.md</code> · <code>TODO.md</code></li>
+      <li><strong>四个条件</strong> —— Agent 可读 · 人类可读 · 版本控制 · 跨 session 持久</li>
+    </ul>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 4</span>
+</section>
+
+<!-- 21 · tmux -->
+<section class="slide quote-slide">
+  <div class="grain"></div>
+  <span class="page-num">21 / 30</span>
+  <span class="chapter-tag">Mario · Visibility</span>
+  <div class="slide-content">
+    <blockquote class="reveal">
+      后台进程没有可见性。Mario 的解法是 tmux —— 因为 tmux 是你能<em>看见</em>的。
+    </blockquote>
+    <cite class="reveal">Harness 系列 · 篇 4</cite>
+    <ul class="bullet-list reveal" style="margin-top: 1.5rem; max-width: 60ch;">
+      <li><strong>子 agent 的陷阱</strong> —— 表面并行，实则失控</li>
+      <li><strong>Mario 的判断</strong> —— 想用子 agent，是<em>规划不足</em>的信号</li>
+      <li><strong>替代</strong> —— 独立 session 收集 artifact，新 session 作输入</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 22 · Karpathy autoresearch -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">22 / 30</span>
+  <span class="chapter-tag">Independent · Karpathy</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">独立开发者一：Karpathy</p>
+    <h2 class="reveal">autoresearch · <em>LOOP FOREVER 不是比喻</em></h2>
+    <div class="two-col reveal">
+      <ul class="bullet-list">
+        <li><code>program.md</code> —— 目标</li>
+        <li><code>train.py</code> —— 行动</li>
+        <li><code>prepare.py</code> —— 评估</li>
+        <li><strong>闭环</strong> —— 读 → 修 → 训 5min → 看 val_bpb → commit/reset → 日志 → loop</li>
+      </ul>
+      <div class="card">
+        <span class="num">实证</span>
+        <h3>Mac Mini M4 一晚 80+ 轮</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">对标 H100 的 100 轮。<br/>前提：评估者可机械化 —— 数字不会骗人。</p>
+      </div>
+    </div>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 5</span>
+</section>
+
+<!-- 23 · Garry Tan gstack -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">23 / 30</span>
+  <span class="chapter-tag">Independent · Garry Tan</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">独立开发者二：YC CEO</p>
+    <h2 class="reveal">gstack · <em>八个认知档位</em>，不是一套流程</h2>
+    <table class="reveal">
+      <thead><tr><th>档位</th><th>认知模式</th><th>反问</th></tr></thead>
+      <tbody>
+        <tr><td><code>/plan-ceo-review</code></td><td>创始人品味</td><td>这是对的事情吗？</td></tr>
+        <tr><td><code>/plan-eng-review</code></td><td>技术主管</td><td>可以做到吗？</td></tr>
+        <tr><td><code>/review</code></td><td>偏执工程师</td><td>什么还会出错？</td></tr>
+        <tr><td><code>/ship</code></td><td>发布机器</td><td>把它落地</td></tr>
+        <tr><td><code>/browse</code></td><td>QA · 给 agent 眼睛</td><td>18 工具调用 · 60s QA pass</td></tr>
+      </tbody>
+    </table>
+    <p class="reveal" style="font-style: italic;">规划不是审查，审查不是发布。<em>混在一起会四者皆平庸。</em></p>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 5</span>
+</section>
+
+<!-- 24 · OpenClaw 三层记忆 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">24 / 30</span>
+  <span class="chapter-tag">Independent · OpenClaw</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">独立开发者三：OpenClaw</p>
+    <h2 class="reveal">三层记忆 · <em>Mac Mini 就够了</em></h2>
+    <table class="reveal">
+      <thead><tr><th>层</th><th>载体</th><th>机制</th></tr></thead>
+      <tbody>
+        <tr><td><strong>热</strong></td><td><code>MEMORY.md</code> ≤ 8 KB</td><td>每 session 自动加载 · 核心决策 + 偏好</td></tr>
+        <tr><td><strong>暖</strong></td><td>日期归档</td><td>Micro Sync 每 3h 抽取 · Daily Wrap-Up 每日整合</td></tr>
+        <tr><td><strong>冷</strong></td><td>第二大脑</td><td>历史文档 · 语义 + 关键字混合检索</td></tr>
+      </tbody>
+    </table>
+    <p class="reveal">硬约束 8 KB，不是技术限制 —— 是<em>强迫取舍</em>。</p>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 5</span>
+</section>
+
+<!-- ============================================================
+     ACT 5 · 共同底层 + 三个实验（25-27）
+     ============================================================ -->
+
+<!-- 25 · 三套逻辑的共同底层 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">25 / 30</span>
+  <span class="chapter-tag">Synthesis</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">形态不同，底层相同</p>
+    <h2 class="reveal">autoresearch · gstack · OpenClaw<br/><em>共用一套哲学</em></h2>
+    <ul class="bullet-list reveal">
+      <li><strong>目标清晰</strong> —— val_bpb 数字 / CEO 档位方向 / MEMORY.md 项目状态</li>
+      <li><strong>行动有边界</strong> —— 只改 train.py / 一 skill 一模式 / 热记忆 8 KB 硬约束</li>
+      <li><strong>反馈闭环</strong> —— 机械评估 / 实时 UI / 暖记忆捕捉决策</li>
+      <li><strong>记忆持久</strong> —— 实验日志 / 决策文件 / 可追溯痕迹</li>
+    </ul>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 5</span>
+</section>
+
+<!-- 26 · 从这里开始 · 三个实验 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">26 / 30</span>
+  <span class="chapter-tag">Practical</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">这周就能做</p>
+    <h2 class="reveal">三个<em>最小可行实验</em></h2>
+    <div class="three-col reveal">
+      <div class="card">
+        <span class="num">01</span>
+        <h3>跑一次 autoresearch</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">感受 LOOP FOREVER 是什么感觉。</p>
+      </div>
+      <div class="card">
+        <span class="num">02</span>
+        <h3>装上 gstack</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">下个功能前，先用 <code>/plan-ceo-review</code>。</p>
+      </div>
+      <div class="card">
+        <span class="num">03</span>
+        <h3>写 MEMORY.md</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">把这周三个最重要的决策写进去。</p>
+      </div>
+    </div>
+    <p class="reveal" style="font-style: italic;">不是三个独立工具 —— 是<em>同一个 harness 哲学的三种实现</em>。</p>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 5</span>
+</section>
+
+<!-- 27 · 过渡 · 你怎么知道 harness 在工作 -->
+<section class="slide divider">
+  <div class="grain"></div>
+  <span class="page-num">27 / 30</span>
+  <span class="chapter-tag">Part Final</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">第六章 · 我们的判断</p>
+    <h2 class="reveal">你怎么知道 <em>harness 真的在工作？</em></h2>
+    <p class="reveal" style="margin-top: 1rem; color: var(--text-muted);">前五篇是最好条件下的实践 —— 这一篇是最坏条件下的判断。</p>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 6</span>
+</section>
+
+<!-- ============================================================
+     ACT 6 · 六个判断 + 收尾（28-30）
+     ============================================================ -->
+
+<!-- 28 · 判断 1 2 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">28 / 30</span>
+  <span class="chapter-tag">Judgement · 01 - 02</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">20 年企业 IT 经验 · 校准两三年 AI 经验</p>
+    <h2 class="reveal">六个判断 · <em>上</em></h2>
+    <div class="two-col reveal">
+      <div class="card">
+        <span class="num">判断 01</span>
+        <h3>不稳定的根源<br/>通常不是模型</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">Talk-with-Buffett 的质量飘忽 —— 问题在反馈回路缺失。<br/><em>Agent 有没有办法知道自己做对了？</em></p>
+      </div>
+      <div class="card">
+        <span class="num">判断 02</span>
+        <h3>可见性是你给自己的，<br/>不是工具给的</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">可见性来自<strong>减法</strong>，不是加法。<br/>去掉看不见的工具，比加监控更重要。</p>
+      </div>
+    </div>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 6</span>
+</section>
+
+<!-- 29 · 判断 3 4 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">29 / 30</span>
+  <span class="chapter-tag">Judgement · 03 - 04</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">继续</p>
+    <h2 class="reveal">六个判断 · <em>中</em></h2>
+    <div class="two-col reveal">
+      <div class="card">
+        <span class="num">判断 03</span>
+        <h3>品味无法被<br/>evaluator 机械化</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">Talk-with-Buffett · judge-the-code · publish-md-to-wechat —— 三个产品共同撞上这堵墙。<br/><em>任何声称完全自动化的方案，都值得追问。</em></p>
+      </div>
+      <div class="card">
+        <span class="num">判断 04</span>
+        <h3>独立开发者的约束<br/>是注意力</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">cron &gt; 调度框架<br/>文件 &gt; 数据库<br/>shell &gt; 应用封装<br/><em>每层抽象都是要维护的故障域。</em></p>
+      </div>
+    </div>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 6</span>
+</section>
+
+<!-- 30 · 判断 5 6 + 收尾 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">30 / 30</span>
+  <span class="chapter-tag">Judgement · 05 - 06 · Closing</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">最后两个判断</p>
+    <h2 class="reveal">六个判断 · <em>下</em></h2>
+    <div class="two-col reveal">
+      <div class="card">
+        <span class="num">判断 05</span>
+        <h3>记忆是目前<br/>还没解的问题</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">所有方案都是外部存储模拟持久记忆。<br/>最务实的做法：<em>接受不完美</em>。</p>
+      </div>
+      <div class="card">
+        <span class="num">判断 06</span>
+        <h3>企业 harness 的终态：<br/>skill = 业务 SOP</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">Uber 五个月 2 skill → 500+ 生态。<br/>自下而上开发 + 自上而下治理，<em>两层并行</em>。</p>
+      </div>
+    </div>
+    <p class="reveal" style="margin-top: 1rem; text-align: center; font-family: var(--font-display); font-style: italic; font-size: clamp(1.1rem, 2.2vw, 1.6rem); color: var(--accent-warm);">
+      从<em>诚实</em>开始，harness 自然会生长。
+    </p>
+  </div>
+  <span class="source-tag">Harness 系列 · 篇 6</span>
+</section>
+
+<script>
+class SlidePresentation {
+  constructor() {
+    this.slides = Array.from(document.querySelectorAll('.slide'));
+    this.progressBar = document.getElementById('progressBar');
+    this.navDotsContainer = document.getElementById('navDots');
+    this.currentIndex = 0;
+    this.setupNavDots();
+    this.setupIntersectionObserver();
+    this.setupKeyboardNav();
+    this.setupTouchNav();
+  }
+  setupNavDots() {
+    this.navDotsContainer.innerHTML = '';
+    this.slides.forEach((_, i) => {
+      const btn = document.createElement('button');
+      btn.setAttribute('aria-label', `Slide ${i + 1}`);
+      btn.addEventListener('click', () => this.slides[i].scrollIntoView({ behavior: 'smooth' }));
+      this.navDotsContainer.appendChild(btn);
+    });
+    this.dots = Array.from(this.navDotsContainer.children);
+  }
+  setupIntersectionObserver() {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          this.currentIndex = this.slides.indexOf(entry.target);
+          this.updateProgress();
+          this.updateDots();
+        }
+      });
+    }, { threshold: 0.5 });
+    this.slides.forEach(s => io.observe(s));
+  }
+  updateProgress() {
+    this.progressBar.style.width = ((this.currentIndex + 1) / this.slides.length) * 100 + '%';
+  }
+  updateDots() {
+    this.dots.forEach((d, i) => d.classList.toggle('active', i === this.currentIndex));
+  }
+  goTo(i) {
+    const idx = Math.max(0, Math.min(this.slides.length - 1, i));
+    this.slides[idx].scrollIntoView({ behavior: 'smooth' });
+  }
+  setupKeyboardNav() {
+    document.addEventListener('keydown', (e) => {
+      if (e.target.getAttribute && e.target.getAttribute('contenteditable')) return;
+      if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)) {
+        e.preventDefault(); this.goTo(this.currentIndex + 1);
+      } else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) {
+        e.preventDefault(); this.goTo(this.currentIndex - 1);
+      } else if (e.key === 'Home') { e.preventDefault(); this.goTo(0); }
+        else if (e.key === 'End') { e.preventDefault(); this.goTo(this.slides.length - 1); }
+    });
+  }
+  setupTouchNav() {
+    let startY = 0;
+    document.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const dy = startY - e.changedTouches[0].clientY;
+      if (Math.abs(dy) > 50) this.goTo(this.currentIndex + (dy > 0 ? 1 : -1));
+    }, { passive: true });
+  }
+}
+
+class InlineEditor {
+  constructor() {
+    this.isActive = false;
+    this.toggleBtn = document.getElementById('editToggle');
+    this.banner = document.getElementById('editBanner');
+    this.editableSelectors = 'h1, h2, h3, p, li, blockquote, cite, td, th, code';
+    this.loadFromStorage();
+    this.setupInteractions();
+    this.setupAutoSave();
+  }
+  setupInteractions() {
+    const hotzone = document.getElementById('editHotzone');
+    let hideTimeout = null;
+    const show = () => { clearTimeout(hideTimeout); this.toggleBtn.classList.add('show'); };
+    const hide = () => {
+      hideTimeout = setTimeout(() => {
+        if (!this.isActive) this.toggleBtn.classList.remove('show');
+      }, 400);
+    };
+    hotzone.addEventListener('mouseenter', show);
+    hotzone.addEventListener('mouseleave', hide);
+    this.toggleBtn.addEventListener('mouseenter', show);
+    this.toggleBtn.addEventListener('mouseleave', hide);
+    hotzone.addEventListener('click', () => this.toggle());
+    this.toggleBtn.addEventListener('click', () => this.toggle());
+    document.addEventListener('keydown', (e) => {
+      if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+        this.toggle();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 's' && this.isActive) {
+        e.preventDefault();
+        this.exportFile();
+      }
+    });
+  }
+  toggle() {
+    this.isActive = !this.isActive;
+    document.body.classList.toggle('edit-active', this.isActive);
+    this.toggleBtn.classList.toggle('active', this.isActive);
+    this.banner.classList.toggle('active', this.isActive);
+    document.querySelectorAll(this.editableSelectors).forEach(el => {
+      if (this.isActive) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+  setupAutoSave() {
+    document.addEventListener('input', (e) => {
+      if (e.target.getAttribute('contenteditable')) this.saveToStorage();
+    });
+  }
+  saveToStorage() {
+    const data = {};
+    document.querySelectorAll(this.editableSelectors).forEach((el, i) => {
+      data[i] = el.innerHTML;
+    });
+    try { localStorage.setItem('slides-content', JSON.stringify(data)); } catch (e) {}
+  }
+  loadFromStorage() {
+    try {
+      const raw = localStorage.getItem('slides-content');
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      document.querySelectorAll(this.editableSelectors).forEach((el, i) => {
+        if (data[i] !== undefined) el.innerHTML = data[i];
+      });
+    } catch (e) {}
+  }
+  exportFile() {
+    const editableEls = Array.from(document.querySelectorAll('[contenteditable]'));
+    editableEls.forEach(el => el.removeAttribute('contenteditable'));
+    document.body.classList.remove('edit-active');
+    this.toggleBtn.classList.remove('active', 'show');
+    this.banner.classList.remove('active', 'show');
+    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    document.body.classList.add('edit-active');
+    editableEls.forEach(el => el.setAttribute('contenteditable', 'true'));
+    this.toggleBtn.classList.add('active');
+    this.banner.classList.add('active');
+    const blob = new Blob([html], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'agent-harness-slides.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+}
+
+new SlidePresentation();
+new InlineEditor();
+</script>
+</body>
+</html>
