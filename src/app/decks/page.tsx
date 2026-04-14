@@ -23,7 +23,7 @@ const decks: Deck[] = [
     kicker: 'HARNESS 系列 · 30 页',
     description:
       '基于《Harness 系列》六篇整理的 60 分钟技术大会演讲：五个维度、三套实践、六个判断。',
-    slides: 30,
+    slides: 31,
     duration: '60 min',
     date: '2026.04',
   },

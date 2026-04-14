@@ -286,6 +286,39 @@ td strong { color: var(--text-primary); font-weight: 500; }
   text-transform: uppercase;
 }
 
+.speaker-card {
+  margin-top: clamp(1.2rem, 2.5vw, 2rem);
+  padding-top: clamp(0.9rem, 1.8vw, 1.4rem);
+  border-top: 1px solid var(--line);
+  max-width: 56ch;
+  display: flex; flex-direction: column;
+  gap: 0.3rem;
+}
+.speaker-name {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.speaker-alias {
+  font-style: italic;
+  color: var(--accent-warm);
+  font-weight: 400;
+  margin-left: 0.4rem;
+}
+.speaker-role {
+  font-family: var(--font-mono);
+  font-size: var(--small-size);
+  color: var(--accent-gold);
+  letter-spacing: 0.05em;
+}
+.speaker-bio {
+  font-size: var(--small-size);
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-top: 0.3rem;
+}
+
 .divider { align-items: center; justify-content: center; text-align: center; }
 .divider h2 { max-width: 20ch; }
 .divider .eyebrow { margin-bottom: 1rem; }
@@ -449,7 +482,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 1 · 主题页 -->
 <section class="slide title-slide">
   <div class="grain"></div>
-  <span class="page-num">01 / 30</span>
+  <span class="page-num">01 / 31</span>
   <span class="chapter-tag">Opening</span>
   <div class="slide-content">
     <p class="eyebrow reveal">一场关于 AI 运行环境的演讲</p>
@@ -457,8 +490,15 @@ body.edit-active [contenteditable]:focus {
     <p class="sub reveal">2026 年 AI 工程师的核心议题 ——<br/>5 套真实工程实践 · 6 个判断</p>
     <div class="meta reveal">
       <span>60 min</span>
-      <span>30 slides</span>
+      <span>31 slides</span>
       <span>基于《Harness 系列》六篇</span>
+    </div>
+    <div class="speaker-card reveal">
+      <div class="speaker-name">朱耀飞 <span class="speaker-alias">Rafa</span></div>
+      <div class="speaker-role">AWS 行业解决方案专家 · 出海企业全球化技术架构 &amp; AI 数字化</div>
+      <div class="speaker-bio">20 年横跨算力底层、企业集成、云原生、生成式 AI 四个技术周期。<br/>
+        主导美的集团含东芝日本的全球联络中心云转型、大众中国千万级出行平台、MayBank 系统整合。<br/>
+        《AI 早知道》作者 · ai.air7.fun · github.com/walk4rever</div>
     </div>
   </div>
 </section>
@@ -466,7 +506,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 2 · 千里马的挽具 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">02 / 30</span>
+  <span class="page-num">02 / 31</span>
   <span class="chapter-tag">Opening · Metaphor</span>
   <div class="slide-content">
     <p class="eyebrow reveal">开场隐喻</p>
@@ -484,7 +524,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 3 · 信息工具 vs 生产工具 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">03 / 30</span>
+  <span class="page-num">03 / 31</span>
   <span class="chapter-tag">Opening · The Shift</span>
   <div class="slide-content">
     <p class="eyebrow reveal">一道门 · 两种用法</p>
@@ -513,7 +553,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 4 · 维度一 · Context -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">04 / 30</span>
+  <span class="page-num">04 / 31</span>
   <span class="chapter-tag">Dimension · 01 / 05</span>
   <div class="slide-content">
     <p class="eyebrow reveal">维度一</p>
@@ -532,7 +572,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 5 · 维度二 · 工具集 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">05 / 30</span>
+  <span class="page-num">05 / 31</span>
   <span class="chapter-tag">Dimension · 02 / 05</span>
   <div class="slide-content">
     <p class="eyebrow reveal">维度二</p>
@@ -550,7 +590,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 6 · 维度三 · 反馈回路 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">06 / 30</span>
+  <span class="page-num">06 / 31</span>
   <span class="chapter-tag">Dimension · 03 / 05</span>
   <div class="slide-content">
     <p class="eyebrow reveal">维度三 · 最被忽视，也最关键</p>
@@ -569,7 +609,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 7 · 维度四 · 记忆 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">07 / 30</span>
+  <span class="page-num">07 / 31</span>
   <span class="chapter-tag">Dimension · 04 / 05</span>
   <div class="slide-content">
     <p class="eyebrow reveal">维度四</p>
@@ -587,7 +627,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 8 · 维度五 · 约束 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">08 / 30</span>
+  <span class="page-num">08 / 31</span>
   <span class="chapter-tag">Dimension · 05 / 05</span>
   <div class="slide-content">
     <p class="eyebrow reveal">维度五</p>
@@ -610,7 +650,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 9 · Anthropic · 概述 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">09 / 30</span>
+  <span class="page-num">09 / 31</span>
   <span class="chapter-tag">Practice · 01 / 03 · Anthropic</span>
   <div class="slide-content">
     <p class="eyebrow reveal">实践一：Anthropic</p>
@@ -629,7 +669,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 10 · Generator-Evaluator -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">10 / 30</span>
+  <span class="page-num">10 / 31</span>
   <span class="chapter-tag">Anthropic · G vs E</span>
   <div class="slide-content">
     <p class="eyebrow reveal">刻薄的质检员</p>
@@ -654,7 +694,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 11 · Sprint Contract -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">11 / 30</span>
+  <span class="page-num">11 / 31</span>
   <span class="chapter-tag">Anthropic · Contract</span>
   <div class="slide-content">
     <p class="eyebrow reveal">先协商，再开工</p>
@@ -673,7 +713,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 12 · 模型升级让 harness 瘦身 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">12 / 30</span>
+  <span class="page-num">12 / 31</span>
   <span class="chapter-tag">Anthropic · Evolution</span>
   <div class="slide-content">
     <p class="eyebrow reveal">诚实承认</p>
@@ -691,7 +731,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 13 · OpenAI · 概述 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">13 / 30</span>
+  <span class="page-num">13 / 31</span>
   <span class="chapter-tag">Practice · 02 / 03 · OpenAI</span>
   <div class="slide-content">
     <p class="eyebrow reveal">实践二：OpenAI</p>
@@ -709,7 +749,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 14 · 代码有传染性 -->
 <section class="slide quote-slide">
   <div class="grain"></div>
-  <span class="page-num">14 / 30</span>
+  <span class="page-num">14 / 31</span>
   <span class="chapter-tag">OpenAI · Contagion</span>
   <div class="slide-content">
     <blockquote class="reveal">AI 没有品味，只有频率识别。</blockquote>
@@ -725,7 +765,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 15 · GC Agent -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">15 / 30</span>
+  <span class="page-num">15 / 31</span>
   <span class="chapter-tag">OpenAI · GC Agent</span>
   <div class="slide-content">
     <p class="eyebrow reveal">第二类 Agent</p>
@@ -743,7 +783,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 16 · Knowledge as Code -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">16 / 30</span>
+  <span class="page-num">16 / 31</span>
   <span class="chapter-tag">OpenAI · KaC</span>
   <div class="slide-content">
     <p class="eyebrow reveal">Knowledge as Code</p>
@@ -761,7 +801,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 17 · 约束 = 护栏 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">17 / 30</span>
+  <span class="page-num">17 / 31</span>
   <span class="chapter-tag">OpenAI · Constraints</span>
   <div class="slide-content">
     <p class="eyebrow reveal">约束的悖论</p>
@@ -783,7 +823,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 18 · Mario · 概述 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">18 / 30</span>
+  <span class="page-num">18 / 31</span>
   <span class="chapter-tag">Practice · 03 / 03 · Mario</span>
   <div class="slide-content">
     <p class="eyebrow reveal">实践三：一位 DOS 时代的工程师</p>
@@ -805,7 +845,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 19 · Mario 的四个工具 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">19 / 30</span>
+  <span class="page-num">19 / 31</span>
   <span class="chapter-tag">Mario · Minimalism</span>
   <div class="slide-content">
     <p class="eyebrow reveal">极简方案</p>
@@ -827,7 +867,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 20 · 文件是唯一诚实的状态 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">20 / 30</span>
+  <span class="page-num">20 / 31</span>
   <span class="chapter-tag">Mario · State</span>
   <div class="slide-content">
     <p class="eyebrow reveal">砍掉一切不透明的状态</p>
@@ -845,7 +885,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 21 · tmux -->
 <section class="slide quote-slide">
   <div class="grain"></div>
-  <span class="page-num">21 / 30</span>
+  <span class="page-num">21 / 31</span>
   <span class="chapter-tag">Mario · Visibility</span>
   <div class="slide-content">
     <blockquote class="reveal">
@@ -863,7 +903,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 22 · Karpathy autoresearch -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">22 / 30</span>
+  <span class="page-num">22 / 31</span>
   <span class="chapter-tag">Independent · Karpathy</span>
   <div class="slide-content">
     <p class="eyebrow reveal">独立开发者一：Karpathy</p>
@@ -888,7 +928,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 23 · Garry Tan gstack -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">23 / 30</span>
+  <span class="page-num">23 / 31</span>
   <span class="chapter-tag">Independent · Garry Tan</span>
   <div class="slide-content">
     <p class="eyebrow reveal">独立开发者二：YC CEO</p>
@@ -911,7 +951,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 24 · OpenClaw 三层记忆 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">24 / 30</span>
+  <span class="page-num">24 / 31</span>
   <span class="chapter-tag">Independent · OpenClaw</span>
   <div class="slide-content">
     <p class="eyebrow reveal">独立开发者三：OpenClaw</p>
@@ -929,18 +969,47 @@ body.edit-active [contenteditable]:focus {
   <span class="source-tag">Harness 系列 · 篇 5</span>
 </section>
 
-<!-- ============================================================
-     ACT 5 · 共同底层 + 三个实验（25-27）
-     ============================================================ -->
-
-<!-- 25 · 三套逻辑的共同底层 -->
+<!-- 25 · Hermes · Agent 操作系统 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">25 / 30</span>
+  <span class="page-num">25 / 31</span>
+  <span class="chapter-tag">Independent · Hermes</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">独立开发者四：Nous Research</p>
+    <h2 class="reveal">Hermes · <em>Agent 的操作系统</em></h2>
+    <div class="two-col reveal">
+      <ul class="bullet-list">
+        <li><strong>五层架构</strong> —— CLI · Core · Gateway · Session · Cron</li>
+        <li><strong>四大闭环</strong> —— Memory · Skills · Cron · Gateway</li>
+        <li><strong>11+ 平台</strong> —— Telegram · Discord · Slack · Feishu · DingTalk …</li>
+        <li><strong>模型抽象</strong> —— OpenAI · Anthropic · OpenRouter 可替换</li>
+      </ul>
+      <div class="card">
+        <span class="num">定位差异</span>
+        <h3>不是工具，是长期在线的代理人</h3>
+        <p style="color: var(--text-muted); font-size: var(--small-size);">
+          前三套解"单次运行质量"，Hermes 解<em>长期在线 · 多平台 · 自我改进</em>。<br/>
+          用着用着就更懂你，也更会干活。
+        </p>
+      </div>
+    </div>
+    <p class="reveal" style="font-style: italic;">代价也清晰：配置复杂 · 安全面宽（shell / 消息入口 / 自动执行）。</p>
+  </div>
+  <span class="source-tag">AI早知道 · Hermes Deep Research</span>
+</section>
+
+<!-- ============================================================
+     ACT 5 · 共同底层 + 三个实验（26-28）
+     ============================================================ -->
+
+<!-- 26 · 四套逻辑的共同底层 -->
+<section class="slide">
+  <div class="grain"></div>
+  <span class="page-num">26 / 31</span>
   <span class="chapter-tag">Synthesis</span>
   <div class="slide-content">
     <p class="eyebrow reveal">形态不同，底层相同</p>
-    <h2 class="reveal">autoresearch · gstack · OpenClaw<br/><em>共用一套哲学</em></h2>
+    <h2 class="reveal">autoresearch · gstack · OpenClaw · Hermes<br/><em>共用一套哲学</em></h2>
     <ul class="bullet-list reveal">
       <li><strong>目标清晰</strong> —— val_bpb 数字 / CEO 档位方向 / MEMORY.md 项目状态</li>
       <li><strong>行动有边界</strong> —— 只改 train.py / 一 skill 一模式 / 热记忆 8 KB 硬约束</li>
@@ -954,7 +1023,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 26 · 从这里开始 · 三个实验 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">26 / 30</span>
+  <span class="page-num">27 / 31</span>
   <span class="chapter-tag">Practical</span>
   <div class="slide-content">
     <p class="eyebrow reveal">这周就能做</p>
@@ -984,7 +1053,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 27 · 过渡 · 你怎么知道 harness 在工作 -->
 <section class="slide divider">
   <div class="grain"></div>
-  <span class="page-num">27 / 30</span>
+  <span class="page-num">28 / 31</span>
   <span class="chapter-tag">Part Final</span>
   <div class="slide-content">
     <p class="eyebrow reveal">第六章 · 我们的判断</p>
@@ -1001,7 +1070,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 28 · 判断 1 2 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">28 / 30</span>
+  <span class="page-num">29 / 31</span>
   <span class="chapter-tag">Judgement · 01 - 02</span>
   <div class="slide-content">
     <p class="eyebrow reveal">20 年企业 IT 经验 · 校准两三年 AI 经验</p>
@@ -1025,7 +1094,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 29 · 判断 3 4 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">29 / 30</span>
+  <span class="page-num">30 / 31</span>
   <span class="chapter-tag">Judgement · 03 - 04</span>
   <div class="slide-content">
     <p class="eyebrow reveal">继续</p>
@@ -1049,7 +1118,7 @@ body.edit-active [contenteditable]:focus {
 <!-- 30 · 判断 5 6 + 收尾 -->
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">30 / 30</span>
+  <span class="page-num">31 / 31</span>
   <span class="chapter-tag">Judgement · 05 - 06 · Closing</span>
   <div class="slide-content">
     <p class="eyebrow reveal">最后两个判断</p>
