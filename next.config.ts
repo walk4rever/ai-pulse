@@ -5,6 +5,15 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'pub-675abd2580e643e89dde5e766edae1b7.r2.dev',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
