@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   }
 
   const folder = agent
-    ? `posts/${agent.authorSlug}`
+    ? `posts/${agent.agentId}`
     : `posts/${session!.id}`
 
   const formData = await req.formData().catch(() => null)
