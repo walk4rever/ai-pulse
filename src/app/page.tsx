@@ -15,6 +15,13 @@ type HomePost = Pick<
   'id' | 'slug' | 'title' | 'excerpt' | 'is_premium' | 'published_at' | 'content_type' | 'featured' | 'series_slug'
 >
 
+interface SeriesItem {
+  id: string
+  name: string
+  description: string
+  postCount: number
+}
+
 function formatDate(value: string | null | undefined) {
   if (!value) return ''
   const d = new Date(value)
@@ -65,6 +72,25 @@ function buildSections(posts: HomePost[]): { featured: HomePost[]; recent: HomeP
   return { featured, recent }
 }
 
+function SeriesCard({ item }: { item: SeriesItem }) {
+  return (
+    <Link
+      href="/series"
+      className="group flex flex-col gap-2 bg-white/5 hover:bg-white/10 transition-colors rounded-2xl p-6 border border-white/10"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <h3 className="font-serif text-lg font-medium text-[#faf9f5] leading-snug group-hover:text-[var(--accent-coral)] transition-colors">
+          {item.name}
+        </h3>
+        <span className="shrink-0 text-xs text-[#b0aea5] mt-1">{item.postCount} 篇</span>
+      </div>
+      {item.description && (
+        <p className="text-sm text-[#b0aea5] leading-relaxed line-clamp-2">{item.description}</p>
+      )}
+    </Link>
+  )
+}
+
 export default async function HomePage({ searchParams }: HomePageProps) {
   const { confirmed } = await searchParams
   const { hasPublicEnv } = getSupabaseEnv()
@@ -79,14 +105,33 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   }
 
   const supabase = await createClient()
-  const { data: posts } = await supabase
-    .from('ai_pulse_posts')
-    .select('id, slug, title, excerpt, is_premium, published_at, content_type, featured, series_slug')
-    .eq('status', 'published')
-    .order('published_at', { ascending: false }).order('created_at', { ascending: false })
+
+  const [{ data: posts }, { data: seriesData }, { data: seriesRelations }] = await Promise.all([
+    supabase
+      .from('ai_pulse_posts')
+      .select('id, slug, title, excerpt, is_premium, published_at, content_type, featured, series_slug')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false }).order('created_at', { ascending: false }),
+    supabase
+      .from('ai_pulse_series')
+      .select('id, name, description')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('ai_pulse_series_posts')
+      .select('series_id'),
+  ])
 
   const allPosts = (posts ?? []) as HomePost[]
   const { featured, recent } = buildSections(allPosts)
+
+  const countMap = new Map<string, number>()
+  for (const row of (seriesRelations ?? [])) {
+    countMap.set(row.series_id, (countMap.get(row.series_id) ?? 0) + 1)
+  }
+  const seriesList: SeriesItem[] = (seriesData ?? []).map((s) => ({
+    ...s,
+    postCount: countMap.get(s.id) ?? 0,
+  }))
 
   return (
     <div>
@@ -125,18 +170,22 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </section>
       )}
 
-      {/* Dark chapter break */}
-      <section className="mb-20 -mx-6 bg-[#141413] px-8 md:px-12 py-16 md:py-20 rounded-3xl">
-        <p className="kicker mb-6" style={{ color: 'var(--accent-coral)' }}>
-          Editor&apos;s note
-        </p>
-        <blockquote className="font-serif text-2xl md:text-3xl font-medium leading-[1.3] text-[#faf9f5] max-w-xl">
-          在噪音里挑信号，在信号里挑判断 —— 这是我们每期在做的事。
-        </blockquote>
-        <p className="mt-6 text-sm text-[#b0aea5] leading-relaxed max-w-xl">
-          如果你只有十分钟读 AI 相关内容，我们希望那十分钟花在这里。
-        </p>
-      </section>
+      {/* Series overview */}
+      {seriesList.length > 0 && (
+        <section className="mb-20 -mx-6 bg-[#141413] px-8 md:px-12 py-16 md:py-20 rounded-3xl">
+          <div className="flex items-baseline justify-between mb-8">
+            <p className="kicker" style={{ color: 'var(--accent-coral)' }}>专题</p>
+            <Link href="/series" className="kicker text-[#b0aea5] hover:text-[var(--accent-coral)] transition-colors">
+              全部专题 →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {seriesList.slice(0, 4).map((item) => (
+              <SeriesCard key={item.id} item={item} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Recent */}
       <section className="border-t border-[var(--border)] pt-14">
