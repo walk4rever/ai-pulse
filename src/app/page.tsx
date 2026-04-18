@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getSupabaseEnv } from '@/lib/supabase/env'
 import { Post } from '@/types'
 import { getTypeLabel } from '@/lib/content'
@@ -105,6 +105,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   }
 
   const supabase = await createClient()
+  const serviceSupabase = await createServiceClient()
 
   const [{ data: posts }, { data: seriesData }, { data: seriesRelations }] = await Promise.all([
     supabase
@@ -112,11 +113,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       .select('id, slug, title, excerpt, is_premium, published_at, content_type, featured, series_slug')
       .eq('status', 'published')
       .order('published_at', { ascending: false }).order('created_at', { ascending: false }),
-    supabase
+    serviceSupabase
       .from('ai_pulse_series')
       .select('id, name, description')
       .order('created_at', { ascending: false }),
-    supabase
+    serviceSupabase
       .from('ai_pulse_series_posts')
       .select('series_id'),
   ])
