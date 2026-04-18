@@ -85,7 +85,7 @@ export default async function SeriesPage() {
         {seriesList.map((seriesItem) => {
           const items = grouped.get(seriesItem.id) ?? []
           return (
-            <section key={seriesItem.id}>
+            <section key={seriesItem.id} id={seriesItem.id}>
               <h2 className="font-serif text-2xl md:text-3xl font-medium mb-2 text-[var(--foreground)]">
                 {seriesItem.name}
               </h2>

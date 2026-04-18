@@ -75,7 +75,7 @@ function buildSections(posts: HomePost[]): { featured: HomePost[]; recent: HomeP
 function SeriesCard({ item }: { item: SeriesItem }) {
   return (
     <Link
-      href="/series"
+      href={`/series#${item.id}`}
       className="group flex flex-col gap-2 bg-white/5 hover:bg-white/10 transition-colors rounded-2xl p-6 border border-white/10"
     >
       <div className="flex items-start justify-between gap-4">
