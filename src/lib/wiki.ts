@@ -180,3 +180,65 @@ async function findBacklinks(targetSlug: string, _category: WikiCategory): Promi
 
   return backlinks
 }
+
+export interface GraphNode {
+  id: string
+  slug: string
+  category: WikiCategory
+  title: string
+  val: number
+}
+
+export interface GraphLink {
+  source: string
+  target: string
+}
+
+export interface GraphData {
+  nodes: GraphNode[]
+  links: GraphLink[]
+}
+
+export async function getWikiGraphData(): Promise<GraphData> {
+  const allPages = await getWikiPages()
+  const slugToId = new Map(allPages.map((p) => [p.slug, `${p.category}/${p.slug}`]))
+
+  const nodes: GraphNode[] = allPages.map((p) => ({
+    id: `${p.category}/${p.slug}`,
+    slug: p.slug,
+    category: p.category,
+    title: p.frontmatter.title,
+    val: 1,
+  }))
+
+  const links: GraphLink[] = []
+  const seen = new Set<string>()
+
+  for (const page of allPages) {
+    const filePath = path.join(WIKI_DIR, page.category, `${page.slug}.md`)
+    const raw = await readFile(filePath, 'utf8')
+    const wikiLinks = extractInternalLinks(raw)
+    const sourceId = `${page.category}/${page.slug}`
+
+    for (const linkedSlug of wikiLinks) {
+      const targetId = slugToId.get(linkedSlug)
+      if (!targetId || targetId === sourceId) continue
+      const key = `${sourceId}→${targetId}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      links.push({ source: sourceId, target: targetId })
+    }
+  }
+
+  // boost node size by link count
+  const linkCount = new Map<string, number>()
+  for (const link of links) {
+    linkCount.set(link.source, (linkCount.get(link.source) ?? 0) + 1)
+    linkCount.set(link.target, (linkCount.get(link.target) ?? 0) + 1)
+  }
+
+  return {
+    nodes: nodes.map((n) => ({ ...n, val: 1 + (linkCount.get(n.id) ?? 0) })),
+    links,
+  }
+}
