@@ -20,10 +20,10 @@ const decks: Deck[] = [
   {
     slug: 'agent-harness',
     title: 'Harness 工程：从黑箱到可见',
-    kicker: 'HARNESS 系列 · 30 页',
+    kicker: 'HARNESS 系列 · 43 页',
     description:
-      '基于《Harness 系列》六篇整理的 60 分钟技术大会演讲：五个维度、三套实践、六个判断。',
-    slides: 31,
+      '基于《Harness 系列》六篇整理的技术演讲：五个维度、三套实践，附 Uber 与 Ramp 两个完整企业案例。',
+    slides: 43,
     duration: '60 min',
     date: '2026.04',
   },
