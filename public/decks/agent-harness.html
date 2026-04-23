@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Harness 工程 · 从黑箱到规模 v0.3.0</title>
+<title>Harness 工程 · 从黑箱到规模 v0.4.0</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -361,6 +361,44 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
   html { scroll-behavior: auto; }
   .slide::before, .slide::after { animation: none; }
 }
+
+/* ---- v0.4.0 图片素材样式 ---- */
+.slide-img {
+  border-radius: 10px;
+  border: 1px solid rgba(232,228,223,0.12);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 1px 0 rgba(232,228,223,0.06);
+  object-fit: contain;
+  opacity: 0.92;
+  max-width: 100%;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+.slide-img:hover { opacity: 1; }
+.img-caption {
+  font-family: var(--font-mono); font-size: 0.7rem;
+  color: var(--text-muted); letter-spacing: 0.1em;
+  margin-top: 0.35em; text-align: center;
+}
+/* 左文右图布局 */
+.img-aside {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 44%);
+  gap: clamp(1.2rem, 3vw, 2.8rem);
+  align-items: center;
+  width: 100%;
+}
+.img-aside .text-side {
+  display: flex; flex-direction: column;
+  gap: var(--element-gap); text-align: left;
+}
+/* 图片置底条 */
+.img-row {
+  width: 100%; display: flex; flex-direction: column; align-items: center;
+  gap: 0.35rem;
+}
+@media (max-width: 760px) {
+  .img-aside { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -378,7 +416,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide title-slide">
   <div class="grain"></div>
-  <span class="page-num">01 / 40</span>
+  <span class="page-num">01 / 43</span>
   <span class="chapter-tag">Ch.1 临界点 · Title</span>
   <div class="slide-content">
     <p class="eyebrow reveal">一场关于 AI 运行环境的演讲</p>
@@ -386,49 +424,65 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
     <p class="sub reveal">2026 年 AI 工程师的核心议题 ——<br/>四层递进实践 · 自主循环终态 · 企业治理范式 · 六个判断</p>
     <div class="meta reveal">
       <span>60 min</span>
-      <span>40 slides</span>
-      <span>v0.3.0</span>
+      <span>43 slides</span>
+      <span>v0.4.0</span>
     </div>
   </div>
 </section>
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">02 / 40</span>
+  <span class="page-num">02 / 43</span>
   <span class="chapter-tag">Ch.1 临界点 · Metaphor</span>
   <div class="slide-content">
     <p class="eyebrow reveal">开场隐喻</p>
-    <h2 class="reveal">大模型是<em>千里马</em>，但千里马随处可得。</h2>
-    <ul class="bullet-list reveal" style="margin-top: 0.8rem;">
-      <li>问题不是"去哪里找更强的模型"，<strong>而是能不能驾驭它</strong></li>
-      <li>你需要的是一整套 <strong>挽具（Harness）</strong>，不只是骑手和马</li>
-      <li>Harness = 围绕 AI 模型构建的<strong>运行环境的总和</strong></li>
-      <li>2026 年的质变：从理论走向生产 —— 前沿模型终于足够可靠</li>
-    </ul>
+    <div class="img-aside reveal">
+      <div class="text-side">
+        <h2>大模型是<em>千里马</em>，但千里马随处可得。</h2>
+        <ul class="bullet-list" style="margin-top: 0.6rem;">
+          <li>问题不是"去哪里找更强的模型"，<strong>而是能不能驾驭它</strong></li>
+          <li>你需要的是一整套 <strong>挽具（Harness）</strong>，不只是骑手和马</li>
+          <li>Harness = 围绕 AI 模型构建的<strong>运行环境的总和</strong></li>
+          <li>2026 年的质变：从理论走向生产 —— 前沿模型终于足够可靠</li>
+        </ul>
+      </div>
+      <div class="img-row">
+        <img class="slide-img" src="assets/harness-arch-diagram.png" alt="Harness 架构图：Context Injection / Control / Action / Persist / Observe & Verify" style="max-height:42vh; background:#fff; border-radius:10px;">
+        <span class="img-caption">Harness = Model 外围的完整运行环境</span>
+      </div>
+    </div>
   </div>
   <span class="source-tag">Harness 系列 · 篇 1</span>
 </section>
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">03 / 40</span>
+  <span class="page-num">03 / 43</span>
   <span class="chapter-tag">Ch.1 临界点 · The Shift</span>
   <div class="slide-content">
     <p class="eyebrow reveal">一道门 · 两种用法</p>
     <h2 class="reveal">从<em>信息工具</em>到<em>生产工具</em>。</h2>
-    <div class="two-col reveal" style="margin-top: 0.8rem;">
-      <div class="card">
-        <span class="num">没有 Harness</span>
-        <h3>信息工具</h3>
-        <p style="color:var(--text-secondary);font-size:var(--small-size);">输入问题 → 输出答案<br/>世界不变。</p>
+    <div class="img-aside reveal" style="margin-top:0.8rem;align-items:center;">
+      <div class="text-side">
+        <div class="two-col" style="gap:clamp(0.8rem,2vw,1.8rem);">
+          <div class="card">
+            <span class="num">没有 Harness</span>
+            <h3>信息工具</h3>
+            <p style="color:var(--text-secondary);font-size:var(--small-size);">输入问题 → 输出答案<br/>世界不变。</p>
+          </div>
+          <div class="card">
+            <span class="num">有设计的 Harness</span>
+            <h3>生产工具</h3>
+            <p style="color:var(--text-secondary);font-size:var(--small-size);">文件被修改，代码被运行，状态改变。<br/>世界变了。</p>
+          </div>
+        </div>
+        <p style="font-style:italic;margin-top:0.8rem;margin-left:0;max-width:none;">Harness 是跨越这道门的关键。今天的演讲，就是拆开它。</p>
       </div>
-      <div class="card">
-        <span class="num">有设计的 Harness</span>
-        <h3>生产工具</h3>
-        <p style="color:var(--text-secondary);font-size:var(--small-size);">文件被修改，代码被运行，状态改变。<br/>世界变了。</p>
+      <div class="img-row">
+        <img class="slide-img" src="assets/openclaw-agent-teams.jpg" alt="OpenClaw Always-on Agent Teams" style="max-height:44vh;">
+        <span class="img-caption">OpenClaw · 7×24 在线的 Agent 团队</span>
       </div>
     </div>
-    <p class="reveal" style="font-style:italic;">Harness 是跨越这道门的关键。今天的演讲，就是拆开它。</p>
   </div>
   <span class="source-tag">Harness 系列 · 篇 1</span>
 </section>
@@ -439,7 +493,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">04 / 40</span>
+  <span class="page-num">04 / 43</span>
   <span class="chapter-tag">Ch.2 Harness 解剖 · 全局地图</span>
   <div class="slide-content">
     <p class="eyebrow reveal">Harness 解剖 · 全局地图</p>
@@ -469,7 +523,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">05 / 40</span>
+  <span class="page-num">05 / 43</span>
   <span class="chapter-tag">Ch.2 Harness 解剖 · 维度一 Context</span>
   <div class="slide-content">
     <p class="eyebrow reveal">维度一</p>
@@ -487,7 +541,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">06 / 40</span>
+  <span class="page-num">06 / 43</span>
   <span class="chapter-tag">Ch.2 Harness 解剖 · 维度二 Tools</span>
   <div class="slide-content">
     <p class="eyebrow reveal">维度二</p>
@@ -504,7 +558,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">07 / 40</span>
+  <span class="page-num">07 / 43</span>
   <span class="chapter-tag">Ch.2 Harness 解剖 · 维度三 Feedback</span>
   <div class="slide-content">
     <p class="eyebrow reveal">维度三 · 最被忽视，也最关键</p>
@@ -522,7 +576,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">08 / 40</span>
+  <span class="page-num">08 / 43</span>
   <span class="chapter-tag">Ch.2 Harness 解剖 · 维度四 Memory</span>
   <div class="slide-content">
     <p class="eyebrow reveal">维度四</p>
@@ -539,7 +593,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">09 / 40</span>
+  <span class="page-num">09 / 43</span>
   <span class="chapter-tag">Ch.2 Harness 解剖 · 维度五 Constraints</span>
   <div class="slide-content">
     <p class="eyebrow reveal">维度五</p>
@@ -557,7 +611,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">10 / 40</span>
+  <span class="page-num">10 / 43</span>
   <span class="chapter-tag">Ch.2 Harness 解剖 · 原则一 Thin/Fat</span>
   <div class="slide-content">
     <p class="eyebrow reveal">架构原则一</p>
@@ -585,7 +639,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">11 / 40</span>
+  <span class="page-num">11 / 43</span>
   <span class="chapter-tag">Ch.2 Harness 解剖 · 原则二 Latent</span>
   <div class="slide-content">
     <p class="eyebrow reveal">架构原则二</p>
@@ -622,28 +676,36 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">12 / 40</span>
+  <span class="page-num">12 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 1 · Mario · Overview</span>
   <div class="slide-content">
     <div class="layer-badge reveal">
       <span class="badge">Layer 1</span>
       <span>可见性是一切的前提</span>
     </div>
-    <h2 class="reveal">Mario · <em>你连 context 里有什么都不知道</em></h2>
-    <ul class="bullet-list reveal">
-      <li><strong>根本问题</strong> —— 在优化任何事之前，先要看见你在优化什么</li>
-      <li><strong>黑箱工具的代价</strong> —— 你以为在做 context engineering，其实是蒙眼驾驶</li>
-      <li><strong>极简方案</strong> —— 4 个工具 / 900 token，Terminal-Bench 与 Claude Code 持平</li>
-      <li><strong>一个 DOS 时代工程师的本能</strong> —— 凡是看不见状态的工具，一律不信任</li>
-    </ul>
-    <p class="reveal" style="font-style:italic;">可见性不是加出来的，是<em>减出来的</em>。</p>
+    <div class="img-aside reveal">
+      <div class="text-side">
+        <h2>Mario · <em>你连 context 里有什么都不知道</em></h2>
+        <ul class="bullet-list" style="margin-top:0.6rem;">
+          <li><strong>根本问题</strong> —— 在优化任何事之前，先要看见你在优化什么</li>
+          <li><strong>黑箱工具的代价</strong> —— 你以为在做 context engineering，其实是蒙眼驾驶</li>
+          <li><strong>极简方案</strong> —— 4 个工具 / 900 token，Terminal-Bench 与 Claude Code 持平</li>
+          <li><strong>一个 DOS 时代工程师的本能</strong> —— 凡是看不见状态的工具，一律不信任</li>
+        </ul>
+        <p style="font-style:italic;margin-top:0.6rem;margin-left:0;max-width:none;">可见性不是加出来的，是<em>减出来的</em>。</p>
+      </div>
+      <div class="img-row">
+        <img class="slide-img" src="assets/context-panel.png" alt="Claude Code /context 用量面板" style="max-height:62vh;">
+        <span class="img-caption">/context · 你的 context 里装了什么，一目了然</span>
+      </div>
+    </div>
   </div>
   <span class="source-tag">Harness 系列 · 篇 4</span>
 </section>
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">13 / 40</span>
+  <span class="page-num">13 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 1 · Mario · Tools</span>
   <div class="slide-content">
     <p class="eyebrow reveal">极简方案</p>
@@ -664,7 +726,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">14 / 40</span>
+  <span class="page-num">14 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 1 · Mario · State</span>
   <div class="slide-content">
     <p class="eyebrow reveal">砍掉一切不透明的状态</p>
@@ -681,7 +743,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide quote-slide">
   <div class="grain"></div>
-  <span class="page-num">15 / 40</span>
+  <span class="page-num">15 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 1 · Mario · Visibility</span>
   <div class="slide-content">
     <blockquote class="reveal">
@@ -700,28 +762,36 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">16 / 40</span>
+  <span class="page-num">16 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 2 · Anthropic · Overview</span>
   <div class="slide-content">
     <div class="layer-badge reveal">
       <span class="badge">Layer 2</span>
       <span>质量需要对抗性反馈</span>
     </div>
-    <h2 class="reveal">Prithvi 的 <em>5 个月实验</em></h2>
-    <ul class="bullet-list reveal">
-      <li><strong>核心问题</strong> —— 可见性有了，但如何保证持续高质量？</li>
-      <li><strong>答案工具</strong> —— Generator-Evaluator + Sprint Contract</li>
-      <li><strong>对照实验</strong> —— 单 agent <strong>$9 / 20 分钟</strong>（游戏坏掉）</li>
-      <li><strong>完整 harness</strong> —— <strong>$200 / 6 小时</strong>（能玩，10 个细粒度特性）</li>
-    </ul>
-    <p class="reveal" style="font-style:italic;">20 倍成本，100 倍质量。这不是砸钱，是系统设计。</p>
+    <div class="img-aside reveal">
+      <div class="text-side">
+        <h2>Prithvi 的 <em>5 个月实验</em></h2>
+        <ul class="bullet-list" style="margin-top:0.6rem;">
+          <li><strong>核心问题</strong> —— 可见性有了，但如何保证持续高质量？</li>
+          <li><strong>答案工具</strong> —— Generator-Evaluator + Sprint Contract</li>
+          <li><strong>对照实验</strong> —— 单 agent <strong>$9 / 20 分钟</strong>（游戏坏掉）</li>
+          <li><strong>完整 harness</strong> —— <strong>$200 / 6 小时</strong>（能玩，10 个细粒度特性）</li>
+        </ul>
+        <p style="font-style:italic;margin-top:0.6rem;margin-left:0;max-width:none;">20 倍成本，100 倍质量。这不是砸钱，是系统设计。</p>
+      </div>
+      <div class="img-row">
+        <img class="slide-img" src="assets/ai-level-assistant.png" alt="AI Level Assistant — Generate / Try Another / Discard" style="max-height:44vh;">
+        <span class="img-caption">AI 生成关卡 · Try Another / Discard —— Generator-Evaluator 的直观呈现</span>
+      </div>
+    </div>
   </div>
   <span class="source-tag">Harness 系列 · 篇 2 · Anthropic Labs 2026-03</span>
 </section>
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">17 / 40</span>
+  <span class="page-num">17 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 2 · Anthropic · G-E</span>
   <div class="slide-content">
     <p class="eyebrow reveal">刻薄的质检员</p>
@@ -745,7 +815,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">18 / 40</span>
+  <span class="page-num">18 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 2 · Anthropic · Contract</span>
   <div class="slide-content">
     <p class="eyebrow reveal">先协商，再开工</p>
@@ -763,7 +833,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">19 / 40</span>
+  <span class="page-num">19 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 2 · Anthropic · Evolution</span>
   <div class="slide-content">
     <p class="eyebrow reveal">诚实承认</p>
@@ -782,7 +852,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">20 / 40</span>
+  <span class="page-num">20 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 3 · OpenAI · Overview</span>
   <div class="slide-content">
     <div class="layer-badge reveal">
@@ -802,22 +872,29 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide quote-slide">
   <div class="grain"></div>
-  <span class="page-num">21 / 40</span>
+  <span class="page-num">21 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 3 · OpenAI · Contagion</span>
   <div class="slide-content">
-    <blockquote class="reveal">AI 没有品味，只有频率识别。</blockquote>
-    <cite class="reveal">Harness 系列 · 篇 3</cite>
-    <ul class="bullet-list reveal" style="margin-top:1.6rem;max-width:60ch;">
-      <li><strong>人工编码时期</strong> —— 坏模式停在那里，很少被复制</li>
-      <li><strong>AI 时代</strong> —— 一处反模式出现 → 被复制到 10 个地方</li>
-      <li><strong>传统 PR review 失效</strong> —— 跟不上 3.5 PRs/人/天的速度</li>
-    </ul>
+    <div class="img-aside reveal">
+      <div class="text-side">
+        <blockquote>AI 没有品味，只有频率识别。</blockquote>
+        <ul class="bullet-list" style="margin-top:1.2rem;">
+          <li><strong>人工编码时期</strong> —— 坏模式停在那里，很少被复制</li>
+          <li><strong>AI 时代</strong> —— 一处反模式出现 → 被复制到 10 个地方</li>
+          <li><strong>传统 PR review 失效</strong> —— 跟不上 3.5 PRs/人/天的速度</li>
+        </ul>
+      </div>
+      <div class="img-row">
+        <img class="slide-img" src="assets/claude-code-terminal.png" alt="Claude Code terminal session" style="max-height:46vh;">
+        <span class="img-caption">Claude Code 终端实况 · Agent 操作完全可见、可追溯</span>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">22 / 40</span>
+  <span class="page-num">22 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 3 · OpenAI · GC Agent</span>
   <div class="slide-content">
     <p class="eyebrow reveal">第二类 Agent</p>
@@ -834,7 +911,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">23 / 40</span>
+  <span class="page-num">23 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 3 · OpenAI · KaC</span>
   <div class="slide-content">
     <p class="eyebrow reveal">Knowledge as Code</p>
@@ -851,7 +928,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">24 / 40</span>
+  <span class="page-num">24 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 3 · OpenAI · Constraints</span>
   <div class="slide-content">
     <p class="eyebrow reveal">约束的悖论</p>
@@ -874,7 +951,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">25 / 40</span>
+  <span class="page-num">25 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 4 · Hermes · Architecture</span>
   <div class="slide-content">
     <div class="layer-badge reveal">
@@ -883,26 +960,9 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
     </div>
     <h2 class="reveal">Hermes Agent · <em>一个完整的 Harness 参考实现</em></h2>
     <div class="two-col reveal" style="margin-top:0.5rem;">
-      <div class="stack" style="gap:0.3rem;">
-        <div class="arch-layer top">
-          <span class="layer-label" style="min-width:5em;">用户层</span>
-          <p>CLI · 11+ 消息平台（Telegram · Discord · Feishu · WeChat...）</p>
-        </div>
-        <div class="arch-arrow">↕</div>
-        <div class="arch-layer mid">
-          <span class="layer-label" style="min-width:5em;">Session</span>
-          <p>平台归一化 · 用户身份 · 群组 / thread / DM 路由注入 prompt</p>
-        </div>
-        <div class="arch-arrow">↕</div>
-        <div class="arch-layer mid">
-          <span class="layer-label" style="min-width:5em;">AIAgent</span>
-          <p>核心循环 · 多模型后端可替换（Anthropic / OpenAI / OpenRouter）</p>
-        </div>
-        <div class="arch-arrow">↕</div>
-        <div class="arch-layer bot">
-          <span class="layer-label" style="min-width:5em;">能力层</span>
-          <p>Memory · Skills · Cron · Tools · Subagents</p>
-        </div>
+      <div class="img-row">
+        <img class="slide-img" src="assets/aiagent-core-loop.png" alt="AIAgent 核心循环架构图" style="max-height:50vh; background:#f5f4f2; border-radius:10px;">
+        <span class="img-caption">用户/CLI → Gateway → Session/Context → AIAgent 核心循环 → 六大能力层</span>
       </div>
       <ul class="bullet-list" style="align-self:center;">
         <li><strong>不是聊天壳</strong> —— 是把 AI 变成长期在线系统的底座</li>
@@ -917,7 +977,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">26 / 40</span>
+  <span class="page-num">26 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Layer 4 · Hermes · Loop</span>
   <div class="slide-content">
     <p class="eyebrow reveal">自我改进闭环</p>
@@ -948,7 +1008,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">27 / 40</span>
+  <span class="page-num">27 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · 逻辑终点</span>
   <div class="slide-content divider">
     <p class="eyebrow reveal">从实践到自主</p>
@@ -966,7 +1026,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide apex">
   <div class="grain"></div>
-  <span class="page-num">28 / 40</span>
+  <span class="page-num">28 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Apex · Karpathy</span>
   <div class="slide-content">
     <div class="layer-badge reveal">
@@ -981,10 +1041,9 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
         <li><code>prepare.py</code> —— 评估</li>
         <li><strong>闭环</strong> —— 读 → 修 → 训 5min → 看 val_bpb → commit/reset → 日志 → loop</li>
       </ul>
-      <div class="card">
-        <span class="num">实证</span>
-        <h3>Mac Mini M4 一晚 80+ 轮</h3>
-        <p style="color:var(--text-secondary);font-size:var(--small-size);">对标 H100 的 100 轮。<br/>前提：评估者可机械化 —— 数字不会骗人。</p>
+      <div class="img-row">
+        <img class="slide-img" src="assets/autoresearch-terminal.jpg" alt="autoresearch loop terminal" style="max-height:44vh; width:100%;">
+        <span class="img-caption">autoresearch 实况 · Mac Mini M4 · 一晚 80+ 轮 · 对标 H100</span>
       </div>
     </div>
   </div>
@@ -993,7 +1052,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide apex">
   <div class="grain"></div>
-  <span class="page-num">29 / 40</span>
+  <span class="page-num">29 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Apex · Shopify · Overview</span>
   <div class="slide-content">
     <div class="layer-badge reveal">
@@ -1014,7 +1073,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide apex">
   <div class="grain"></div>
-  <span class="page-num">30 / 40</span>
+  <span class="page-num">30 / 43</span>
   <span class="chapter-tag">Ch.3 实践 · Apex · Shopify · Method</span>
   <div class="slide-content">
     <p class="eyebrow reveal">三阶段循环</p>
@@ -1049,7 +1108,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide enterprise">
   <div class="grain"></div>
-  <span class="page-num">31 / 40</span>
+  <span class="page-num">31 / 43</span>
   <span class="chapter-tag">Ch.4 企业范式 · 导入</span>
   <div class="slide-content divider">
     <p class="eyebrow reveal">企业范式 · 另一个问题</p>
@@ -1060,28 +1119,36 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide enterprise">
   <div class="grain"></div>
-  <span class="page-num">32 / 40</span>
+  <span class="page-num">32 / 43</span>
   <span class="chapter-tag">Ch.4 企业范式 · Uber · Overview</span>
   <div class="slide-content">
     <p class="eyebrow reveal">企业案例：Uber</p>
     <h2 class="reveal">2 → 500+ · <em>五个月的有机生长</em></h2>
-    <table class="reveal" style="margin-top:0.5rem;">
-      <thead><tr><th>时间</th><th>状态</th></tr></thead>
-      <tbody>
-        <tr><td>2024 年 10 月</td><td>2 个 Skills：CI 日志分类 / 基础代码审查</td></tr>
-        <tr><td>2024 年 12 月</td><td>约 20 个</td></tr>
-        <tr><td>2025 年 1 月</td><td>团队开始认识到实用价值</td></tr>
-        <tr><td>2025 年 3 月</td><td><strong>200+ 精选 Skills · 300+ 实验性工具</strong></td></tr>
-      </tbody>
-    </table>
-    <p class="reveal" style="font-style:italic;margin-top:0.5rem;">没有顶层设计，没有全公司推广令。<em>只是真的省了时间。</em></p>
+    <div class="img-aside reveal" style="margin-top:0.5rem;align-items:center;">
+      <div class="text-side">
+        <table>
+          <thead><tr><th>时间</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>2024 年 10 月</td><td>2 个 Skills：CI 日志分类 / 基础代码审查</td></tr>
+            <tr><td>2024 年 12 月</td><td>约 20 个</td></tr>
+            <tr><td>2025 年 1 月</td><td>团队开始认识到实用价值</td></tr>
+            <tr><td>2025 年 3 月</td><td><strong>200+ 精选 Skills · 300+ 实验性工具</strong></td></tr>
+          </tbody>
+        </table>
+        <p style="font-style:italic;margin-top:0.5rem;margin-left:0;max-width:none;">没有顶层设计，没有全公司推广令。<em>只是真的省了时间。</em></p>
+      </div>
+      <div class="img-row">
+        <img class="slide-img" src="assets/uber-skills-timeline.png" alt="Uber Claude Skills 增长时间线" style="max-height:48vh; background:#f8f8f8; border-radius:10px;">
+        <span class="img-caption">Uber · Claude Skills 增长时间线 · 2024.10 → 2025.03</span>
+      </div>
+    </div>
   </div>
   <span class="source-tag">Uber Engineering · 2025</span>
 </section>
 
 <section class="slide enterprise">
   <div class="grain"></div>
-  <span class="page-num">33 / 40</span>
+  <span class="page-num">33 / 43</span>
   <span class="chapter-tag">Ch.4 企业范式 · Uber · Architecture</span>
   <div class="slide-content">
     <p class="eyebrow reveal">组织级 Harness 的核心架构决策</p>
@@ -1102,7 +1169,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide enterprise">
   <div class="grain"></div>
-  <span class="page-num">34 / 40</span>
+  <span class="page-num">34 / 43</span>
   <span class="chapter-tag">Ch.4 企业范式 · Uber · Why</span>
   <div class="slide-content">
     <p class="eyebrow reveal">规模化的四个条件</p>
@@ -1123,7 +1190,7 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide enterprise">
   <div class="grain"></div>
-  <span class="page-num">35 / 40</span>
+  <span class="page-num">35 / 43</span>
   <span class="chapter-tag">Ch.4 企业范式 · Uber · Principles</span>
   <div class="slide-content">
     <p class="eyebrow reveal">从 Uber 案例提取</p>
@@ -1139,12 +1206,88 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 </section>
 
 <!-- ============================================================
-     Ch.5 我们的判断 · 36-40
+     Ch.4 企业范式 · Ramp · 36-38
+     ============================================================ -->
+
+<section class="slide enterprise">
+  <div class="grain"></div>
+  <span class="page-num">36 / 43</span>
+  <span class="chapter-tag">Ch.4 企业范式 · Ramp · Overview</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">企业案例：Ramp · 金融自动化</p>
+    <h2 class="reveal">不要建<em>一千个 Agent</em>，<br/>要建一个 Agent + 一千种技能。</h2>
+    <div class="two-col reveal" style="margin-top:0.6rem;">
+      <ul class="bullet-list">
+        <li><strong>背景</strong> —— 估值 $320 亿，5 万家客户，年处理 $1000 亿交易</li>
+        <li><strong>教训</strong> —— 各团队自由实验 → <em>四种实现方式 · 五个对话界面</em> → 混乱</li>
+        <li><strong>收敛</strong> —— Omnihat 统一入口 + 内部工具目录（数百 → 数千）</li>
+        <li><strong>架构判断</strong> —— 收敛 Agent，扩张技能。框架轻，工具重</li>
+      </ul>
+      <div class="card">
+        <span class="num">核心公式</span>
+        <h3>1 个 Agent<br/>× N 种 Skills</h3>
+        <p style="color:var(--text-secondary);font-size:var(--small-size);">一杯咖啡的 15 分钟行政时间 → 接近零。<br/>从卡费、发票到对账，全链路 Agent 化。</p>
+      </div>
+    </div>
+  </div>
+  <span class="source-tag">Ramp · The Pragmatic Summit · 2026</span>
+</section>
+
+<section class="slide enterprise">
+  <div class="grain"></div>
+  <span class="page-num">37 / 43</span>
+  <span class="chapter-tag">Ch.4 企业范式 · Ramp · Policy Agent</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">上下文工程 · 正确性定义</p>
+    <h2 class="reveal">出错的根源不是模型，<em>是上下文不够。</em></h2>
+    <div class="two-col reveal" style="margin-top:0.6rem;">
+      <ul class="bullet-list">
+        <li><strong>费用政策即代码</strong> —— 英语是新的编程语言，自然语言文档直接驱动 Agent 决策</li>
+        <li><strong>关键上下文</strong> —— 员工职级 · 收据细节 · 商户信息，比换模型更管用</li>
+        <li><strong>正确性定义</strong> —— 用户不一定对；每周跨职能团队标注 ground truth</li>
+        <li><strong>Eval 从 5 个开始</strong> —— 不追求完美，确保这 5 个绝对不错，再不断积累</li>
+      </ul>
+      <div class="card">
+        <span class="num">生产数据</span>
+        <h3>$1000 亿支出中<br/>2600 万次决策</h3>
+        <p style="color:var(--text-secondary);font-size:var(--small-size);">阻止 51 万笔违规交易<br/>节省约 <strong style="color:var(--text-primary);">$2.9 亿</strong></p>
+      </div>
+    </div>
+  </div>
+  <span class="source-tag">Ramp · The Pragmatic Summit · 2026</span>
+</section>
+
+<section class="slide enterprise">
+  <div class="grain"></div>
+  <span class="page-num">38 / 43</span>
+  <span class="chapter-tag">Ch.4 企业范式 · Ramp · Trust & Scale</span>
+  <div class="slide-content">
+    <p class="eyebrow reveal">信任 · 自主性是赢得的，不是设计的</p>
+    <h2 class="reveal">当月 <em>50%+</em> 合并 PR 来自 AI</h2>
+    <div class="two-col reveal" style="margin-top:0.6rem;">
+      <ul class="bullet-list">
+        <li><strong>从"建议"开始</strong> —— 不做任何自动操作，用户先建立信任</li>
+        <li><strong>用户主动要求</strong> —— "20 美元以下你基本都对，直接自动批"→ <em>自主性滑块</em></li>
+        <li><strong>Ramp Inspect</strong> —— 产品 / 法务 / 营销等非工程团队同样在用</li>
+        <li><strong>工程师的价值转移</strong> —— 写代码速度 → <em>判断力</em>：知道该建什么，知道 AI 哪里错了</li>
+      </ul>
+      <div class="card">
+        <span class="num">文化结论</span>
+        <h3>Jobs not finished</h3>
+        <p style="color:var(--text-secondary);font-size:var(--small-size);">AI 不只省时间，它把"值得去做"的边界往外推。软件永远处于没完成的状态。</p>
+      </div>
+    </div>
+  </div>
+  <span class="source-tag">Ramp · The Pragmatic Summit · 2026</span>
+</section>
+
+<!-- ============================================================
+     Ch.5 我们的判断 · 39-43
      ============================================================ -->
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">36 / 40</span>
+  <span class="page-num">39 / 43</span>
   <span class="chapter-tag">Ch.5 我们的判断 · 01-03</span>
   <div class="slide-content">
     <p class="eyebrow reveal">我们的判断 · 关于 Harness 设计质量</p>
@@ -1173,36 +1316,42 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">37 / 40</span>
+  <span class="page-num">40 / 43</span>
   <span class="chapter-tag">Ch.5 我们的判断 · 04-05</span>
   <div class="slide-content">
     <p class="eyebrow reveal">我们的判断 · 关于规模与务实</p>
     <h2 class="reveal">极端条件下的<em>务实选择</em></h2>
-    <div class="two-col reveal" style="margin-top:0.8rem;">
-      <div class="judgment-card">
-        <span class="j-num">判断 04</span>
-        <h3>独立开发者的约束是注意力</h3>
-        <p style="color:var(--text-secondary);">cron &gt; 调度框架 · 文件 &gt; 数据库。<br/>复杂度本身就是成本。</p>
+    <div class="img-aside reveal" style="margin-top:0.8rem;align-items:center;">
+      <div class="text-side">
+        <div class="judgment-card">
+          <span class="j-num">判断 04</span>
+          <h3>独立开发者的约束是注意力</h3>
+          <p style="color:var(--text-secondary);">cron &gt; 调度框架 · 文件 &gt; 数据库。<br/>复杂度本身就是成本。</p>
+        </div>
+        <div class="judgment-card" style="margin-top:0.6rem;">
+          <span class="j-num">判断 05</span>
+          <h3>记忆是目前还没解的问题</h3>
+          <p style="color:var(--text-secondary);">所有方案都是外部存储模拟持久记忆。最务实的做法：<em style="color:var(--accent-warm);">接受不完美，选文件不选数据库</em>。</p>
+        </div>
+        <p style="font-style:italic;margin-top:0.6rem;margin-left:0;max-width:none;">这两个判断都是在说同一件事：在不确定性面前，选简单的那个。</p>
       </div>
-      <div class="judgment-card">
-        <span class="j-num">判断 05</span>
-        <h3>记忆是目前还没解的问题</h3>
-        <p style="color:var(--text-secondary);">所有方案都是外部存储模拟持久记忆。最务实的做法：<em style="color:var(--accent-warm);">接受不完美，选文件不选数据库</em>。</p>
+      <div class="img-row">
+        <img class="slide-img" src="assets/four-layers-memory.png" alt="Four Layers of OpenClaw Memory" style="max-height:48vh;">
+        <span class="img-caption">Four Layers of OpenClaw Memory · 所有记忆方案都是外部存储的组合</span>
       </div>
     </div>
-    <p class="reveal" style="font-style:italic;margin-top:0.8rem;max-width:52ch;">这两个判断都是在说同一件事：在不确定性面前，选简单的那个。</p>
   </div>
   <span class="source-tag">Harness 系列 · 篇 6</span>
 </section>
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">38 / 40</span>
+  <span class="page-num">41 / 43</span>
   <span class="chapter-tag">Ch.5 我们的判断 · 06</span>
   <div class="slide-content">
     <p class="eyebrow reveal">判断 06 · 终极判断</p>
     <h2 class="reveal">企业 Harness 的终态：<br/><em>设计时治理，运行时自由。</em></h2>
-    <div class="two-col reveal" style="margin-top:0.8rem;">
+    <div class="three-col reveal" style="margin-top:0.8rem;">
       <div class="card">
         <span class="num">Shopify 证明了</span>
         <h3>循环有多强</h3>
@@ -1213,15 +1362,20 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
         <h3>它能以什么姿态生长</h3>
         <p style="color:var(--text-secondary);font-size:var(--small-size);">2 → 500+ Skills，五个月，无顶层设计令。自下而上生产，自上而下治理。</p>
       </div>
+      <div class="card">
+        <span class="num">Ramp 证明了</span>
+        <h3>自主性是赢得的</h3>
+        <p style="color:var(--text-secondary);font-size:var(--small-size);">从"建议模式"到用户主动要求自动化。信任不是设计出来的，是用出来的。</p>
+      </div>
     </div>
-    <p class="reveal" style="font-style:italic;margin-top:0.8rem;font-family:var(--font-display);font-size:clamp(1rem,1.8vw,1.35rem);color:var(--text-secondary);">两层并行，不可合并。合并意味着：<em>要么所有人都受约束，要么没有人受约束。</em></p>
+    <p class="reveal" style="font-style:italic;margin-top:0.8rem;font-family:var(--font-display);font-size:clamp(1rem,1.8vw,1.35rem);color:var(--text-secondary);">三个案例，同一个终态：<em>设计时治理，运行时自由。</em></p>
   </div>
   <span class="source-tag">Harness 系列 · 篇 6</span>
 </section>
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">39 / 40</span>
+  <span class="page-num">42 / 43</span>
   <span class="chapter-tag">Ch.5 我们的判断 · 最小实验</span>
   <div class="slide-content">
     <p class="eyebrow reveal">这周就能做</p>
@@ -1243,26 +1397,26 @@ body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent-warm)
         <p style="color:var(--text-secondary);font-size:var(--small-size);">找一件你反复做的事，把它写成 skill。如果在团队：想清楚哪三个 Skill 值得进 Golden。</p>
       </div>
     </div>
-    <p class="reveal" style="font-style:italic;margin-top:0.8rem;">三个实验对应三个章节：<em>自主循环 · 架构原则 · Fat Skills</em>。同一套哲学的三种入口。</p>
+    <p class="reveal" style="font-style:italic;margin-top:0.8rem;">三个实验对应三个章节：<em>自主循环 · 架构原则 · Fat Skills</em>。同一套哲学的三种入口。加分项：找一个高频痛点，从"建议模式"开始，看用户什么时候主动要求自动化。</p>
   </div>
   <span class="source-tag">Harness 系列 · 综合</span>
 </section>
 
 <section class="slide">
   <div class="grain"></div>
-  <span class="page-num">40 / 40</span>
+  <span class="page-num">43 / 43</span>
   <span class="chapter-tag">Ch.5 我们的判断 · 综合与尾声</span>
   <div class="slide-content">
     <p class="eyebrow reveal">从架构到组织 · 形态不同，底层相同</p>
-    <h2 class="reveal">四层实践 · 两个循环 · 一个企业范式 · <em>一套哲学</em></h2>
+    <h2 class="reveal">四层实践 · 两个循环 · 两个企业范式 · <em>一套哲学</em></h2>
     <div class="two-col reveal" style="margin-top:0.6rem;">
       <ul class="bullet-list">
-        <li><strong>目标可机械评估</strong> —— val_bpb / CI 秒数 / Sprint Contract / Cron 定时验证</li>
+        <li><strong>目标可机械评估</strong> —— val_bpb / CI 秒数 / Sprint Contract / Ramp Policy 2600万次决策</li>
         <li><strong>行动边界清晰</strong> —— Thin Harness 200 行 / 只改 train.py / 一 skill 一模式</li>
       </ul>
       <ul class="bullet-list">
-        <li><strong>反馈闭环存在</strong> —— G-E 分离 / 二元淘汰 / Memory+Skills+Cron 自我改进</li>
-        <li><strong>知识可沉淀复用</strong> —— Fat Skills / AGENTS.md / Uber Golden Marketplace</li>
+        <li><strong>反馈闭环存在</strong> —— G-E 分离 / 二元淘汰 / ground truth 跨职能标注</li>
+        <li><strong>知识可沉淀复用</strong> —— Fat Skills / AGENTS.md / Uber Golden Marketplace / Ramp 工具目录</li>
       </ul>
     </div>
     <p class="reveal" style="margin-top:1.2rem;text-align:center;font-family:var(--font-display);font-style:italic;font-size:clamp(1.2rem,2.5vw,1.8rem);color:var(--accent-warm);">
