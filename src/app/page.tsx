@@ -36,7 +36,7 @@ function FeaturedCard({ post }: { post: HomePost }) {
         <span className="kicker" style={{ color: 'var(--accent)' }}>{getTypeLabel(post.content_type)}</span>
         <span className="date">{formatDate(post.published_at)}</span>
       </div>
-      <Link href={`/post/${post.slug}`} className="group flex-1">
+      <Link href={postHref(post)} className="group flex-1">
         <h3 className="font-serif text-xl font-medium leading-snug group-hover:text-[var(--accent)] transition-colors">
           {post.title}
         </h3>
@@ -50,12 +50,20 @@ function FeaturedCard({ post }: { post: HomePost }) {
   )
 }
 
+function postHref(post: HomePost): string {
+  if (post.content_type === 'intel') {
+    const date = post.slug.replace('intel-', '')
+    return `/intel?d=${date}`
+  }
+  return `/post/${post.slug}`
+}
+
 function PostItem({ post }: { post: HomePost }) {
   return (
     <article className="py-6 flex items-baseline gap-6">
       <span className="date shrink-0 w-24">{formatDate(post.published_at)}</span>
       <div className="flex-1 min-w-0">
-        <Link href={`/post/${post.slug}`} className="group">
+        <Link href={postHref(post)} className="group">
           <h3 className="font-serif text-lg md:text-xl font-medium leading-snug group-hover:text-[var(--accent)] transition-colors">
             {post.title}
           </h3>

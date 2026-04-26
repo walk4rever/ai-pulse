@@ -22,6 +22,7 @@ interface Props {
   year: number
   month: number
   days: IntelDay[]
+  initialDate?: string
 }
 
 const DOW = ['一', '二', '三', '四', '五', '六', '日']
@@ -44,10 +45,12 @@ function pad(n: number) {
   return String(n).padStart(2, '0')
 }
 
-export function IntelCalendar({ year, month, days }: Props) {
+export function IntelCalendar({ year, month, days, initialDate }: Props) {
   const byDate = new Map(days.map((d) => [d.date, d]))
   const latest = days[0]?.date ?? null
-  const [selected, setSelected] = useState<string | null>(latest)
+  const [selected, setSelected] = useState<string | null>(
+    initialDate && byDate.has(initialDate) ? initialDate : latest
+  )
 
   const current = selected ? byDate.get(selected) ?? null : null
   const total = daysInMonth(year, month)
@@ -146,7 +149,7 @@ export function IntelCalendar({ year, month, days }: Props) {
                 </span>
               </div>
               <div className="text-sm font-medium leading-snug text-[var(--foreground)]">{s.title}</div>
-              <div className="text-xs text-[var(--muted)] leading-relaxed line-clamp-2 flex-1">{s.desc}</div>
+              <div className="text-xs text-[var(--muted)] leading-relaxed flex-1">{s.desc}</div>
               <div className="text-xs text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity">
                 阅读原文 →
               </div>

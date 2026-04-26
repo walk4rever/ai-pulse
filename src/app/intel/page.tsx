@@ -21,7 +21,8 @@ function parseIntelContent(content: string): Pick<IntelDay, 'keywords' | 'signal
   }
 }
 
-export default async function IntelPage() {
+export default async function IntelPage({ searchParams }: { searchParams: Promise<{ d?: string }> }) {
+  const { d } = await searchParams
   const { hasPublicEnv } = getSupabaseEnv()
   if (!hasPublicEnv) {
     return <p className="text-sm text-[var(--muted)]">配置未完成。</p>
@@ -60,7 +61,7 @@ export default async function IntelPage() {
         <p className="kicker mb-2" style={{ color: 'var(--accent)' }}>每日信号</p>
         <h1 className="font-serif text-3xl font-medium tracking-tight">情报</h1>
       </div>
-      <IntelCalendar year={year} month={month} days={days} />
+      <IntelCalendar year={year} month={month} days={days} initialDate={d} />
     </div>
   )
 }
