@@ -8,6 +8,7 @@ const NAV_ITEMS: ReadonlyArray<{ href: string; label: string }> = [
   { href: '/analysis', label: '深度' },
   { href: '/cases', label: '案例' },
   { href: '/interview', label: '访谈' },
+  { href: '/intel', label: '情报' },
   { href: '/series', label: '专题' },
 ]
 
