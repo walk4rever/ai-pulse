@@ -60,12 +60,11 @@ export function IntelCalendar({ year, month, days, initialDate }: Props) {
   return (
     <div>
       {/* Top row: calendar + meta */}
-      <div className="flex items-start gap-8 mb-8">
+      <div className="flex flex-col sm:flex-row items-start gap-6 mb-8">
 
         {/* Calendar */}
         <div
-          className="shrink-0 border border-[var(--border-subtle)] rounded-2xl p-3 bg-white"
-          style={{ width: 280 }}
+          className="w-full sm:w-[280px] sm:shrink-0 border border-[var(--border-subtle)] rounded-2xl p-3 bg-white"
         >
           <div className="flex items-center justify-between mb-2 px-1">
             <span className="font-serif text-sm font-medium">{monthLabel}</span>
