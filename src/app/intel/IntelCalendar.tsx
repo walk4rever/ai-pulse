@@ -130,6 +130,17 @@ export function IntelCalendar({ year, month, days, initialDate }: Props) {
         )}
       </div>
 
+      {/* Infographic */}
+      {current?.image_url && (
+        <div className="mb-6">
+          <img
+            src={current.image_url}
+            alt={`${current.date} 情报图`}
+            className="w-full rounded-2xl border border-[var(--border-subtle)]"
+          />
+        </div>
+      )}
+
       {/* Signal cards */}
       {current && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
