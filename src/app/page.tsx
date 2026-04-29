@@ -3,6 +3,8 @@ import { getSupabaseEnv } from '@/lib/supabase/env'
 import { Post } from '@/types'
 import { getTypeLabel } from '@/lib/content'
 import Link from 'next/link'
+import { IntelHeroPreview } from '@/components/IntelHeroPreview'
+import type { IntelDay } from '@/app/intel/IntelCalendar'
 
 export const revalidate = 60
 
@@ -115,7 +117,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const supabase = await createClient()
   const serviceSupabase = await createServiceClient()
 
-  const [{ data: posts }, { data: seriesData }, { data: seriesRelations }] = await Promise.all([
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+  const monthStart = new Date(year, month - 1, 1).toISOString()
+  const monthEnd = new Date(year, month, 1).toISOString()
+
+  const [{ data: posts }, { data: seriesData }, { data: seriesRelations }, { data: intelData }] = await Promise.all([
     supabase
       .from('ai_pulse_posts')
       .select('id, slug, title, excerpt, is_premium, published_at, content_type, featured, series_slug')
@@ -128,10 +136,34 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     serviceSupabase
       .from('ai_pulse_series_posts')
       .select('series_id'),
+    supabase
+      .from('ai_pulse_posts')
+      .select('slug, excerpt, content, published_at')
+      .eq('status', 'published')
+      .eq('content_type', 'intel')
+      .gte('published_at', monthStart)
+      .lt('published_at', monthEnd)
+      .order('published_at', { ascending: false }),
   ])
 
   const allPosts = (posts ?? []) as HomePost[]
   const { featured, recent } = buildSections(allPosts)
+
+  const intelDays: IntelDay[] = (intelData ?? []).map((row) => {
+    const date = row.published_at ? row.published_at.slice(0, 10) : row.slug.replace('intel-', '')
+    try {
+      const parsed = JSON.parse(row.content ?? '{}')
+      return {
+        date,
+        overview: row.excerpt ?? '',
+        keywords: Array.isArray(parsed.keywords) ? parsed.keywords : [],
+        signals: Array.isArray(parsed.signals) ? parsed.signals : [],
+        image_url: parsed.image_url ?? null,
+      }
+    } catch {
+      return { date, overview: row.excerpt ?? '', keywords: [], signals: [], image_url: null }
+    }
+  })
 
   const countMap = new Map<string, number>()
   for (const row of (seriesRelations ?? [])) {
@@ -157,14 +189,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <p className="mt-8 text-lg md:text-xl text-[var(--muted)] leading-relaxed max-w-2xl">
           AI 降低了执行的门槛，放大了判断力与审美的差距。我们不追所有新闻，只解释真正值得跟进的变化 —— 给 AI 工程师的每周精选、深度分析与长期判断。
         </p>
-        <div className="mt-10">
-          <Link
-            href="/subscribe"
-            className="inline-flex items-center bg-[var(--accent)] text-[#faf9f5] px-6 py-3 rounded-xl text-base font-medium hover:bg-[var(--accent-coral)] transition-colors shadow-[0_0_0_1px_var(--accent),0_4px_24px_rgba(201,100,66,0.2)]"
-          >
-            免费订阅 →
-          </Link>
-        </div>
+        <IntelHeroPreview year={year} month={month} days={intelDays} />
       </section>
 
       {/* Featured */}
