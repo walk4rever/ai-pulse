@@ -63,6 +63,7 @@ body {
   background: var(--surface);
   color: var(--foreground);
   font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 1.0625rem;
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -154,7 +155,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .prose h2 { font-size: 1.5rem; letter-spacing: -0.01em; }
 .prose h3 { font-size: 1.25rem; }
-.prose h4 { font-size: 1.05rem; }
+.prose h4 { font-size: 1.125rem; }
 
 .prose h2 a,
 .prose h3 a,

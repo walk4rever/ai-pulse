@@ -65,7 +65,7 @@ export default function MyPostsPage() {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-3xl mx-auto">
       <div className="flex items-baseline justify-between mb-10">
         <div>
           <p className="kicker mb-1">我的文章</p>

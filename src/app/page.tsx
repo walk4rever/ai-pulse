@@ -182,12 +182,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
       {/* Hero */}
       <section className="mb-20 md:mb-28">
-        <p className="kicker mb-6" style={{ color: 'var(--accent)' }}>AI 早知道 · 每周</p>
-        <h1 className="font-serif text-[2.5rem] md:text-6xl font-medium leading-[1.1] tracking-tight text-[var(--foreground)]">
-          帮你读懂 AI，<br />而不只是跟上 AI。
+        <p className="kicker mb-6" style={{ color: 'var(--accent)' }}>面向 AI 工程师</p>
+        <h1 className="font-serif text-[2.5rem] md:text-6xl xl:text-7xl font-medium leading-[1.1] tracking-tight text-[var(--foreground)]">
+          不是跟上 AI，<br />是读懂 AI。
         </h1>
-        <p className="mt-8 text-lg md:text-xl text-[var(--muted)] leading-relaxed max-w-2xl">
-          AI 降低了执行的门槛，放大了判断力与审美的差距。我们不追所有新闻，只解释真正值得跟进的变化 —— 给 AI 工程师的每周精选、深度分析与长期判断。
+        <p className="mt-8 text-lg md:text-xl text-[var(--muted)] leading-relaxed">
+          围绕 AI 的脉动，精选真正值得跟进的变化与判断 —— 情报、深度、访谈、专题。
         </p>
         <IntelHeroPreview year={year} month={month} days={intelDays} />
       </section>

@@ -15,7 +15,7 @@ export function ListPageHeader({ kicker, title, description, count }: ListPageHe
         {title}
       </h1>
       {description && (
-        <p className="mt-6 text-base md:text-lg text-[var(--muted)] leading-relaxed max-w-xl">
+        <p className="mt-6 text-base md:text-lg text-[var(--muted)] leading-relaxed">
           {description}
         </p>
       )}

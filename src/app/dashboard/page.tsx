@@ -189,7 +189,7 @@ export default function DashboardPage() {
   const activeAgents = agents.filter((a) => a.status === 'active')
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-2xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-12">
         <div>

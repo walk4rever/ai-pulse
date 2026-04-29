@@ -15,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="zh-CN">
       <body className="antialiased">
-        <div className="mx-auto max-w-3xl bg-[var(--background)]">
+        <div className="mx-auto max-w-5xl bg-[var(--background)]">
         <header>
           <div className="px-5 md:px-6 py-6 md:py-12">
             {/* Top row: logo + actions (mobile: flex, desktop: grid cols 3 with centered nav) */}

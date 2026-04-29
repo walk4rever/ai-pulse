@@ -72,7 +72,7 @@ export default async function PostPage({ params }: Props) {
   const authorLabel = formatAuthorLabel(post.author_slug)
 
   return (
-    <article className="max-w-2xl">
+    <article className="max-w-2xl mx-auto">
       <div className="mb-12">
         <BackButton />
       </div>

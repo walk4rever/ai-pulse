@@ -60,6 +60,9 @@ export default async function IntelPage({ searchParams }: { searchParams: Promis
       <div className="mb-8">
         <p className="kicker mb-2" style={{ color: 'var(--accent)' }}>Intel</p>
         <h1 className="font-serif text-3xl font-medium tracking-tight">情报</h1>
+        <p className="mt-4 text-base md:text-lg text-[var(--muted)] leading-relaxed">
+          每日 AI 信号精选 —— 追踪真正值得关注的变化，来自 HN、GitHub 与 arXiv。
+        </p>
       </div>
       <IntelCalendar year={year} month={month} days={days} initialDate={d} />
     </div>
