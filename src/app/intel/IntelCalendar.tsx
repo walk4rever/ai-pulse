@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 export interface Signal {
   n: string
@@ -45,7 +46,15 @@ function pad(n: number) {
   return String(n).padStart(2, '0')
 }
 
+function shiftMonth(year: number, month: number, delta: number) {
+  const d = new Date(year, month - 1 + delta, 1)
+  return { year: d.getFullYear(), month: d.getMonth() + 1 }
+}
+
 export function IntelCalendar({ year, month, days, initialDate }: Props) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const byDate = new Map(days.map((d) => [d.date, d]))
   const latest = days[0]?.date ?? null
   const [selected, setSelected] = useState<string | null>(
@@ -56,6 +65,15 @@ export function IntelCalendar({ year, month, days, initialDate }: Props) {
   const total = daysInMonth(year, month)
   const offset = startOffset(year, month)
   const monthLabel = `${year} 年 ${month} 月`
+  const prev = shiftMonth(year, month, -1)
+  const next = shiftMonth(year, month, 1)
+
+  function goToMonth(y: number, m: number) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('m', `${y}-${pad(m)}`)
+    params.delete('d')
+    router.push(`${pathname}?${params.toString()}`)
+  }
 
   return (
     <div>
@@ -67,7 +85,23 @@ export function IntelCalendar({ year, month, days, initialDate }: Props) {
           className="w-full sm:w-[280px] sm:shrink-0 border border-[var(--border-subtle)] rounded-2xl p-3 bg-white"
         >
           <div className="flex items-center justify-between mb-2 px-1">
+            <button
+              type="button"
+              onClick={() => goToMonth(prev.year, prev.month)}
+              className="text-[0.8rem] text-[var(--muted)] hover:text-[var(--foreground)] px-1"
+              aria-label="上个月"
+            >
+              ‹
+            </button>
             <span className="font-serif text-sm font-medium">{monthLabel}</span>
+            <button
+              type="button"
+              onClick={() => goToMonth(next.year, next.month)}
+              className="text-[0.8rem] text-[var(--muted)] hover:text-[var(--foreground)] px-1"
+              aria-label="下个月"
+            >
+              ›
+            </button>
           </div>
           <div className="grid grid-cols-7 gap-px">
             {DOW.map((d) => (

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { IntelDay } from '@/app/intel/IntelCalendar'
 
 interface Props {
@@ -24,7 +25,15 @@ function pad(n: number) {
   return String(n).padStart(2, '0')
 }
 
+function shiftMonth(year: number, month: number, delta: number) {
+  const d = new Date(year, month - 1 + delta, 1)
+  return { year: d.getFullYear(), month: d.getMonth() + 1 }
+}
+
 export function IntelHeroPreview({ year, month, days }: Props) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const byDate = new Map(days.map((d) => [d.date, d]))
   const latest = days[0]?.date ?? null
   const [selected, setSelected] = useState<string | null>(latest)
@@ -32,13 +41,39 @@ export function IntelHeroPreview({ year, month, days }: Props) {
   const current = selected ? (byDate.get(selected) ?? null) : null
   const total = daysInMonth(year, month)
   const offset = startOffset(year, month)
+  const prev = shiftMonth(year, month, -1)
+  const next = shiftMonth(year, month, 1)
+
+  function goToMonth(y: number, m: number) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('im', `${y}-${pad(m)}`)
+    router.push(`${pathname}?${params.toString()}`)
+  }
 
   return (
     <div className="mt-10 flex flex-col sm:flex-row items-start gap-6">
       {/* Mini calendar */}
       <div className="w-full sm:w-[240px] sm:shrink-0 border border-[var(--border-subtle)] rounded-2xl p-3 bg-[var(--background)]">
         <div className="flex items-center justify-between mb-2 px-1">
-          <span className="text-xs font-medium text-[var(--muted)]">{year} 年 {month} 月</span>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => goToMonth(prev.year, prev.month)}
+              className="text-[0.7rem] text-[var(--muted)] hover:text-[var(--foreground)] px-1"
+              aria-label="上个月"
+            >
+              ‹
+            </button>
+            <span className="text-xs font-medium text-[var(--muted)]">{year} 年 {month} 月</span>
+            <button
+              type="button"
+              onClick={() => goToMonth(next.year, next.month)}
+              className="text-[0.7rem] text-[var(--muted)] hover:text-[var(--foreground)] px-1"
+              aria-label="下个月"
+            >
+              ›
+            </button>
+          </div>
           <Link href="/intel" className="text-[0.65rem] text-[var(--accent)] hover:underline">
             全部情报 →
           </Link>

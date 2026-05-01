@@ -9,7 +9,7 @@ import type { IntelDay } from '@/app/intel/IntelCalendar'
 export const revalidate = 60
 
 interface HomePageProps {
-  searchParams: Promise<{ confirmed?: string }>
+  searchParams: Promise<{ confirmed?: string; im?: string }>
 }
 
 type HomePost = Pick<
@@ -28,6 +28,16 @@ function formatDate(value: string | null | undefined) {
   if (!value) return ''
   const d = new Date(value)
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
+}
+
+function parseYearMonth(value?: string): { year: number; month: number } | null {
+  if (!value) return null
+  const m = /^(\d{4})-(\d{2})$/.exec(value)
+  if (!m) return null
+  const year = Number(m[1])
+  const month = Number(m[2])
+  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) return null
+  return { year, month }
 }
 
 
@@ -102,7 +112,7 @@ function SeriesCard({ item }: { item: SeriesItem }) {
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
-  const { confirmed } = await searchParams
+  const { confirmed, im } = await searchParams
   const { hasPublicEnv } = getSupabaseEnv()
 
   if (!hasPublicEnv) {
@@ -118,8 +128,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const serviceSupabase = await createServiceClient()
 
   const now = new Date()
-  const year = now.getFullYear()
-  const month = now.getMonth() + 1
+  const selectedMonth = parseYearMonth(im) ?? { year: now.getFullYear(), month: now.getMonth() + 1 }
+  const year = selectedMonth.year
+  const month = selectedMonth.month
   const monthStart = new Date(year, month - 1, 1).toISOString()
   const monthEnd = new Date(year, month, 1).toISOString()
 
@@ -189,7 +200,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <p className="mt-8 text-lg md:text-xl text-[var(--muted)] leading-relaxed">
           围绕 AI 的脉动，精选真正值得跟进的变化与判断 —— 情报、深度、访谈、专题。
         </p>
-        <IntelHeroPreview year={year} month={month} days={intelDays} />
+        <IntelHeroPreview key={`${year}-${month}`} year={year} month={month} days={intelDays} />
       </section>
 
       {/* Featured */}
